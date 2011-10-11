@@ -1,0 +1,15 @@
+#userList.shadow.main
+   div
+     |currently active:
+
+#pagesList.shadow.userPages.main
+  div(style="padding:5px;font-size:20px;")
+    a()
+      |pages:
+  #pagesList.pageList
+
+#contributePages.shadow.userPages
+  div(style="padding:5px;font-size:20px;")
+    a()
+      |notifications:
+  #cList.pageList

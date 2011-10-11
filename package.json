@@ -1,0 +1,16 @@
+{
+    "name": "application-name"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      "express": "2.4.6"
+    , "stylus": ">= 0.0.1"
+    , "jade": ">= 0.0.1"
+    , "mongodb": ">= 0.9.6-16"
+	, "now": ">= 0.7.5"
+	, "mongoose" : ">= 2.2.4"
+	, "mongoose-auth" : ">=0.0.11"
+	, "mongoose-types" : ">=1.0.3"
+	, "connect" : ">=1.7.1"
+  }
+}

@@ -1,0 +1,9 @@
+press me
+div 
+	- each article in articles
+		div=article.test
+form( method="post")
+	div
+		//input(type="text", name="test", id="test")
+		//input(type="submit", value="button", onclick='submit')
+		a(href="javascript:main.sendRequest()")='ajax request'
