@@ -59,11 +59,10 @@ sudo node app.js
 oh yeah, you also need to make sure mongodb is running and call some function to populate the database:
 
 first go to gifpumper.net running the browser. go to the chrome debugger and in the console, enter:
-ajax.ajaxFunction('refresh');
+ajax.ajaxFunction('refresh')
+this will fill out the pages
 after that you might have to restart the server again
-you can then you can register as a new user,
-after that, press SHIFT-M and create a page with the name 'profile'
-this is needed of the profiles to display correctly
+you can then you can register as a new user
 
 after that you should be able to edit pages, profile etc
 thats it!

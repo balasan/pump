@@ -474,6 +474,9 @@ function jsonToDom(pageDataIn){
 	
 	pageData = pageDataIn;
 
+	document.body.style.backgroundColor = '';
+	document.body.style.backgroundImage = '';
+
 	document.getElementById("mainDiv").innerHTML="";
 	document.getElementById("mainDiv").style.webkitTransform ='rotateX(0deg)' + ' ' + 'rotateY(0deg)';
 

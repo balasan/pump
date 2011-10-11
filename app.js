@@ -398,13 +398,19 @@ everyone.connected(function(){
 
 everyone.now.updateAll = function(pageData,callback){
 	
-	pageModel.update({pageName:pageData.pageName}, pageData,{upsert:true,multi:false}, function(error) {
-      		if(error) console.log(error)
-      		else
-				pageModel.findOne({pageName:pageData.pageName}, function(error, result){
-					callback(result);
-			});
-    });
+	for(var page in pageData){
+	
+		
+		pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
+	      		if(error) console.log(error)
+	/*
+	      		else
+					pageModel.findOne({pageName:pageData.pageName}, function(error, result){
+						callback(result);
+				});
+	*/
+	    });
+    }
 }
 
 nowjs.on('connect', function () {

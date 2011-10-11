@@ -20,11 +20,27 @@ function ajax(){
 
 	this.someFunction = function(json){        
 	
-		pageData=JSON.parse(json);
+		//pageData=JSON.parse(json);
+		
+		pageData=json;
 		//oldthis.pageData.backgroundImageType = 0;
 		//jsonToDom(pageData);
+		
+//		var imgArray=[]
+		
+/*
+		for(var page in pageData){
+		
+			for(var img in pageData[page].pageData.images){
+			
+				imgArray.push(pageData[page].pageData.images[img])
+			}
+				
+			pageData[page].pageData.images=imgArray;
+		}
+*/
 
-		now.updateAll(pageData,jsonToDom);	
+		now.updateAll(pageData,null);	
 	}
 	
 	
@@ -85,7 +101,7 @@ function ajax(){
 						
 						var script = document.createElement("script");
 						
-						script.src = "http://momentsound.com/gifpumper_beta/updatedb.php?name=nico&reqType=refresh&pageName="+oldthis.pageName+"&callback=ajax.someFunction";
+						script.src = "http://momentsound.com/gifpumper_beta/updatedb.php?name=nico&reqType=refresh&pageName="+"all"+"&callback=ajax.someFunction";
 						
 						document.body.appendChild(script);
 
