@@ -117,7 +117,7 @@ var userSchema = new Schema({
 	, favoritePages : []
 	, favoriteUsers : []
 	, likes: []
-	, userImage: String
+	, userImage: {type:String, default:""}
 	, backgroundImage : String
 	, background : String
 	, info : String
@@ -454,12 +454,15 @@ everyone.now.loadAll = function(pageName,userProfile,callback){
 				if(!err && oldthis.user.name !='noob'){
 					//console.log(result);
 					var userObj = {}
+					if(result.userImage==undefined)
+						result.userImage="";
 					userObj[oldthis.user.name]=result.userImage;
 					//console.log(userObj);
 					pagesGroup[groupName].pageUsers[oldthis.user.clientId]=userObj;
 					pagesGroup[groupName].now.updatePageUser('add',[userObj]);
 				
 				}
+				else console.log(err)
 				if(oldthis.user.name=='noob'){
 					var userObj = {}
 					userObj={'noob':null};
