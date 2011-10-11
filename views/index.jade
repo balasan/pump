@@ -265,7 +265,7 @@ input#lastId(type='hidden', name='lastId')
     br
     //div(style="display:inline; width:100%")
     input.button(type='submit',class="loginClass", name='login', value='login',style='width:78px;')
-    input.button(type='submit',class="regClass", name='register', value='register', style="width:78px; display:none;")
+    input.button(type='submit',class="regClass", name='register', value='register', style="width:78px; display:none;", onclick="javascript:registerFunc(); return false;")
     input.button(type='submit', id="logOut", name='logout', value='logout', style='width:78px;float:right;display:none')
       //br
       //br

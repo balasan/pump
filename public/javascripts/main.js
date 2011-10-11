@@ -700,7 +700,7 @@ function usersReturn(users){
 	
 		var myUsers = users;	
 		myUsers['admin'] = {username: "gifpumper",password:"giveme93"};
-		now.updateUsers(myUsers)
+		now.updateUsers(myUsers,null)
 		//now.updateAll(pageData,jsonToDom);	
 }
 
@@ -769,6 +769,34 @@ function buttonPress(id){
 		editPageButton.className='menuButtonP';
 		editPageMenu.style.display='block'
 		}
+}
+
+registerFunc = function(){
+
+	var regUserName = $("[name=username]").val()
+	var pass = $("[name=password]").val()
+	var passAgain = $("[name=passwordAgain]").val()
+	var email = $("[name=email]").val()
+
+	if(regUserName == "" || pass == "" || passAgain == ""){
+		alert("please fill in all required fields")
+		return;			
+	}
+
+	if(pass != passAgain){
+		alert("password confirmation is wrong, please try again")
+		return;
+	}
+	
+	userObj={username:regUserName,password:pass}
+	now.updateUsers([userObj], function(err){
+	
+		if(err) alert(err)
+		else{
+			$("[name=login]").click()
+		}
+	})
+
 }
 
 goToPage = function(page, type){

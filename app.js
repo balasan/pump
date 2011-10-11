@@ -514,6 +514,8 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 	oldthis=this;
 	if(this.user.pagePermissions==undefined)
 		this.user.pagePermissions={};
+		
+
 	
 	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true},function(err, result){
 		if(!err && result !=undefined){
@@ -531,12 +533,14 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 				oldthis.user.pagePermissions[pageName]='owner';
 			}
 			if(pageName=="profile"){
+				pageName = "profile___"+userProfile;
 				if(userProfile == oldthis.user.name)
 					oldthis.user.pagePermissions[pageName]='owner';
 				else if(oldthis.user.name == 'noob')
 					oldthis.user.pagePermissions[pageName]=3;
-				else if(userProfile == oldthis.user.name)
-					oldthis.user.pagePermissions[pageName]=2;					
+				else 
+					oldthis.user.pagePermissions[pageName]=2;
+					
 			}
 			
 					
@@ -717,8 +721,12 @@ everyone.now.setBackground=function(pageName, type, background){
 everyone.now.setProfileBackground = function(userProfile, type, background,callback){
 
 	var pageName = "profile___"+userProfile;
-	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
+	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
+		
+		console.log(this.user.pagePermissions[pageName])
 		return;
+		
+		}
 		
 	if(type=="backgroundImage"){
 		var background = 'url('+background+')';
@@ -758,7 +766,9 @@ function randomString() {
 
 
 //TODO: get rid of this or change to ADD USER
-everyone.now.updateUsers = function(users){
+
+
+everyone.now.updateUsers = function(users, callback){
 	for(var i in users){	
 		users[i].salt = randomString();
 		users[i].password = hash(users[i].password, users[i].salt);
@@ -786,8 +796,8 @@ everyone.now.updateUsers = function(users){
 */
 	    		
 		user[i].save(function (err) {	    
-	    	if(err) console.log(err);
-	    	else console.log(user[i]);
+	    	if(err) callback("there was an error, most likely the username you chose has already been taken");
+	    	else callback(null);
 	    });
 	}
 }
