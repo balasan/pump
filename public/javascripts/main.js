@@ -532,12 +532,17 @@ function getDocHeight() {
 function recenter(){
 
 
+	var sTop = document.body.scrollTop;
+	var sLeft = document.body.scrollLeft;
+	
 /*
 	var chat = document.getElementById("online");
-	chat.style.top = 10 + document.body.scrollTop+"px";
-	chat.style.right = 10 - document.body.scrollLeft+"px";
+	chat.style.top = 10 + sTop+"px";
+	chat.style.right = 10 - sLeft+"px";
 */
 
+
+/*
 	$('#online').css('right',5 - document.body.scrollLeft+"px");
 	$('#online').css('top',5 + document.body.scrollTop+"px");
 
@@ -549,6 +554,7 @@ function recenter(){
     $('#chatButton').css('right', 5 - document.body.scrollLeft + 'px');
     $('.uiOpen').css('top', 70 + document.body.scrollTop + 'px');
     $('.uiOpen').css('left', 110 + document.body.scrollLeft + 'px');
+*/
     
 /*
 
@@ -573,8 +579,8 @@ function recenter(){
 	$('.uiOpen').animate({
 	    top: 70 + document.body.scrollTop + 'px',
 	    left: 110 + document.body.scrollLeft + 'px',
-	  }, 40,'linear',null);	
-*/ 
+	  }, 40,'linear',null);	 
+*/
 
 	  	  
 
@@ -585,12 +591,22 @@ function recenter(){
 	var transformY = yCenter+"px";
 	
 	var div3d = document.getElementById("div3d")
-	//div3d.style.webkitPerspectiveOrigin = transformX + transformY+"0";
-	div3d.style.webkitPerspectiveOriginX=transformX;
-	div3d.style.webkitPerspectiveOriginY=transformY;
-		
 	var mainDiv = document.getElementById("mainDiv")
 
+
+/*
+	div3d.style.webkitPerspectiveOrigin = transformX + transformY+"0";
+	div3d.style.webkitTransformOrigin = transformX + transformY+"0";
+	mainDiv.style.webkitPerspectiveOrigin = transformX + transformY+"0";
+	mainDiv.style.webkitTransformOrigin = transformX + transformY+"0";
+*/
+	
+	//TODO: CHROME BUG?
+	if(is_chrome){
+		div3d.style.webkitPerspectiveOriginX=transformX;
+		div3d.style.webkitPerspectiveOriginY=transformY;
+	}
+	
 	div3d.style.webkitTransformOriginX = transformX;
 	div3d.style.webkitTransformOriginY = transformY;
 	
@@ -603,13 +619,15 @@ function recenter(){
 	
 	//console.log(xCenter +" " + yCenter);
 	
+/*
 	var elements = document.querySelectorAll('.fixed');
 					for(var i=0;i<elements.length;i++){
 					
 					var scroll = document.body.scrollTop;
 					elements[i].style.webkitTransform = 'translateY(' + scroll +'px)';
 					console.log(scroll);
-					}
+				}
+*/
 
 
 }
@@ -647,8 +665,73 @@ window.onload = function() {
 		$(this).css("background",'none');
 	})	
 	
+		$().ready(function() {
+		
+		  //$('textarea.tinymce').aloha();
+
+		setupTinymce();
+		
+	});
+	
+	
+	
 };
 
+
+setupTinymce = function(){
+
+
+		$('textarea.tinymce').tinymce({
+			// Location of TinyMCE script
+			script_url : '/javascripts/tinymce/jscripts/tiny_mce/tiny_mce.js',
+
+			// General options
+			theme : "advanced",
+			skin : "cirkuit",
+        	//skin_variant : "silver",
+			
+			//inlinepopups
+			plugins : "autolink,lists,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist",
+
+			// Theme options
+			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,blockquote,|,link,unlink,image,cleanup,code,",
+			
+			
+			//styleselect,formatselect,fontselect,fontsizeselect",
+			
+			theme_advanced_buttons2 : "fontsizeselect,styleselect,|,forecolor,backcolor,iespell,media,advhr,pagebreak",
+			theme_advanced_buttons3: "",
+			theme_advanced_toolbar_location : "top",
+			theme_advanced_toolbar_align : "left",
+			theme_advanced_statusbar_location : "bottom",
+			theme_advanced_resizing : true,
+			// Example content CSS (should be your site CSS)
+			content_css : "/stylesheets/gifpumper.css",
+			theme_advanced_font_sizes : "8px,10px,12px,14px,18px,24px,36px,50px,100px",
+    		font_size_style_values : "medium,medium,medium,medium,medium,medium,medium,medium,medium",
+
+			// Drop lists for link/image/media/template dialogs
+/*
+			template_external_list_url : "lists/template_list.js",
+			external_link_list_url : "lists/link_list.js",
+			external_image_list_url : "lists/image_list.js",
+			media_external_list_url : "lists/media_list.js",
+*/
+
+			// Replace values for the template plugin
+/*
+			template_replace_values : {
+				username : "Some User",
+				staffid : "991234"
+			}
+*/
+		});
+		
+/* 		$('textarea.tinymce').css('position','fixed'); */
+
+
+
+}
 
 
 
@@ -677,8 +760,9 @@ function animate(){
 
 }
 
+var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+
 if(!Modernizr.csstransforms3d){
-	var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
 	if (is_chrome){
 		alert("OH BOY, EITHER YOUR VERSION OF CHROME NEEDS AN UPDATE OR YOU DON'T HAVE A VERY GOOD GRAPHICS CARD : (");
@@ -821,5 +905,20 @@ goToPage = function(page, type){
 	now.leavePage(userProfile,loadData)
 	
 	console.log('done');
+
+}
+
+
+addMenu = function(addType,secondAddType){
+
+		$("#imageContainer").hide();
+		$("#textContainer").hide();
+		$("#mediaContainer").hide();
+		$("#divContainer").hide();	
+
+		var container = "#"+addType+"Container"
+
+		$(container).show();
+
 
 }

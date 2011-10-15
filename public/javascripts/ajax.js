@@ -39,6 +39,18 @@ function ajax(){
 			pageData[page].pageData.images=imgArray;
 		}
 */
+		var textObj={}
+		for(var page in pageData){
+		
+			text = pageData[page].pageData.text;	
+			if(text != undefined){
+				for(var i=0; i<text.length; i++){
+				
+					textObj = {text:text[i],user:"anon"}
+				}	
+				pageData[page].pageData.text = textObj;
+			}
+		}
 
 		now.updateAll(pageData,null);	
 	}

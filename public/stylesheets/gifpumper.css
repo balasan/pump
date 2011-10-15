@@ -1,7 +1,7 @@
 
 html{
-width:100%;
-height:100%;
+/* width:100%; */
+/* height:100%; */
 z-index:-1000;
 }
 
@@ -9,12 +9,12 @@ body {
 	font-family: arial, helvetica, sans-serif;
 	font-size: 13px;
 	z-index:-1000;
-	-webkit-transform: translateZ(-1000px);
+/* 	-webkit-transform: translateZ(-1000px); */
 	background-attachment:fixed;
 	/* 	position: fixed; */
 	/* 	cursor: pointer; */
 	/* 	cursor: url(http://thedigit.biz/images/hand.png), url(http://thedigit.biz/images/hand.png), auto; */
-	height:100%; 
+/* 	height:100%;  */
 /* 	height:2000px: */
 /* 	width:2000px: */
 	margin:0px;
@@ -30,12 +30,14 @@ body {
 	perspective: 600px;
 	-webkit-transform-style: preserve-3d;
 	transform-style: preserve-3d;
-	-webkit-perspective-origin: 50% 50%; 
+	position:absolute;
+/* 	-webkit-perspective-origin: 50% 50%;  */
 
 }
 
 #mainDiv {
 
+	position:absolute;
 	width:110%;
  	height:100%;
 	-webkit-transform-style: preserve-3d;
@@ -181,9 +183,7 @@ body {
 */
 }
 
-moveable {
 
-}
 
 #shortMenu{
 -webkit-transform: translateZ(1000px);
@@ -524,6 +524,18 @@ position:fixed;
 .shortCut{
 
 	float:right;
+}
+
+input[type="text"]{
+
+	font-size: 13px;
+
+}
+
+input[type="password"]{
+
+	font-size: 13px;
+
 }
 
 .x {

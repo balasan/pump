@@ -97,7 +97,7 @@ var pageSchema = new Schema({
   , backgroundImageType : Number
   ,	background 	: String
   ,	backgroundImage: String
-  , text : []
+  , text : [textSchema]
   , contributors : []
   , parent : String
   , children : []
@@ -130,6 +130,8 @@ var textSchema = new Schema({
 	  user : String
 	, text : String
 	, time : { type: Date, default: Date.now }
+	, at : []
+	, hash : []
 });
 
 

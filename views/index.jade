@@ -18,17 +18,50 @@
 
 ////add/////
 
-#addMenu.uiClosed(name='addMenu', style='position: fixed; left:300px; top:200px; width:160px;')
-  | image url:
-  br
-  input#gifUrlA(style='width:160px;', type='text', name='gifUrlA', placeholder='example: http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
-  br
-  | repetitions:
-  br
-  input#addNumber(style='width:160px;', type='text', name='addNumber', value='1', maxlength='1/',onfocus="value=''")
-  br
-  br
-  input#add.button(style='width:160px;', type='button', name='addGif', value='add', onclick="addNewImg()")
+#addMenu.uiClosed(name='addMenu', style='position: fixed; left:300px; top:200px; width:auto;padding:5px')
+  div(style="font-size:13px;padding:5px")
+    a(href="javascript:addMenu(\'image\');")
+      |Image | 
+    a(href="javascript:addMenu(\'text\');")
+      |Text | 
+    a(href="javascript:addMenu(\'media\');")
+      |Media | 
+    a(href="javascript:addMenu(\'div\');")
+      |Div
+  #imageContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:block")
+    | image url:
+    br
+    input#gifUrlA(style='width:160px;', type='text', name='gifUrlA', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    | repetitions:
+    br
+    input#addNumber(style='width:160px;', type='text', name='addNumber', value='1', maxlength='1/',onfocus="value=''")
+    br
+    br
+  
+  #textContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+    textarea.tinymce
+  
+  #mediaContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+    | 
+    br
+    textarea(style='width:160px;height:100px', type='text', name='embed', id="embed", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+  
+  #divContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+    | background image url:
+    br
+    input#divBgUrl(style='width:160px;', type='text', name='divBgUrl', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    | repetitions:
+    br
+    input#addNumber(style='width:160px;', type='text', name='addNumber', value='1', maxlength='1/',onfocus="value=''")
+    br
+    br  
+  
+  div(style="padding:0px")
+    input#add.button(style='width:175px;', type='button', name='addGif', value='add', onclick="addNewImg()")
   .x(style='position:absolute; right:0; top:0; border: 1px white;')
     a(href='javascript:openMenu(\'addMenu\');') x
 // 
@@ -409,6 +442,8 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
     a()
       |users:
   #cList.pageList
+ 
+
  
 ///////////////
 ////////MAIN
