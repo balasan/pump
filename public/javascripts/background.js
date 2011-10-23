@@ -40,7 +40,7 @@ var globalBG;
 function changeBackground(){
 
 
-var bgcolorlist=new Array("rgba(0,72,234,1)", "rgba(96,0,234,1)", "rgba(114,34,0,1)", "rgba(102,129,135,1)", "rgba(102,204,255,1)", "rgba(252,255,0,1)", "rgba(194,127,255,1)", "rgba(0,95,21,1)", "rgba(255,0,170,1)", "rgba(249,6,6,1)", "rgba(215,215,215,1)","rgba(215,215,215,1)", "rgba(173,216,230,1)","rgba(40,40,40,1)","rgba(40,40,40,1)")
+var bgcolorlist=new Array("rgba(0,72,234,1)", "rgba(96,0,234,1)", "rgba(114,34,0,1)", "rgba(102,129,135,1)", "rgba(102,204,255,1)", "rgba(252,255,0,1)", "rgba(194,127,255,1)", "rgba(0,95,21,1)", "rgba(255,0,170,1)", "rgba(249,6,6,1)", "rgba(173,216,230,1)","rgba(40,40,40,1)","rgba(40,40,40,1)")
 	var r = Math.random()
 	
 	//document.getElementById("shortMenu").style.color=bgcolorlist[Math.floor(r*bgcolorlist.length)];
@@ -59,7 +59,22 @@ var bgcolorlist=new Array("rgba(0,72,234,1)", "rgba(96,0,234,1)", "rgba(114,34,0
 		$("a").animate({color:color}, 300, function(){
 			okToAnimate=true;
 		});
-		
+
+/*
+	if(okToAnimate){
+		okToAnimate = false;
+		$(".menuButton").animate({color:color}, 300, function(){
+			okToAnimate=true;
+		});
+*/
+			
+/*
+	if($('.menubutton').data("okshadow")){	
+		$('.menuButton').data("okshadow").setoption({
+  		"color": color,
+  		"fuzzMin": 10,})
+		}
+*/
 /*
 		$("a").animate({backgroundColor:bgcolor}, 500, function(){
 			//okToAnimate=true;

@@ -85,6 +85,28 @@ var imageSchema = new Schema({
 	angler : Number,
 	z : Number,
 	url : String,
+	backgroundColor : String,
+	backgroundImage : String,
+	backgroundType : String,	
+	content : String,
+	contentType : String,
+	opacity : Number,
+	user : String
+});
+
+var divSchema = new Schema({
+	width : String,
+	height : String,
+	top : String,
+	left : String,
+	anglex : Number,
+	angley : Number,
+	angler : Number,
+	z : Number,
+	backgroundColor : String,
+	backgroundImage : String,
+	backgroundType : String,	
+	content : String,
 	opacity : Number,
 	user : String
 });
@@ -97,14 +119,13 @@ var pageSchema = new Schema({
   , backgroundImageType : Number
   ,	background 	: String
   ,	backgroundImage: String
-  , text : [textSchema]
+  , text 		: [textSchema]
   , contributors : []
   , parent : String
   , children : []
   , versions : []
   , likes : []
   , profilePage : { type: Boolean, default:false}
-   
 });
 
 var userSchema = new Schema({
@@ -145,7 +166,8 @@ function hash(msg, key) {
 var pageModel = mongoose.model('pageModel', pageSchema);
 var imageModel = mongoose.model('imageModel', imageSchema);
 var userModel = mongoose.model('userModel', userSchema);
-var textSchema = mongoose.model('textModel', textSchema)
+var textSchema = mongoose.model('textModel', textSchema);
+//var divSchema = mongoose.model('divModel', divSchema);
 
 
 ///////
@@ -609,6 +631,51 @@ everyone.now.updateElement = function(pageName, _id, property, value, all, callb
 }
 
 
+everyone.now.editElement = function(pageName, _id, element, all, callback){
+    
+   	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>1)
+		return;
+    oldthis = this;
+
+	var index = "images."+_id;
+	//var index = {};                
+	//index[n] = value;
+	console.log(index);
+	pageModel.update({"pageName":pageName},{index:element},{upsert:true,multi:false}, function(error){
+	//pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
+		
+/*
+		if(all){
+			result.images.forEach(function(image){
+				image[property]=value;
+				});
+			}
+		else {
+			
+			if(result.images.id(_id) != undefined)
+				
+				result.images.id(_id).update(element);
+				
+				
+			else{
+		  		pagesGroup[pageName].now.deleteResponce(_id, false);	
+			 	return; 
+			 }
+			}
+*/
+		//result.save(function (error,result) {
+		if(error){console.log(error)}
+/*
+			if(all)
+				pagesGroup[pageName].now.pushChanges(result);
+			else
+				pagesGroup[pageName].now.updateEditChanges(_id,result.images.id(_id),value);
+*/
+		//});
+	});	
+
+}
+
 
 /*
 everyone.now.setUserPage = function(pageName){
@@ -622,22 +689,14 @@ everyone.now.setUserPage = function(pageName){
 ///ADD
 /////
 
-everyone.now.addNewImg = function(pageName, imgUrl, number, scrollTop, scrollLeft){
+everyone.now.addNewImg = function(pageName, imgObj, number, scrollTop, scrollLeft){
 
 	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
 			return;
 
 	for(var i=0; i<number; i++){
-		var img= new imageModel();
-		img.url = imgUrl;
-		img.height="auto";
-		img.width="auto";
-		img.top = Math.random()*500 + scrollTop+"px";
-		img.left = Math.random()*900 + scrollLeft+"px";
-		img.z = Math.random()*50;
-		img.angler=0;
-		img.angley=0;
-		img.anglex=0;
+		var img= new imageModel(imgObj);
+
 		img.user = this.user.name;
 		
 		var thereIsError=false;

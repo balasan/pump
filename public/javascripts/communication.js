@@ -146,6 +146,7 @@ now.updatePageUser = function(action, userArray, profileName){
 
 function addNewImg(){
 
+
 		var imgUrl = document.getElementById('gifUrlA').value;
 
 		if(pageName=="profile"){
@@ -171,8 +172,62 @@ function addNewImg(){
 			}
 		}
 		
-		var number = parseInt( document.getElementById('addNumber').value );
-		now.addNewImg(pageName, imgUrl, number, scrollTop, scrollLeft);
+		var addObject = {};
+		
+		//TODO RESET RADIOS!
+		
+		addObject.top = Math.random()*500 + scrollTop+"px";
+		addObject.left = Math.random()*900 + scrollLeft+"px";
+		
+		if(addType=="div" || addType=="text"){	
+			addObject.height="300px";
+			addObject.width="400px";	
+		}
+		else{
+			addObject.height="auto";
+			addObject.width="auto";		
+		}
+		addObject.z = Math.random()*50;
+		
+		
+		addObject.angler=0;
+		addObject.angley=0;
+		addObject.anglex=0;
+		if ($("input[name='geoPreset']:checked").val() == 'hPlane') {
+			addObject.angley=90;
+			addObject.height="1000px";
+			addObject.width="1000px";
+			addObject.z = -500;
+		}		
+		else if ($("input[name='geoPreset']:checked").val() == 'vPlane') {
+			addObject.anglex=90;
+			addObject.width="1000px";
+			addObject.height="1000px";
+			addObject.z = -500;
+		}	
+
+		$('input[name="geoPreset"]').attr('checked', false);
+		
+		addObject.contentType=addType;
+
+		if(addType == "image"){
+			addObject.url = imgUrl;
+		}
+		else if(addType == "media"){
+			addObject.content=document.getElementById("media").value;
+			number=1;
+		}
+		else if(addType =='text'){
+			addObject.content = $('textarea.tinymce').val();
+		}
+		if(addType == "div"){
+			addObject.backgroundColor=document.getElementById("divColor").value;
+			addObject.backgroundImage=document.getElementById("divBgUrl").value;
+			number=1;
+		}
+				
+		var number = parseInt(document.getElementById('addNumber').value);
+		now.addNewImg(pageName, addObject, number, scrollTop, scrollLeft);
 }
 
 now.newImg = function(img){
@@ -243,10 +298,20 @@ function replaceImg(){
 	if(replaceType == "all")
 		all=true;
 
-	var newUrl = document.getElementById('gifUrlR').value;
+	var editElement = {}
+	editElement = pageData.images[lastId];
+	editElement.url = $("#editImage").val();
+	//TODO: media/content
+	//editElement.content = $("#editMedia").val()
+	editElement.content = $("#editContent").val();
+	editElement.backgroundImage = $("#editBackgroundColor").val()
+	editElement.backgroundColor = $("#editBackgroundImage").val()
+	
 
-	now.updateElement(pageName, lastId, 'url', newUrl, all, null);
-		
+	//var newUrl = document.getElementById('gifUrlR').value;
+	
+	//now.updateElement(pageName, lastId, 'url', newUrl, all, null);
+	now.editElement(pageName, lastId,editElement,all, null);	
 }
 
 /////////
@@ -341,11 +406,26 @@ function imageToDom(image, property){
 	var img = document.getElementById(image._id);
 	pageData.images[image._id]=image;
 
+	var contentType = image.contentType;
+	if(contentType==undefined)
+		contentType="image"
+
 	if(img == undefined){
-		img = document.createElement('img');
+		
+		if(contentType=="image")
+			img = document.createElement('img');
+		else{
+			
+			img = document.createElement('div');
+			if(image.backgroundColor != undefined)
+				img.style.backgroundColor = image.backgroundColor;
+			if(image.backgroundImage != undefined)
+				img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
+		
+		}
 		img.id = image._id;
 		img.style.position = 'absolute';
-		img.className = 'moveable';
+		img.className = 'editableElement';
 		img.style.cursor='move';
 		img.style.zIndex = 100; 
 		document.getElementById("mainDiv").appendChild(img);	
@@ -353,9 +433,16 @@ function imageToDom(image, property){
 	}
 	
 	//TODO: optimise this
-	if(img.src != image.url)
-		img.src=image.url;
 	
+	if(contentType=="image" && img.src != image.url)
+		img.src=image.url;
+	else{
+		if(image.content != undefined)
+			img.innerHTML = image.content;
+		img.style.paddingTop="10px";
+		img.style.webkitTransformStyle= "preserve-3d";
+
+	}
 	img.style.left = image.left;
 	img.style.top = image.top;	
 	img.style.width = image.width;
@@ -445,6 +532,7 @@ function enter(evt){
 
 var lastPost="";
 var lastTxtDiv;
+
 now.updateText = function(user, text){
 
 	if(user==lastPost){
@@ -472,8 +560,11 @@ now.updateText = function(user, text){
 
 function jsonToDom(pageDataIn){
 	
+	
 	pageData = pageDataIn;
 
+	
+	
 	document.body.style.backgroundColor = '';
 	document.body.style.backgroundImage = '';
 
@@ -491,28 +582,53 @@ function jsonToDom(pageDataIn){
 	$("#userImage").remove();
 	$("#userName").remove();
 
+	if(pageData.pageName != "main" && pageData.pageName != "profile")
+		document.getElementById('pageName').innerHTML = pageData.pageName + " by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a>";
+	else
+		document.getElementById('pageName').innerHTML="";
 
 	if(pageData.images != undefined){
 		for(var i=0; i<pageData.images.length; i++){
+			
+			var contentType = pageData.images[i].contentType;
+			if(contentType==undefined)
+				contentType="image";
 			
 			pageData.images[pageData.images[i]._id]=pageData.images[i];
 			var img = document.getElementById(pageData.images[i]._id);
 			
 			if(img == undefined){
-				img = document.createElement('img');
+				
+				if(contentType=="image")
+					img = document.createElement('img');
+				else{
+					img = document.createElement('div');
+					if(pageData.images[i].backgroundColor != undefined)
+						img.style.backgroundColor = pageData.images[i].backgroundColor;
+					if(pageData.images[i].backgroundImage != undefined)
+						img.style.backgroundImage = 'url('+ pageData.images[i].backgroundImage + ')';
+				}
 				img.id = pageData.images[i]._id;
 				img.style.position = 'absolute';
-				img.className = 'moveable';
+				img.className = 'editableElement';
 				img.style.cursor='move';
 				img.style.zIndex = 100; 
 			}
 
 			//TODO: optimise this
-			if(img.src != pageData.images[i].url)
+			
+			if(contentType=="image" && img.src != pageData.images[i].url)
 				img.src=pageData.images[i].url;
+			else{
+				if(pageData.images[i].content != undefined)
+					img.innerHTML = pageData.images[i].content;
+				img.style.paddingTop="10px";
+				img.style.webkitTransformStyle= "preserve-3d";
+
+
+			}
 			
 			img.style.left = pageData.images[i].left;
-			
 			img.style.top = pageData.images[i].top;	
 			img.style.width = pageData.images[i].width;
 			img.style.height = pageData.images[i].height;	

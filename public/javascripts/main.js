@@ -92,6 +92,12 @@ function moveHandler(e){
   		e = window.event 
   	} 
   	
+  	if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
+  		$(selObj).addClass("selected");
+		pageData.lastId = selObj.id;
+		fillEditMenu();
+		}
+  	
 	if (e.button<=1&&dragOK){
 	     
 	     
@@ -100,7 +106,6 @@ function moveHandler(e){
 			selObj.style.width=e.clientX-clickX-i_width+'px';
 			selObj.style.height=e.clientY-clickY-i_height+'px';
 
-			pageData.lastId = selObj.id;
 			updateElement(selObj,"width",selObj.style.width);
 			updateElement(selObj,"height",selObj.style.height);
 			            
@@ -133,7 +138,6 @@ function moveHandler(e){
 			
 			updateTransform = true;
 			
-			pageData.lastId = selObj.id;
 			updateElement(selObj,"z",z);
 
 	
@@ -166,7 +170,6 @@ function moveHandler(e){
 			
 			updateTransform = true;
 			
-			pageData.lastId = selObj.id;
 			updateElement(selObj,"angler",angler);
 			
 			
@@ -200,7 +203,6 @@ function moveHandler(e){
 			
 			updateTransform = true;
 
-  			pageData.lastId = selObj.id;
 			updateElement(selObj,"anglex",anglex);
 			updateElement(selObj,"angley",angley);			
 			
@@ -216,7 +218,6 @@ function moveHandler(e){
 	    	else
 	    		selObj.style.top=-e.clientY-dragYoffset+'px'; 
 
-  			pageData.lastId = selObj.id;
 	    	updateElement(selObj,"left",selObj.style.left);
 			updateElement(selObj,"top",selObj.style.top);
 	    	   
@@ -255,7 +256,13 @@ function cleanup(e) {
   updateTransform = false;
   
   //document.getElementById('lastId').value = selObj.id;
-  pageData.lastId = selObj.id;
+
+
+
+
+ // $("#"+previousId).removeClass("selected");
+
+  
   
   //ajax.ajaxFunction("element");
   //updateElement(selObj);
@@ -290,16 +297,33 @@ function dragHandler(e){
   selObj=target;
   selObj=document.getElementById(selObj.id);
   
+  
+  if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
+		 $(".selected").removeClass("selected");
+ 		 $(selObj).addClass("selected");
+		 pageData.lastId = selObj.id;
+		 fillEditMenu();
+ 	 }
+ else if($(selObj).hasClass('editableElement')){
+		$(".selected").removeClass("selected");
+ 	 	pageData.lastId=null;
+	
+	}
+  
   orgCursor=target.style.cursor;
   
   //console.log(target.className+" " +target.id + " " + target.localName);
-  if (target.className=="vidFrame"||target.className=="moveable"||target.className=="uiOpen") {
+  if (selObj && (selObj.className=="vidFrame"||$(selObj).hasClass('editableElement')||selObj.className=="uiOpen")) {
   
   	 target.style.cursor=htype;
      dragOK=true;
      
-		i_height = - parseInt(selObj.height);
-		i_width = -parseInt(selObj.width);
+		i_height = - parseInt(selObj.style.height);
+		i_width = -parseInt(selObj.style.width);
+
+		i_height = - $(selObj).height();
+		i_width = - $(selObj).width();
+
 	 if(selObj.style.left!="")
      	dragXoffset=e.clientX-parseInt(selObj.style.left);	
 	 else
@@ -670,12 +694,31 @@ window.onload = function() {
 		  //$('textarea.tinymce').aloha();
 
 		setupTinymce();
-		
+		$('.menuButton').okshadow();
+
+/* 		$('.menu').okshadow(); */
+
+
+/*
+		$('a').okshadow({		  
+		 //color: 'blue',
+		  textShadow: true,
+*/
+		  //transparent: true,
+		  //xMax: 0,
+		  //yMax: 0,
+/* 		  fuzzMin: 0, */
+/* 		  fuzz: 40 */
+	
+	//	  });
+	
 	});
 	
 	
 	
 };
+
+
 
 
 setupTinymce = function(){
@@ -847,11 +890,15 @@ function buttonPress(id){
 	
 	if(editPageButton.className=='menuButtonP'){
 		editPageButton.className='menuButton'
-		editPageMenu.style.display='none'
+		if(editPageMenu)
+			editPageMenu.style.display='none'
+		$(editPageButton).data("okshadow").setoption({color:"#888"});
 		}
 	else{
 		editPageButton.className='menuButtonP';
-		editPageMenu.style.display='block'
+		if(editPageMenu)
+			editPageMenu.style.display='block'
+		$(editPageButton).data("okshadow").setoption({color:""});
 		}
 }
 
@@ -908,17 +955,36 @@ goToPage = function(page, type){
 
 }
 
+var addType = "image";
 
-addMenu = function(addType,secondAddType){
+addMenu = function(_addType,_secondAddType){
 
+		addType = _addType;
 		$("#imageContainer").hide();
 		$("#textContainer").hide();
 		$("#mediaContainer").hide();
 		$("#divContainer").hide();	
-
-		var container = "#"+addType+"Container"
+		$("#editImageContainer").hide();
+		$("#editTextContainer").hide();
+		$("#editMediaContainer").hide();
+		$("#editDivContainer").hide();
+		var container = "#"+_addType+"Container"
 
 		$(container).show();
+}
 
+fillEditMenu = function(){
+
+	var id = pageData.lastId;
+	if(id==undefined || pageData.images[id] == undefined)
+		return;
+	$(".editType").val("");	 
+		 
+	$("#editImage").val(pageData.images[id].url)
+	$("#editContent").val(pageData.images[id].content)
+	$("#editMedia").val(pageData.images[id].content)
+	$("#editBackgroundColor").val(pageData.images[id].background)
+	$("#editBackgroundImage").val(pageData.images[id].backgroundImage)
+	
 
 }

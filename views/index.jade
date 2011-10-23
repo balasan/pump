@@ -20,15 +20,15 @@
 
 #addMenu.uiClosed(name='addMenu', style='position: fixed; left:300px; top:200px; width:auto;padding:5px')
   div(style="font-size:13px;padding:5px")
-    a(href="javascript:addMenu(\'image\');")
-      |Image | 
-    a(href="javascript:addMenu(\'text\');")
-      |Text | 
-    a(href="javascript:addMenu(\'media\');")
-      |Media | 
-    a(href="javascript:addMenu(\'div\');")
-      |Div
-  #imageContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:block")
+      a(href="javascript:addMenu(\'image\');")
+        |Image | 
+      a(href="javascript:addMenu(\'text\');")
+        |Text | 
+      a(href="javascript:addMenu(\'media\');")
+        |Media | 
+      a(href="javascript:addMenu(\'div\');")
+        |Div
+  #imageContainer(style="padding:5px;display:block")
     | image url:
     br
     input#gifUrlA(style='width:160px;', type='text', name='gifUrlA', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
@@ -39,25 +39,34 @@
     br
     br
   
-  #textContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+  #textContainer(style="padding:5px;display:none")
     textarea.tinymce
   
-  #mediaContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+  #mediaContainer(style="padding:5px;display:none")
     | 
     br
-    textarea(style='width:160px;height:100px', type='text', name='embed', id="embed", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    textarea(style='width:160px;height:100px', type='text', name='embed', id="media", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
     br
+  #divContainer(style="padding:5px;display:none")
+    | background color:
     br
-  
-  #divContainer(style="background-color:rgba(255,255,255,.2);padding:5px;display:none")
+    input#divBgUrl(style='width:160px;', type='text', id='divColor', placeholder='name, hex or rgba(r,g,b,a)',onfocus="typing=true; ", onblur="typing=false;")
+    br
     | background image url:
     br
-    input#divBgUrl(style='width:160px;', type='text', name='divBgUrl', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
+    input#divBgUrl(style='width:160px;', type='text', id='divBgUrl', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
     br
-    | repetitions:
-    br
-    input#addNumber(style='width:160px;', type='text', name='addNumber', value='1', maxlength='1/',onfocus="value=''")
-    br
+    | preset: 
+    form(name='divType')
+      input(type='radio', name='geoPreset', value='sPlane', checked='CHECKED')
+      | flat div
+      br
+      input(type='radio', name='geoPreset', value='hPlane')
+      | ground plane
+      br
+      input(type='radio', name='geoPreset', value='vPlane')
+      | wall plane    
+      br
     br  
   
   div(style="padding:0px")
@@ -67,17 +76,53 @@
 // 
 ////replace/////
 
-#replaceMenu.uiClosed(name='replaceMenu', style='position: fixed; left:300px; top:360px; width:160px;')
-  input#gifUrlR(style='width:160px;', type='text', placeholder='http://blahblah.gif')
-  br
-  form(name='f2')
-    input(type='radio', name='replaceType', value='one', checked='CHECKED')
-    | last image
-    input(type='radio', name='replaceType', value='all')
-    | all
-  input#replace.button(style='width:160px;', type='button', name='replace', value='replace', onclick="replaceImg()")
+#editMenu.uiClosed(name='editMenu', style='position: fixed; width:auto;')
+  div(style="font-size:13px;padding:5px")
+      a(href="javascript:addMenu(\'editImage\');")
+        |Image | 
+      a(href="javascript:addMenu(\'editText\');")
+        |Text | 
+      a(href="javascript:addMenu(\'editMedia\');")
+        |Media | 
+      a(href="javascript:addMenu(\'editDiv\');")
+        |Div
+  #editImageContainer(style="padding:5px;display:block")
+    input#editImage.editType(style='width:160px;', type='text', placeholder='http://blahblah.gif')
+    br
+    form(name='f2')
+      input(type='radio', name='replaceType', value='one', checked='CHECKED')
+      | last image
+      input(type='radio', name='replaceType', value='all')
+      | all
+  
+  #editTextContainer(style="padding:5px;display:none")
+    textarea#editContent.editType.tinymce
+  
+  #editMediaContainer(style="padding:5px;display:none")
+    | 
+    br
+    textarea.editType(style='width:160px;height:100px', type='text', name='embed', id="editMedia", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    br
+  #editDivContainer(style="padding:5px;display:none")
+    | background color:
+    br
+    input#editBackgroundColor.editType(style='width:160px;', type='text', placeholder='name, hex or rgba(r,g,b,a)',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    |background image url:
+    br
+    input#editBackgroundImage.editType(style='width:160px;', type='text', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    |width:  
+    input#editWidth(style='width:50px;display:inline;', type='text')
+    br  
+    |height: 
+    input#editHeight(style='width:50px;display:inline;', type='text') 
+  
+  div(style="padding:0px")
+    input#replace.button(style='width:160px;', type='button', name='replace', value='replace', onclick="replaceImg()")
+    
   .x
-    a(href='javascript:openMenu(\'replaceMenu\');') x
+    a(href='javascript:openMenu(\'editMenu\');') x
 //
 ////delete/////
 
@@ -168,52 +213,6 @@ input#lastId(type='hidden', name='lastId')
 ////more pages/////
 
 #moreMenu.uiClosed(name='moreMenu', style='left:400px; top:100px; width:160px;')
-  select(style='width:160px;', name='mydropdown')
-    option more pages over here
-    option(value='vietnam') vietnam
-    option(value='VIETNĂM') VIETNĂM
-    option(value='ffoogg') ffoogg
-    option(value='extrascientific') extrascientific
-    option(value='i') i
-    option(value='AmericanDreams') AmericanDreams
-    option(value='seapunk') seapunk
-    option(value='yoga') yoga
-    option(value='office') office
-    option(value='bexlayer') bexlayer
-    option(value='ecosystem') ecosystem
-    option(value='hauntedinternet') hauntedinternet
-    option(value='projects') projects
-    option(value='geology') geology
-    option(value='sandstorm') sandstorm
-    option(value='forest') forest
-    option(value='napolian') napolian
-    option(value='radz') radz
-    option(value='msisland') msisland
-    option(value='idgi') idgi
-    option(value='bonzai_fun') bonzai_fun
-    option(value='mario') mario
-    option(value='sigh') sigh
-    option(value='thanku') thanku
-    option(value='al') al
-    option(value='sad_cat') sad_cat
-    option(value='aesthetics') aesthetics
-    option(value='666') 666
-    option(value='smoke_weed') smoke_weed
-    option(value='life2') life2
-    option(value='doit') doit
-    option(value='finger') finger
-    option(value='bwra3') bwra3
-    option(value='bwra2') bwra2
-    option(value='bwra1') bwra1
-    option(value='hello') hello
-    option(value='glitter') glitter
-    option(value='bwacid') bwacid
-    option(value='sex') sex
-    option(value='big') big
-    option(value='nico') nico
-  br
-  br
-  br
   | create new page:
   br
   input(style='width:160px;', type='text',id='newPage', name='newPage', value='enter unique page name', onfocus="value=''")
@@ -318,17 +317,24 @@ input#lastId(type='hidden', name='lastId')
 
 //#topBar(style="position:fixed;top:0px;left:0;width:100%;height:25px;background:rgba(255,255,255,.5);")
 
-#menuContainer.menu(style="z-index:1000;top:5px;left:5px;position:fixed;")
+#menuContainer(style="z-index:1000;top:5px;left:5px;position:fixed;")
   -if(loggedIn)
     #editPageButton.menuButton
       a(href='javascript:buttonPress("editPage");') Edit Page
-    | |
-    #pageButton.menuButton
-      a(href='javascript:buttonPress("editPage");') Help
+    | 
+    #animateButton.menuButton
+      a(href='javascript:animate();javascript:buttonPress("animate");') Animate
+    | 
+    #helpButton.menuButton
+      a(href='javascript:openMenu(\'helpMenu\');javascript:buttonPress("help");') Help
   -else
     a(href='/') GIFPUMPER.COM
+  |       
+  #pageName(style="display:inline;")    
 
 #editPageMenu.menu(style="display:none;top:20px;left:5px;position:fixed;")
+      div.menuDiv 
+        a(href='javascript:openMenu(\'moreMenu\');') ⇧N New Page
       -if(owner)
         div.menuDiv 
           a(href='javascript:openMenu(\'pageMenu\');') ⇧P Page Settings
@@ -337,18 +343,17 @@ input#lastId(type='hidden', name='lastId')
       //div.shortCut 
       div.menuDiv 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
-      div.menuDiv 
+      //div.menuDiv 
         a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
       div.menuDiv 
         a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
+      div.menuDiv 
+        a(href='javascript:openMenu(\'editMenu\');fillEditMenu()') ⇧E Edit
 
- 
-
-
-  
-#editPageMenu.menu(style="display:none;top:30px;left:80px;position:fixed;")
+//   
+  #editPageMenu.menu(style="display:none;top:30px;left:80px;position:fixed;")
       a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
-      //div.shortCut 
+      div.shortCut 
       br
       a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
       br
@@ -358,10 +363,9 @@ input#lastId(type='hidden', name='lastId')
 
 
 
-      //br 
 //
- #shortMenu.moveable(style='position:fixed; left:10px; top:10px; z-index:999')
-  div(style='float:left;')
+  #shortMenu.moveable(style='position:fixed; left:10px; top:10px; z-index:999')
+   div(style='float:left;')
     a(href='javascript:openMenu(\'helpMenu\');') ⇧+click+drag
     |  | 
     a(href='javascript:openMenu(\'helpMenu\');') ⌥ (alt)+click+drag
@@ -378,20 +382,13 @@ input#lastId(type='hidden', name='lastId')
     br
     a(href='javascript:openMenu(\'deleteMenu\');') ⇧ Delete
     br    
-    // <a href="javascript:openMenu('faceMenu');">&#x21E7; Facebook</a><br> 
-    // <a href="javascript:openMenu('comments');">&#x21E7; Comments</a><br> 
-    a(href='javascript:openMenu(\'helpMenu\');') ⇧ Help
-    br
-    | |
-    a(href='javascript:openMenu(\'moreMenu\');') ⇧ More Pages 
-    | |
-    a(href='javascript:animate();') Animate
-    br
+
+
 
 #rightMenu(style='position:fixed; top:5px; right:150px; opacity:.8; padding:0; height:10px')
   div(style="height:100%; float:left; padding-right:20px")
-    input(style='width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
-    |  | 
+    //input(style='width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
+    //|  | 
     a(href="javascript:goToPage('main','null')") Main Page 
     | |
     -if(!loggedIn)
@@ -402,7 +399,6 @@ input#lastId(type='hidden', name='lastId')
       a(href="javascript:goToPage(user, 'profile');") My Profile 
       | | 
       a(href='javascript:logOut();') Logout 
-     
 
 
   div(style='opacity:.8; padding:0;float:right')
@@ -419,8 +415,8 @@ input#lastId(type='hidden', name='lastId')
      | <a href='javascript:openChat();'><img src="http://how2program.com/thumbs/4054_Pixel_chat_icon_._.._.jpg6U4SDMK2R5.jpg",border='0px', height='30px'></a>
 
 div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; height:auto; padding:0")
-   #chatTop.menuTop.chat(style="padding-top:1px;padding-bottom:1px;	opacity: .7;")
-    | chat
+   #chatTop.menuTop.chat(style="padding-top:1px;padding-bottom:1px;	opacity: .7;color:red")
+    | msg
     .x 
       a(href='javascript:openChat();') x
    #chatBox.chat

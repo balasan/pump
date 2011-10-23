@@ -61,6 +61,9 @@ body {
 	background-color: fuchsia;
 	opacity: .9;
 	
+	left: 140px;
+	top:70px;
+	
 	-webkit-transform: translate(-100px, -50px) scale(0) translateZ(10000px);
 	-moz-transform: translate(-100px, -50px) scale(0);
 	-o-transform: translate(-100px, -50px) scale(0) ;
@@ -90,6 +93,9 @@ body {
 	z-index: 1000;
 	background-color: fuchsia;
 	opacity: .9;
+	
+	left: 140px;
+	top:70px;
 	
 	-webkit-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
 	-moz-transform: translate(0px, 0px)  scale(1);
@@ -213,18 +219,18 @@ A:hover {
 .button:active  {
 
 	border:none;
-   -moz-box-shadow: -1px -2px 3px rgba(0,0,0,0.6);
-   -webkit-box-shadow: -2px -1px 3px rgba(0,0,0,0.6);
-   border-bottom: 1px solid rgba(0,0,0,0.25);
+   -moz-box-shadow: -1px -2px 3px rgba(130,130,130,1);
+   -webkit-box-shadow: -2px -1px 3px rgba(130,130,130,1);
+   border-bottom: 1px solid rgba(130,130,130,1);
    background-image:none;
 }
 
 .button, button:visited {
 
 	border:none;
-    -moz-box-shadow: 1px 2px 3px rgba(0,0,0,0.6);
-    -webkit-box-shadow: 1px 2px 3px rgba(0,0,0,0.6);
-    border-bottom: 1px solid rgba(0,0,0,0.25);   
+    -moz-box-shadow: 1px 2px 3px rgba(130,130,130,1);
+    -webkit-box-shadow: 1px 2px 3px rgba(130,130,130,1);
+    border-bottom: 1px solid rgba(130,130,130,1);   
    background-image:none;
    background-color:white;  
    
@@ -237,9 +243,9 @@ position:fixed;
 }
 
 #topBar{
-	-webkit-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	-moz-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	box-shadow: 6px 6px 6px  rgba(0, 0, 0, 0.6);
+	-webkit-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	-moz-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	box-shadow: 6px 6px 6px  rgba(130,130,130,1);
 
 }
 
@@ -255,9 +261,9 @@ position:fixed;
 	width:120px;
 	z-index: 1000;
 	overflow: auto;
-	-webkit-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	-moz-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	box-shadow: 6px 6px 6px  rgba(0, 0, 0, 0.6);
+	-webkit-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	-moz-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	box-shadow: 6px 6px 6px  rgba(130,130,130,1);
 	z-index:999;	
 }
 
@@ -286,9 +292,9 @@ position:fixed;
 /* 	padding-right:1px; */
 /* 	background-image:url('http://desizntech.info/wp-content/uploads/2010/05/pattern_5.jpg');	 */
 	opacity:.7;
-	-webkit-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	-moz-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6);
-	box-shadow: 6px 6px 6px  rgba(0, 0, 0, 0.6);
+	-webkit-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	-moz-box-shadow: 6px 6px 6px rgba(130,130,130,1);
+	box-shadow: 6px 6px 6px  rgba(130,130,130,1);
 	z-index: 999;
 	-webkit-transform: translateZ(10000px);
 
@@ -366,12 +372,14 @@ position:fixed;
 
 	width:auto;
 	padding:3px;
-/* 	background-color: rgba(240,240,240,.5);; */
-/* 	-moz-border-radius: 1px; */
-/* 	border-radius:1px; */
+	background-color: rgba(255,255,255,.7);;
+	-moz-border-radius: 1px;
+	border-radius:1px;
 	display:inline;
 	border:none;
-	
+	z-index:1000;
+/* 	-webkit-transform: translateZ(20000px); */
+
 /*
  	box-shadow: -1px -1px 3px rgba(0,0,0,0.3); 
  	-webkit-box-shadow: -1px -1px 3px rgba(0,0,0,0.3); 
@@ -384,33 +392,30 @@ position:fixed;
 	padding-right:5px;
 	margin-right: 4px;
 	
-/* 	-webkit-box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.6); */
-/* 	-moz-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6); */
-/* 	box-shadow: 6px 0px 6px  rgba(0, 0, 0, 0.6); */
+	box-shadow: 1px -1px 1px  rgba(126, 126, 126, 0.6);
+	-webkit-box-shadow: 1px -1px 1px  rgba(126, 126, 126, 0.6);
+	-moz-box-shadow: 1px -1px 1px  rgba(126, 126, 126, 0.6); 
 
-/*  	box-shadow: -1px -1px 3px rgba(0,0,0,0.3);  */
-
-/*  	border: 1px grey outset; */ */
-
+/*  border: 1px grey outset; */ */
 /* 	text-decoration:line-through; */
 
 }
 
 .menuButton{
 
-/*
+
 	border:none;
-    -moz-box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    -webkit-box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    border-bottom: 1px solid rgba(0,0,0,0.1);  
-*/ 
+    -moz-box-shadow: -20px -5px 15px rgba(130,130,130,1);
+    -webkit-box-shadow: -20px -5px 15px rgba(130,130,130,1);
+/*     border-bottom: 1px solid rgba(0,0,0,0.1);   */
+ 
 	width:auto;
 	padding:3px;
 	padding-left:5px;
 	padding-right:5px;
-/* 	background-color: rgba(240,240,240,.7);; */
-/* 	-moz-border-radius: 1px; */
-/* 	border-radius:1px; */
+	background-color: rgba(255,255,255,.6);;
+	-moz-border-radius: 1px;
+	border-radius:1px;
 	display:inline;
 	margin-right: 4px;
 
@@ -428,6 +433,11 @@ position:fixed;
 
 }
 
+.selected{
+	border:6px solid;
+	border-color: rgba(255,255,0,.6);
+}
+
 .menu{
 	position:fixed;
 
@@ -436,7 +446,10 @@ position:fixed;
 	background:none;
 	z-index:1000;
 	-webkit-transform: translateZ(10000px);
-/* 	background-color: rgba(240,240,240,.5);; */
+	background-color: rgba(255,255,255,.7);;
+	box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-webkit-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-moz-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
 
 
 }
@@ -450,7 +463,9 @@ position:fixed;
 
 /* 	-webkit-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6); */
 /* 	-moz-box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.6); */
-	box-shadow: 2px 2px 2px  rgba(0, 0, 0, 0.6);
+	box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-webkit-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-moz-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
 	-webkit-transform: translateZ(10000px);
 
 }
@@ -533,9 +548,7 @@ input[type="text"]{
 }
 
 input[type="password"]{
-
 	font-size: 13px;
-
 }
 
 .x {
@@ -547,8 +560,9 @@ input[type="password"]{
 	width: 8px;
 	height:8px;
 	line-height: 6px;
-	-moz-box-shadow: -1px 1px 2px rgba(0,0,0,0.6);
-    -webkit-box-shadow: -1px 1px 2px rgba(0,0,0,0.6);
+	box-shadow: -1px 1px 2px  rgba(126, 126, 126, 0.6);
+	-webkit-box-shadow: -1px 1px 2px  rgba(126, 126, 126, 0.6);
+	-moz-box-shadow: -1px 1px 2px  rgba(126, 126, 126, 0.6);
 	z-index: 999;
 }
 
