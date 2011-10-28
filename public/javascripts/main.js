@@ -914,7 +914,10 @@ function buttonPress(id){
 			editPageMenu.style.display='block'
 		$(editPageButton).data("okshadow").setoption({color:""});
 		}
+
+
 }
+
 
 registerFunc = function(){
 

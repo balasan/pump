@@ -1,0 +1,68 @@
+#################
+directions:
+#################
+
+///
+install nodejs 0.4.12
+///
+
+*the unstable version 0.5.xx will not work!
+*best to install without using sudo
+see: https://gist.github.com/579814
+
+if you use github to get node, after cloning, do
+git checkout v0.4.12
+in terminal
+
+///
+install npm tools
+instal mongodb 0.2.0
+///
+
+///
+edit git exclude setup
+///
+
+after you checkout the pump code from github:
+in the project directory, go to .git/info/exclude
+and add 
+node_modules/*
+on the bottom line 
+we want to ignore this directory during checkin/outs since we will use npm to install all the modules - they might be slightly different depending on nodejs setup
+
+to install all the necessary modules, in termina, in project directory enter:
+npm install -d
+(this will install all the dependencies)
+
+last thing!
+
+///
+Ždit /etc/hosts file
+in terminal, inter 
+sudo vi /etc/hosts
+
+press 'i' to edit
+
+on the bottom line add
+127.0.0.1 gifpumper.net
+
+then 'esc' then 'wq'
+
+we need to do this the address gifpumper.net is redirected to the localhost 
+this is for the cookies/login to work
+
+thats it!
+
+in the project directory enter 
+sudo node app.js
+
+oh yeah, you also need to make sure mongodb is running and call some function to populate the database:
+
+first go to gifpumper.net running the browser. go to the chrome debugger and in the console, enter:
+ajax.ajaxFunction('refresh')
+this will fill out the pages
+after that you might have to restart the server again
+you can then you can register as a new user
+
+after that you should be able to edit pages, profile etc
+thats it!
