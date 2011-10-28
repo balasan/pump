@@ -36,6 +36,12 @@ if (pageName == "profile"){
 */
 
 }
+else{
+	var version = tokens[4];
+	if(version!="" && version!=undefined)
+		version = parseInt(version);
+	else version = undefined;
+}
 
 
 var ajax = new ajax();
@@ -412,8 +418,8 @@ document.onkeydown=function(e){
 		case 65:
 			menuType = "addMenu";
  		 	break;
- 		case 82:
-			menuType = "replaceMenu";
+ 		case 69:
+			menuType = "editMenu";
   			break;
 		case 68:
 			menuType = "deleteMenu";
@@ -424,7 +430,7 @@ document.onkeydown=function(e){
 		case 70:
 			menuType = "faceMenu";
  		 	break;
- 		case 77:
+ 		case 78:
  			menuType = "moreMenu";
  		 	break;
 		default:
@@ -435,22 +441,25 @@ document.onkeydown=function(e){
 		
 		if(isCtrl == true && menuType != "") {	
 			
-			if(document.getElementById(menuType).className == 'uiOpen') {
-				document.getElementById(menuType).className = 'uiClosed';
+			if(document.getElementById(menuType).style.display=="block") {
+				
+				//document.getElementById(menuType).className = 'uiClosed';
+				document.getElementById(menuType).style.display="none";
 				createCookie(menuType,"uiClosed",90);
 			}
 			else {
 			
 				var elements = document.querySelectorAll('.uiOpen');
 				for(var i=0;i<elements.length;i++){
-				elements[i].className = 'uiClosed';
-				
+					//elements[i].className = 'uiClosed';
+					elements[i].style.display="none";
+
 				}
 				
 				
 				document.getElementById(menuType).className = 'uiOpen';
-				document.getElementById(menuType).style.top = 200 + document.body.scrollTop;
-				
+				//document.getElementById(menuType).style.top = 200 + document.body.scrollTop;
+				document.getElementById(menuType).style.display = "block";
 				
 				console.log(document.getElementById(menuType).style.top);
 				
@@ -489,20 +498,25 @@ var bgColorList=new Array("rgba(0,72,234,.85)", "rgba(96,0,234,.85)", "rgba(143,
 //for clicking on menus
 function openMenu(menuType){
 			
-	if(document.getElementById(menuType).className == 'uiOpen') {
-		document.getElementById(menuType).className = 'uiClosed';
+	if(document.getElementById(menuType).style.display=="block") {
+				
+		//document.getElementById(menuType).className = 'uiClosed';
+		document.getElementById(menuType).style.display="none";
 		createCookie(menuType,"uiClosed",90);
 	}
 	else {
 	
 		var elements = document.querySelectorAll('.uiOpen');
 		for(var i=0;i<elements.length;i++){
-		
-			elements[i].className = 'uiClosed';
-		
+			//elements[i].className = 'uiClosed';
+			elements[i].style.display="none";
+
 		}
+		
+		
 		document.getElementById(menuType).className = 'uiOpen';
-		//document.write(document.getElementById(menuType).className);
+		//document.getElementById(menuType).style.top = 200 + document.body.scrollTop;
+		document.getElementById(menuType).style.display = "block";
 		createCookie(menuType,"uiOpen",90);
 		
 		var r = Math.random()
@@ -726,7 +740,7 @@ setupTinymce = function(){
 
 		$('textarea.tinymce').tinymce({
 			// Location of TinyMCE script
-			script_url : '/javascripts/tinymce/jscripts/tiny_mce/tiny_mce.js',
+			script_url : '/public/javascripts/tinymce/jscripts/tiny_mce/tiny_mce.js',
 
 			// General options
 			theme : "advanced",
@@ -930,11 +944,15 @@ registerFunc = function(){
 
 }
 
-goToPage = function(page, type){
+goToPage = function(page, type, _version){
 
 	console.log(page + " "+ type);
 	
 	pageName = page;
+	version=_version;
+	nextVersion=undefined;
+	prevVersion=undefined;
+
 	if(type=="profile"){
 		var url="/profile/"+page;
 		pageName = "profile";
@@ -945,15 +963,22 @@ goToPage = function(page, type){
 		}
 	else
 		var url="/"+page
+		
+	if(version!=undefined){
+	
+		url+="/"+version;
+	}
 	window.history.pushState("", "", url);
 	pageData=null;
 	$(".usersOnline").remove();
 	noobs=0;
-	now.leavePage(userProfile,loadData)
-	
-	console.log('done');
 
+	now.leavePage(userProfile,loadData)
+	//console.log('done');
 }
+
+
+
 
 var addType = "image";
 
@@ -983,7 +1008,7 @@ fillEditMenu = function(){
 	$("#editImage").val(pageData.images[id].url)
 	$("#editContent").val(pageData.images[id].content)
 	$("#editMedia").val(pageData.images[id].content)
-	$("#editBackgroundColor").val(pageData.images[id].background)
+	$("#editBackgroundColor").val(pageData.images[id].backgroundColor)
 	$("#editBackgroundImage").val(pageData.images[id].backgroundImage)
 	
 

@@ -36,7 +36,8 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+  app.use('/public', express.static(__dirname + '/public'));
+//app.use(express.static(your_path));
 });
 
 app.configure('development', function(){
@@ -110,10 +111,23 @@ var divSchema = new Schema({
 	opacity : Number,
 	user : String
 });
+
+var versionSchema = new Schema({
+    pageName    : String
+  , owner 		: String
+  , images      : [imageSchema]
+  , backgroundImageType : Number
+  ,	background 	: String
+  ,	backgroundImage: String
+  , text 		: [textSchema]
+  , contributors : []
+  , likes : []
+});
 	
 var pageSchema = new Schema({
     pageName    : {type : String, index: { unique: true }}
   , owner 		: String
+  , editors		: String
   , images      : [imageSchema]
   , privacy		: Number
   , backgroundImageType : Number
@@ -123,9 +137,9 @@ var pageSchema = new Schema({
   , contributors : []
   , parent : String
   , children : []
-  , versions : []
+  , versions : [versionSchema]
+  , currentVersion: {type: Number, default:0, min:0}
   , likes : []
-  , profilePage : { type: Boolean, default:false}
 });
 
 var userSchema = new Schema({
@@ -167,6 +181,8 @@ var pageModel = mongoose.model('pageModel', pageSchema);
 var imageModel = mongoose.model('imageModel', imageSchema);
 var userModel = mongoose.model('userModel', userSchema);
 var textSchema = mongoose.model('textModel', textSchema);
+var versionModel = mongoose.model('versionModel', versionSchema);
+
 //var divSchema = mongoose.model('divModel', divSchema);
 
 
@@ -225,7 +241,15 @@ app.get('/', function(req, res){
 
 
 
-app.get('/:page', function(req,res) {
+
+app.get("/:page/:version?", function(req,res) {
+
+	if(req.params.page == "javascripts" || req.params.page == "stylesheets")
+		return;
+	//req.params.page = req.params[0];
+	//console.log(req.params.page);
+	//console.log(req.params.version);
+
 	if(req.params.page!='favicon.ico'){
 		var loggedIn = false;
 		var user = 'not logged in';	
@@ -274,7 +298,8 @@ app.get('/:page', function(req,res) {
 	}
 });
 
-app.get('/profile/:user', function(req,res) {
+app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
+	req.params.user=req.params[0];
 	if(req.params.user!='favicon.ico'){
 		var loggedIn = false;
 		var user = 'not logged in';	
@@ -424,6 +449,7 @@ everyone.now.updateAll = function(pageData,callback){
 	
 	for(var page in pageData){
 	
+
 		
 		pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
 	      		if(error) console.log(error)
@@ -448,7 +474,7 @@ nowjs.on('connect', function () {
 var pagesGroup = {};
 
 
-everyone.now.loadAll = function(pageName,userProfile,callback){
+everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
 	var groupName=pageName;
 	if(pageName=="profile")
@@ -462,8 +488,13 @@ everyone.now.loadAll = function(pageName,userProfile,callback){
 		return;
 	}
 
+	if(version !=undefined)
+		var sliceParam = [parseInt(version),1]
+	else
+		var sliceParam = -1;
+
 	var oldthis = this;
-	pageModel.findOne({'pageName': pageName}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
@@ -525,7 +556,7 @@ everyone.now.leavePage = function(userProfile, callback){
 };
 
 nowjs.on('disconnect', function(){
-	
+
 	pagesGroup[this.user.currentPage].now.updatePageUser('delete',this.user.name);
 	delete pagesGroup[this.user.currentPage].pageUsers[this.user.clientId];
 	//pagesGroup[this.user.currentPage].removeUser(this.user.clientId);
@@ -636,12 +667,27 @@ everyone.now.editElement = function(pageName, _id, element, all, callback){
    	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>1)
 		return;
     oldthis = this;
+	
+	pageModel.findOne({"pageName":pageName, "images._id":_id}, function(error, result){
 
-	var index = "images."+_id;
-	//var index = {};                
-	//index[n] = value;
-	console.log(index);
-	pageModel.update({"pageName":pageName},{index:element},{upsert:true,multi:false}, function(error){
+		console.log(element);
+	
+		//delete element._id;
+		result.images.id(_id).set(element);
+		//result.images.update({_id:_id},[element]);
+		
+		result.save(function (error,result) {
+			if(!error){
+				pagesGroup[pageName].now.newImg(element);
+			
+				}
+				//console.log(images)
+			else console.log(error)
+		})
+
+	//delete element._id;
+	//console.log(element);
+	//pageModel.update({"pageName":pageName, "images._id":_id},{$set : {"images.$.backgroundColor":'yellow'}},{upsert: true}, function(error){
 	//pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
 		
 /*
@@ -908,6 +954,11 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 					pageInit.owner = oldthis1.user.name;
 					pageInit.privacy = 0;
 					pageInit.text=[];
+					pageInit.versions=[];
+				 	pageInit.children=[];
+					pageInit.parent = result.pageName;
+					pageInit.likes = [];
+					
 					var newPage =new pageModel(pageInit);
 					newPage.save(function (error,result) {
 						if(!error){
@@ -1002,5 +1053,86 @@ everyone.now.loadMainPage = function(user, callback){
 		}
 	})
 }
+
+////////////////////
+//SAVE DELETE PAGE VERSION
+///////////////////
+
+
+//TODO save local change instead of db query?
+everyone.now.saveVersion = function(callback){
+
+	var pageName = this.user.currentPage;
+	if (this.user.pagePermissions[pageName] !='owner' && this.user.pagePermissions[pageName] != 0)
+		return;
+		
+	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0},function(error,result){
+		if(!error){
+			var newVersion ={}
+			newVersion = result;
+			var savedVersion = result.currentVersion;
+			//delete result.currentVersion;
+			
+			var version = new versionModel(newVersion);
+			console.log(version);
+
+			pageModel.update({"pageName":pageName}, {$push: {"versions" : version}, $inc:{currentVersion:1}}, function (err) {
+			
+				console.log(savedVersion)
+				if(err)
+					callback(err,null)
+				else
+					callback(null, savedVersion)
+				})
+		}
+		else console.log(error)
+	})
+}
+
+everyone.now.deletePageVersion = function(id,callback){
+
+	var pageName = this.user.currentPage;
+	if (this.user.pagePermissions[pageName] !='owner')
+		return;
+
+	//pageModel.update({pageName:pageName},{$pull : {"versions._id":id}, $inc:{currentVersion:-1}},function(error){
+	
+	pageModel.findOne({"pageName":pageName}, function(error, result){
+		if(!error){
+
+			//result.images.id(imgId).remove();
+			//result.save(function (error) {
+			console.log(result)
+			//result.versions.id(rid)
+			//console.log(result.images)
+			//result.versions.id(id).set({});
+			result.versions.id(id).remove();
+
+
+			if(result.versions.id(id) != undefined)
+								
+				result.versions.id(id).remove();
+				
+				//console.log(result.versions)
+				console.log(result);
+				result.currentVersion--;
+				
+				if(result.currentVersion<0)
+					result.currentVersion=0;
+				result.save(function (error) {
+					if(!error)
+						callback(null)
+					else{
+						callback(error)
+						console.log(error)
+						}
+			})
+		}
+		else
+			callback(error)
+	})
+
+}
+
 
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

@@ -24,8 +24,8 @@ body {
 
 #div3d{
 
- 	height:110%; 
-	width:110%;
+ 	height:100%; 
+	width:100%;
 	-webkit-perspective: 600px;
 	perspective: 600px;
 	-webkit-transform-style: preserve-3d;
@@ -38,7 +38,7 @@ body {
 #mainDiv {
 
 	position:absolute;
-	width:110%;
+	width:100%;
  	height:100%;
 	-webkit-transform-style: preserve-3d;
 }
@@ -60,6 +60,9 @@ body {
 	z-index: 1000;
 	background-color: fuchsia;
 	opacity: .9;
+	
+	display:none;
+
 	
 	left: 140px;
 	top:70px;
@@ -96,6 +99,8 @@ body {
 	
 	left: 140px;
 	top:70px;
+	
+	display:none;
 	
 	-webkit-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
 	-moz-transform: translate(0px, 0px)  scale(1);
@@ -439,10 +444,14 @@ position:fixed;
 }
 
 .menu{
-	position:fixed;
-
+	margin-top:3px;
 	width:auto;
-	padding:0;
+	padding:7px;
+	padding-bottom:7px;
+	padding-top:7px;
+	position:fixed;
+	width:auto;
+/* 	padding:0; */
 	background:none;
 	z-index:1000;
 	-webkit-transform: translateZ(10000px);
@@ -470,13 +479,14 @@ position:fixed;
 
 }
 
+#menuContainer{
+	-webkit-transform: translateZ(10000px);
+
+
+}
 
 #editPageMenu{
-	margin-top:3px;
-	width:auto;
-	padding:7px;
-	padding-bottom:7px;
-	padding-top:7px;
+
 }
 
 #profileContainer{

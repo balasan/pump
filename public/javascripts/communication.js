@@ -27,18 +27,38 @@ function loadData(){
 		now.getPagePermissions(pageName,userProfile, function(err,name){
 			if (!err)
 				myName = name;
-				now.loadAll(pageName,userProfile,loadAll)
+				now.loadAll(pageName,userProfile,version,loadAll)
 		})
 	}
 }
 
 now.pushChanges = function(pageData){
-	jsonToDom(pageData);
+
+/*
+	var currentPageVersions={}
+	currentVersions[pageData.pageName]=pageData.versions
+	currentVersions[pageData.pageName].reverse;
+	var totalVersions = pageData.currentVersion;
+*/
+
+	if(version != undefined)
+		jsonToDom(pageData.versions[0]);		
+	else
+		jsonToDom(pageData);
 }    	
 
 now.setPagePermissions = function(_permissions, _owner){
 	var permissions = _permissions;
 	var owner = _owner;
+	if(owner){
+		$("#settingsButton").show();
+		if(version!=undefined)
+			$("#deleteVersion").show();			
+		}
+	else{
+		$("#settingsButton").hide();
+		$("#deleteVersion").hide();			
+		}
 }
 
 
@@ -46,12 +66,32 @@ function loadAll(error, pageData){
 	if(error != null){
 		
 		//TODO: re-enable this
-		alert('PLEASE LOG IN TO VIEW PROFILES')
+		//alert('PLEASE LOG IN TO VIEW PROFILES')
+		alert(error)
 		window.location= "/"
 		console.log(error)
 		return;
 	}
-	jsonToDom(pageData)
+	
+	var lastVersion=pageData.currentVersion;
+	
+	
+	if(version != undefined){
+		if(version>0)
+			prevVersion=version-1;
+		
+		if(version == undefined || version==lastVersion-1)
+			nextVersion=undefined;
+		else nextVersion=version+1;	
+
+		jsonToDom(pageData.versions[0]);
+
+	}
+	else{
+		if(lastVersion>0)
+			prevVersion=lastVersion-1;	
+		jsonToDom(pageData);
+	}
 }
 
 /////////////
@@ -218,7 +258,7 @@ function addNewImg(){
 			number=1;
 		}
 		else if(addType =='text'){
-			addObject.content = $('textarea.tinymce').val();
+			addObject.content = $('#addContent').val();
 		}
 		if(addType == "div"){
 			addObject.backgroundColor=document.getElementById("divColor").value;
@@ -232,7 +272,10 @@ function addNewImg(){
 
 now.newImg = function(img){
 
-	pageData.images.push(img);
+	//TODO: watch out on page save! not necessary?
+	if(pageData.images[img._id]==undefined)
+		pageData.images.push(img);
+
 	//TODO: make this more efficient?
 	imageToDom(img)
 
@@ -302,10 +345,10 @@ function replaceImg(){
 	editElement = pageData.images[lastId];
 	editElement.url = $("#editImage").val();
 	//TODO: media/content
-	//editElement.content = $("#editMedia").val()
-	editElement.content = $("#editContent").val();
-	editElement.backgroundImage = $("#editBackgroundColor").val()
-	editElement.backgroundColor = $("#editBackgroundImage").val()
+	editElement.content = $("#editMedia").val()
+	//editElement.content = $("#editContent").val();
+	editElement.backgroundColor = $("#editBackgroundColor").val()
+	editElement.backgroundImage = $("#editBackgroundImage").val()
 	
 
 	//var newUrl = document.getElementById('gifUrlR').value;
@@ -362,7 +405,7 @@ function setPrivacy(){
 
 
 ///////////////////
-///ADD DELETE PAGE
+///ADD DELETE SAVE PAGE
 //////////////////
 
 
@@ -396,6 +439,30 @@ function deletePage(){
 	show_confirm();
 }
 
+function saveVersion(){
+
+	now.saveVersion(function(err,savedVersion){
+
+		if(err)
+			alert(err)
+		else alert("This version of the page has been SAVED as version " + savedVersion)
+	})
+
+}
+
+function deleteVersion(){
+
+
+	if(version!=undefined)
+		now.deletePageVersion(pageData._id,function(error){
+		
+			if(error)
+				alert("THERE WAS AN ARROR, VERSION NOT DELETED")
+			else {}
+		
+		})
+
+}
 
 //////////
 ////IMAGE
@@ -415,13 +482,8 @@ function imageToDom(image, property){
 		if(contentType=="image")
 			img = document.createElement('img');
 		else{
-			
 			img = document.createElement('div');
-			if(image.backgroundColor != undefined)
-				img.style.backgroundColor = image.backgroundColor;
-			if(image.backgroundImage != undefined)
-				img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
-		
+
 		}
 		img.id = image._id;
 		img.style.position = 'absolute';
@@ -436,7 +498,11 @@ function imageToDom(image, property){
 	
 	if(contentType=="image" && img.src != image.url)
 		img.src=image.url;
-	else{
+	else{				
+		if(image.backgroundColor != undefined)
+			img.style.backgroundColor = image.backgroundColor;
+		if(image.backgroundImage != undefined)
+			img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
 		if(image.content != undefined)
 			img.innerHTML = image.content;
 		img.style.paddingTop="10px";
@@ -581,6 +647,16 @@ function jsonToDom(pageDataIn){
 	
 	$("#userImage").remove();
 	$("#userName").remove();
+	
+	if(prevVersion!=undefined)
+	  $("#prevVersion").show();
+	else
+	  $("#prevVersion").hide();
+	if(version!=undefined)
+	  $("#nextVersion").show();
+	else
+	  $("#nextVersion").hide();
+
 
 	if(pageData.pageName != "main" && pageData.pageName != "profile")
 		document.getElementById('pageName').innerHTML = pageData.pageName + " by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a>";

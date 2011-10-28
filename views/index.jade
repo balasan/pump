@@ -40,7 +40,7 @@
     br
   
   #textContainer(style="padding:5px;display:none")
-    textarea.tinymce
+    textarea#addContent.tinymce
   
   #mediaContainer(style="padding:5px;display:none")
     | 
@@ -254,7 +254,9 @@ input#lastId(type='hidden', name='lastId')
       -check=true
     input(type='radio', name='privacy', value='3',checked=check)
     | only i can see
-    br    
+    br
+  input(style='width:160px;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value=''", onkeyup="searchUsers()")
+  #searchResults
   input#pageSettings.button(type='submit', style='width:78px;', name='pageSettings', value='Save',onclick='setPrivacy()') 
   | 
   input#deletePage.button(type='submit', style='width:78px;', name='deletePage', value='Delete Page',onclick='deletePage()')
@@ -319,8 +321,11 @@ input#lastId(type='hidden', name='lastId')
 
 #menuContainer(style="z-index:1000;top:5px;left:5px;position:fixed;")
   -if(loggedIn)
+    #editElementButton.menuButton
+      a(href='javascript:buttonPress("editElement");') Elements
+    | 
     #editPageButton.menuButton
-      a(href='javascript:buttonPress("editPage");') Edit Page
+      a(href='javascript:buttonPress("editPage");') Page
     | 
     #animateButton.menuButton
       a(href='javascript:animate();javascript:buttonPress("animate");') Animate
@@ -332,15 +337,9 @@ input#lastId(type='hidden', name='lastId')
   |       
   #pageName(style="display:inline;")    
 
-#editPageMenu.menu(style="display:none;top:20px;left:5px;position:fixed;")
-      div.menuDiv 
-        a(href='javascript:openMenu(\'moreMenu\');') ⇧N New Page
-      -if(owner)
-        div.menuDiv 
-          a(href='javascript:openMenu(\'pageMenu\');') ⇧P Page Settings
-      div.menuDiv 
-        a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
-      //div.shortCut 
+#editElementMenu.menu(style="display:none;top:20px;left:5px;position:fixed;")
+      //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
+        |-elements 
       div.menuDiv 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
       //div.menuDiv 
@@ -349,18 +348,21 @@ input#lastId(type='hidden', name='lastId')
         a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
       div.menuDiv 
         a(href='javascript:openMenu(\'editMenu\');fillEditMenu()') ⇧E Edit
-
-//   
-  #editPageMenu.menu(style="display:none;top:30px;left:80px;position:fixed;")
-      a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
-      div.shortCut 
-      br
-      a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
-      br
-      a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
-      br
-      a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
-
+      div.menuDiv 
+        a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
+   
+#editPageMenu.menu(style="display:none;top:20px;left:78px;position:fixed;")
+      //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
+        |-page 
+      div.menuDiv 
+        a(href='javascript:openMenu(\'moreMenu\');') ⇧N New
+      div.menuDiv 
+        a(href='javascript:saveVersion();') ⇧S Save Version 
+      #settingsButton.menuDiv(style="display:none") 
+          a(href='javascript:openMenu(\'pageMenu\');') ⇧P Settings   
+      #deleteVersion.menuDiv(style="display:none") 
+          a(href='javascript:deleteVersion();') Delete This Version
+      //div.shortCut
 
 
 //
@@ -439,6 +441,14 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
       |users:
   #cList.pageList
  
+//#versionNav(style="z-index:1000;bottom:5px;left:5px;position:fixed;")
+
+#prevVersion(style="display:inline;z-index:1000;top:50%;left:5px;position:fixed;")
+     a(href="javascript:goToPage(pageData.pageName, null, prevVersion)")
+       img(src='http://mousepointers.net/wp-content/uploads/2008/05/arrow-left.gif')
+#nextVersion(style="display:inline;display:inline;z-index:1000;top:50%;right:5px;position:fixed;")  
+     a(href="javascript:goToPage(pageData.pageName, null, nextVersion)")
+       img(src="http://mousepointers.net/wp-content/uploads/2008/05/arrow-right.gif")   	  
 
  
 ///////////////
