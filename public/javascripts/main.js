@@ -4,7 +4,9 @@ var tokens = url.split("/");
 
 //this is our page (change to 3 for actual relese, 4 for beta)
 var pageName = tokens[3];
-
+var version=undefined;
+var prevVersion=undefined;
+var nextVersion=undefined;
 
 var mainPage = false;
 var profile = false;
@@ -34,6 +36,7 @@ if (pageName == "profile"){
 		profile = true;
 	}
 */
+
 
 }
 else{
@@ -672,13 +675,12 @@ function recenter(){
 
 windowReady=false;
 nowReady=false;
+var addEditorsEl;
 
 window.onload = function() { 
 
 	console.log('onload');
-	windowReady=true;
 	
-	//loadData();
 	
 	var r = Math.random()
 	var chatTop = document.getElementById('chatTop');
@@ -707,8 +709,18 @@ window.onload = function() {
 		
 		  //$('textarea.tinymce').aloha();
 
-		setupTinymce();
+			addEditorsEl = $('textarea.addEditors')
+			//addEditorsEl.tagify();
+			//$('textarea.addEditors').( {delimiters: [null]} );
+			addEditorsEl.tagify( {"addTagPrompt": 'enter username'}, {"delimiters": [null]});
+			
+			$('.tagify-container').keyup(searchUsers)
+			setupTinymce();
+			
 		$('.menuButton').okshadow();
+
+		windowReady=true;
+		loadData();
 
 /* 		$('.menu').okshadow(); */
 
@@ -903,15 +915,26 @@ function buttonPress(id){
 
 	
 	if(editPageButton.className=='menuButtonP'){
-		editPageButton.className='menuButton'
+		//editPageButton.className='menuButton'
+		$(editPageButton).removeClass('menuButtonP');
+		$(editPageButton).addClass('menuButton');
 		if(editPageMenu)
 			editPageMenu.style.display='none'
 		$(editPageButton).data("okshadow").setoption({color:"#888"});
 		}
 	else{
-		editPageButton.className='menuButtonP';
-		if(editPageMenu)
+		if(editPageMenu){
+			$(".menu").hide();
+			$(".dropButton").removeClass('menuButtonP');
+			$(".dropButton").addClass('menuButton');
+			//$(".dropButton").data("okshadow").setoption({color:""});
 			editPageMenu.style.display='block'
+
+
+			}
+		//editPageButton.className='menuButtonP';
+		$(editPageButton).removeClass('menuButton');
+		$(editPageButton).addClass('menuButtonP');
 		$(editPageButton).data("okshadow").setoption({color:""});
 		}
 

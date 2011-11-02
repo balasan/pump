@@ -561,6 +561,37 @@ input[type="password"]{
 	font-size: 13px;
 }
 
+.ui-autocomplete{
+
+	position:fixed;
+	width:200px;
+	background:rgba(255,255,255,.9);
+	box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-webkit-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	-moz-box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
+	padding:2px;
+	cursor: default; 
+	z-index:4000;
+	-webkit-transform: translate(0px, 0px)  scale(1) translateZ(11000px);
+	-moz-transform: translate(0px, 0px)  scale(1);
+	-o-transform: translate(0px, 0px)  scale(1) translateZ(11000px);
+	-transform: translate(0px, 0px)  scale(1) translateZ(11000px);
+	list-style-type: none;
+	display: inline;
+
+}
+
+.ui-menu-item{
+/* 	display: inline; */
+
+    display: inline-block;
+    padding: 3px 5px;
+    margin: 3px;
+    border-radius: 1px;
+    border: 1px solid #EEE;
+    background-color: #eee;
+}
+
 .x {
 	position: absolute;
 	font-family: Courier New, Courier New, monospace;	

@@ -227,7 +227,7 @@ input#lastId(type='hidden', name='lastId')
 //
 ////page settings/////
 
-#pageMenu.uiClosed(name='pageMenu', style='left:400px; top:300px;')
+#pageMenu.uiClosed(name='pageMenu', style='left:400px;')
   form(name='privacy')
     | Set Page Privacy:
     br
@@ -253,9 +253,12 @@ input#lastId(type='hidden', name='lastId')
     -if (privacy==3)
       -check=true
     input(type='radio', name='privacy', value='3',checked=check)
-    | only i can see
+    | invisible
     br
-  input(style='width:160px;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value=''", onkeyup="searchUsers()")
+  br
+  |add editors:
+  br
+  textarea.addEditors(style='width:auto;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value=''", onKeyPress="searchUsers();")
   #searchResults
   input#pageSettings.button(type='submit', style='width:78px;', name='pageSettings', value='Save',onclick='setPrivacy()') 
   | 
@@ -321,10 +324,10 @@ input#lastId(type='hidden', name='lastId')
 
 #menuContainer(style="z-index:1000;top:5px;left:5px;position:fixed;")
   -if(loggedIn)
-    #editElementButton.menuButton
+    #editElementButton.menuButton.dropButton
       a(href='javascript:buttonPress("editElement");') Elements
     | 
-    #editPageButton.menuButton
+    #editPageButton.menuButton.dropButton
       a(href='javascript:buttonPress("editPage");') Page
     | 
     #animateButton.menuButton
@@ -443,10 +446,10 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
  
 //#versionNav(style="z-index:1000;bottom:5px;left:5px;position:fixed;")
 
-#prevVersion(style="display:inline;z-index:1000;top:50%;left:5px;position:fixed;")
+#prevVersionDiv(style="display:none;z-index:1000;top:50%;left:5px;position:fixed;")
      a(href="javascript:goToPage(pageData.pageName, null, prevVersion)")
        img(src='http://mousepointers.net/wp-content/uploads/2008/05/arrow-left.gif')
-#nextVersion(style="display:inline;display:inline;z-index:1000;top:50%;right:5px;position:fixed;")  
+#nextVersionDiv(style="display:inline;display:none;z-index:1000;top:50%;right:5px;position:fixed;")  
      a(href="javascript:goToPage(pageData.pageName, null, nextVersion)")
        img(src="http://mousepointers.net/wp-content/uploads/2008/05/arrow-right.gif")   	  
 

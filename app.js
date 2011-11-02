@@ -127,7 +127,7 @@ var versionSchema = new Schema({
 var pageSchema = new Schema({
     pageName    : {type : String, index: { unique: true }}
   , owner 		: String
-  , editors		: String
+  , editors		: []
   , images      : [imageSchema]
   , privacy		: Number
   , backgroundImageType : Number
@@ -578,7 +578,7 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 		
 
 	
-	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true},function(err, result){
+	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true, editors:true},function(err, result){
 		if(!err && result !=undefined){
 			//console.log(result)
 			//if(result==undefined)
@@ -590,6 +590,14 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 			}
 			else oldthis.user.pagePermissions[pageName]=result.privacy;
 			
+			//console.log(result)
+			if(result.editors!=undefined){
+				for(var i=0;i<result.editors.length;i++){
+					if(result.editors[i]==oldthis.user.name && !owner){
+						oldthis.user.pagePermissions[pageName]=0;
+					}
+				}
+			}
 			if(oldthis.user.name=="gifpumper"){
 				oldthis.user.pagePermissions[pageName]='owner';
 			}
@@ -920,11 +928,11 @@ everyone.now.updateUsers = function(users, callback){
 /////////
 
 
-everyone.now.setPrivacy = function(pageName, privacy,callback){
+everyone.now.setPrivacy = function(pageName, privacy,editors,callback){
 
 	if (this.user.pagePermissions[pageName] !='owner')
 		return;
-	pageModel.update({"pageName":pageName},{$set :{"privacy":privacy}}, function(err){
+	pageModel.update({"pageName":pageName},{$set :{"privacy":privacy,editors:editors}}, function(err){
 		if(err)	callback(err);
 		else{
 			callback(null);
@@ -1052,6 +1060,21 @@ everyone.now.loadMainPage = function(user, callback){
 			})
 		}
 	})
+}
+
+everyone.now.findUser = function(userTxt, callback){
+
+	var user = new RegExp("^"+userTxt);
+	console.log(user)
+	userModel.find({username: user}, { username : 1 },function(error,result){
+	//userModel.find({username: { $regex : user}}, { username : 1 },function(error,result){
+		if(!error){
+				console.log(result);
+				callback(result);
+				
+				}
+		else console.log(error)
+	}).limit(10);
 }
 
 ////////////////////

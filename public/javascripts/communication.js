@@ -20,7 +20,7 @@ now.ready(function(){
 var myName;
 function loadData(){
 
-	if(nowReady){// && windowReady){
+	if(nowReady && windowReady){
 	
 		if(myName==undefined)
 			myName="noob"
@@ -79,6 +79,7 @@ function loadAll(error, pageData){
 	if(version != undefined){
 		if(version>0)
 			prevVersion=version-1;
+		else prevVersion=undefined;
 		
 		if(version == undefined || version==lastVersion-1)
 			nextVersion=undefined;
@@ -291,8 +292,7 @@ function deleteImage(){
 	var	len = document.f1.deleteType.length;
 	var lastId =pageData.lastId;
 
-	if(lastId == undefined)
-		return;
+
 
 	for (i = 0; i <len; i++) {
 		if (document.f1.deleteType[i].checked) {
@@ -302,9 +302,13 @@ function deleteImage(){
 	var all = false;
 	if(deleteType == "all")
 		all=true;
+		
+	if(!all && lastId == undefined)
+		return;
 
 	now.deleteImage(pageName, lastId, all);
 	
+	$("input[name=deleteType]").filter("[value=one]").attr("checked",true);	
 }
 
 now.deleteResponce = function(imgId, all){
@@ -345,8 +349,10 @@ function replaceImg(){
 	editElement = pageData.images[lastId];
 	editElement.url = $("#editImage").val();
 	//TODO: media/content
-	editElement.content = $("#editMedia").val()
-	//editElement.content = $("#editContent").val();
+	if( editElement.contentType == "media")
+		editElement.content = $("#editMedia").val()
+	if( editElement.contentType == "text")
+		editElement.content = $("#editContent").val();
 	editElement.backgroundColor = $("#editBackgroundColor").val()
 	editElement.backgroundImage = $("#editBackgroundImage").val()
 	
@@ -392,7 +398,10 @@ function setPrivacy(){
 			setPrivacy = document.privacy.privacy[i].value;
 		}		
 	}
-	now.setPrivacy(pageName, setPrivacy, function(error){		
+	
+	var editors = addEditorsEl.tagify('serialize').split(',');
+	
+	now.setPrivacy(pageName, setPrivacy,editors, function(error){		
 		if(!error) openMenu('pageMenu');
 		}
 	);
@@ -445,23 +454,42 @@ function saveVersion(){
 
 		if(err)
 			alert(err)
-		else alert("This version of the page has been SAVED as version " + savedVersion)
+		else {alert("This version of the page has been SAVED as version " + savedVersion);
+			prevVersion = savedVersion;
+			
+			$("#prevVersionDiv").show();
+		}
 	})
 
 }
 
 function deleteVersion(){
 
+	var r=confirm("ARE YOU SURE YOU WANT TO DELETE THIS VERSION?");
+	
+	if(version!=undefined){ 
+	
+			if (r==true){
+				now.deletePageVersion(pageData._id,function(error){
+	
+				if(error)
+					alert("THERE WAS AN ARROR, VERSION NOT DELETED")
 
-	if(version!=undefined)
-		now.deletePageVersion(pageData._id,function(error){
+				else
+				  {
+				  	if(version>0)
+						goToPage(pageName,null,version-1);
+					else goToPage(pageName,null,null);
+	
+				  }
+			})
+		}
 		
-			if(error)
-				alert("THERE WAS AN ARROR, VERSION NOT DELETED")
-			else {}
-		
-		})
 
+		
+
+		show_confirm();	
+	}
 }
 
 //////////
@@ -618,6 +646,31 @@ now.updateText = function(user, text){
 	changeBackground();
 }
 
+function searchUsers(){
+
+	var addEditorsEl = $('textarea.addEditors')
+
+
+	var txt = addEditorsEl.tagify('inputField').val();
+	
+	now.findUser(txt,function(userArray){
+
+		var newArray=[]
+		for(var i = 0; i<userArray.length;i++){
+			newArray.push(userArray[i].username)
+		}
+		addEditorsEl.tagify('inputField').autocomplete({
+		    source: newArray,
+		    position: { of: addEditorsEl.tagify('containerDiv'), 
+		    			my:"left top",
+		    			at:"left bottom" },
+		    select: function(){this.okToAdd = true},
+		    close: function(event, ui) { if(this.okToAdd) addEditorsEl.tagify('add'); this.okToAdd = false;}
+		});
+
+	})
+
+}
 
 /////////
 ////PAGE
@@ -643,19 +696,34 @@ function jsonToDom(pageDataIn){
 	document.getElementById('cList').innerHTML="";
 
 	document.getElementById('profileContainer').style.display='none';
-	//document.getElementById('profileContainer').innerHTML="";	
+	//document.getElementById('profileContainer').innerHTML="";
+	
+	
+
+	if(pageData.editors != undefined){
+	
+		var editorsText="";
+
+		for(var k = 0;k<pageData.editors.length;k++){
+			editorsText+=pageData.editors[k]+", "
+			}
+			
+		$('textarea.addEditors').val(editorsText)
+
+	}
+
 	
 	$("#userImage").remove();
 	$("#userName").remove();
 	
 	if(prevVersion!=undefined)
-	  $("#prevVersion").show();
+	  $("#prevVersionDiv").show();
 	else
-	  $("#prevVersion").hide();
+	  $("#prevVersionDiv").hide();
 	if(version!=undefined)
-	  $("#nextVersion").show();
+	  $("#nextVersionDiv").show();
 	else
-	  $("#nextVersion").hide();
+	  $("#nextVersionDiv").hide();
 
 
 	if(pageData.pageName != "main" && pageData.pageName != "profile")
@@ -854,9 +922,7 @@ loadProfileInfo = function(info){
 			document.getElementById('cList').appendChild(newDiv);
 	
 			//}		
-		}
-	
-	
+		}	
 		document.getElementById('contributePages').style.display='block';
 }
 
