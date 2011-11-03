@@ -25,7 +25,7 @@ if (pageName == ''){
 if (pageName == "profile"){
 
 	if(tokens[4] == undefined)
-		goToPage('main')
+		window.location = "./";
 	else{
 		userProfile=tokens[4];
 		profile = true; 
@@ -712,7 +712,7 @@ window.onload = function() {
 			addEditorsEl = $('textarea.addEditors')
 			//addEditorsEl.tagify();
 			//$('textarea.addEditors').( {delimiters: [null]} );
-			addEditorsEl.tagify( {"addTagPrompt": 'enter username'}, {"delimiters": [null]});
+			addEditorsEl.tagify( {"addTagPrompt": 'enter username'},{delimiters: [null]});
 			
 			$('.tagify-container').keyup(searchUsers)
 			setupTinymce();
@@ -910,32 +910,32 @@ function openChat(){
 
 function buttonPress(id){
 
-	var editPageButton = document.getElementById(id+"Button");
-	var editPageMenu = document.getElementById(id+"Menu");
+	var editButton = document.getElementById(id+"Button");
+	var editMenu = document.getElementById(id+"Menu");
 
 	
-	if(editPageButton.className=='menuButtonP'){
+	if($(editButton).hasClass('menuButtonP')){
 		//editPageButton.className='menuButton'
-		$(editPageButton).removeClass('menuButtonP');
-		$(editPageButton).addClass('menuButton');
-		if(editPageMenu)
-			editPageMenu.style.display='none'
-		$(editPageButton).data("okshadow").setoption({color:"#888"});
+		$(editButton).removeClass('menuButtonP').addClass('menuButton');
+		//$(editPageButton)
+		if(editMenu)
+			editMenu.style.display='none'
+			$(editButton).data("okshadow").setoption({color:"#888"});
 		}
 	else{
-		if(editPageMenu){
+		if(editMenu){
 			$(".menu").hide();
-			$(".dropButton").removeClass('menuButtonP');
-			$(".dropButton").addClass('menuButton');
-			//$(".dropButton").data("okshadow").setoption({color:""});
-			editPageMenu.style.display='block'
+			$(".dropButton").removeClass('menuButtonP').addClass('menuButton');
+			
+			$(".menuButton").data("okshadow").setoption({color:"#888"});
+			$("#editPageButton").data("okshadow").setoption({color:"#888"});
 
+			editMenu.style.display='block'
 
 			}
 		//editPageButton.className='menuButtonP';
-		$(editPageButton).removeClass('menuButton');
-		$(editPageButton).addClass('menuButtonP');
-		$(editPageButton).data("okshadow").setoption({color:""});
+		$(editButton).removeClass('menuButton').addClass('menuButtonP');
+		$(editButton).data("okshadow").setoption({color:""});
 		}
 
 

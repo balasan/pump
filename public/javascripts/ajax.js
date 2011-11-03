@@ -39,16 +39,16 @@ function ajax(){
 			pageData[page].pageData.images=imgArray;
 		}
 */
-		var textObj={}
 		for(var page in pageData){
-		
+			
+			var textArray=[]
 			text = pageData[page].pageData.text;	
 			if(text != undefined){
 				for(var i=0; i<text.length; i++){
 				
-					textObj = {text:text[i],user:"anon"}
+					textArray.push({text:text[i],user:"anon"});
 				}	
-				pageData[page].pageData.text = textObj;
+				pageData[page].pageData.text = textArray.reverse();
 			}
 		}
 

@@ -593,6 +593,19 @@ now.backgroundResponce = function(type, background){
 ////////////
 ///TXT/////
 //////////
+function fillChat(user, text) {
+
+	var newTxtDiv = document.createElement('div');
+	//text.remove(/<script\b[^>]*>(.*?)<\/script>/i)
+	newTxtDiv.innerHTML ="<b><a href='/profile/"+user+"'>"+user+"</a>:</b> " +text;
+	newTxtDiv.style.paddingBottom="1px";
+	//newTxtDiv.innerHTML = newDiv.innerHTML;			
+	document.getElementById('chatBox').appendChild(newTxtDiv);
+	lastPost=user;
+	lastTxtDiv=newTxtDiv;
+}
+
+
 var maxrows=6;
 
 function doResize() {
@@ -616,11 +629,15 @@ function enter(evt){
 		var inputBox = document.getElementById("inputBox");
 		var inputTxt = inputBox.value;
 		
+			var textObject = {};
+				textObject.text = inputTxt;
+				textObject.time = new Date();
+
+		
 		inputBox.value="";
-		now.submitComment(pageName,userProfile,inputTxt);
+		now.submitComment(pageName,textObject, userProfile);
 		evt.preventDefault();
-		//inputBox.blur();
-		//document.yourform.submit();
+
 	} 		
 }
 
@@ -633,18 +650,15 @@ now.updateText = function(user, text){
 		lastTxtDiv.innerHTML+="<br>"+text;
 	}
 	else{
-		var newTxtDiv = document.createElement('div');
-		//text.remove(/<script\b[^>]*>(.*?)<\/script>/i)
-		newTxtDiv.innerHTML ="<b><a href='/profile/"+user+"'>"+user+"</a>:</b> " +text;
-		newTxtDiv.style.paddingBottom="1px";
-		//newTxtDiv.innerHTML = newDiv.innerHTML;			
-		document.getElementById('chatBox').appendChild(newTxtDiv);
-		lastPost=user;
-		lastTxtDiv=newTxtDiv;
+		fillChat(user,text);
+
 	}
 	document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 	changeBackground();
+
 }
+
+
 
 function searchUsers(){
 
@@ -683,6 +697,8 @@ function jsonToDom(pageDataIn){
 	pageData = pageDataIn;
 
 	
+	if(lastPost!=undefined)
+		lastPost="";	
 	
 	document.body.style.backgroundColor = '';
 	document.body.style.backgroundImage = '';
@@ -698,18 +714,31 @@ function jsonToDom(pageDataIn){
 	document.getElementById('profileContainer').style.display='none';
 	//document.getElementById('profileContainer').innerHTML="";
 	
-	
+	document.getElementById('chatBox').innerHTML="";
+
+	addEditorsEl.tagify('removeAll');
+	addEditorsEl.tagify('inputField').val('')
+	addEditorsEl.val('');
 
 	if(pageData.editors != undefined){
 	
 		var editorsText="";
 
 		for(var k = 0;k<pageData.editors.length;k++){
-			editorsText+=pageData.editors[k]+", "
+			//editorsText+=pageData.editors[k]+", "
+			
+			addEditorsEl.tagify('inputField').val(pageData.editors[k])
+			addEditorsEl.tagify('add');
+
 			}
 			
-		$('textarea.addEditors').val(editorsText)
+		//addEditorsEl.tagify.val(editorsText)
+		
+		//addEditorsEl.tagify('inputField').val(editorsText)
+		//addEditorsEl.val(editorsText).show()
 
+		//addEditorsEl.tagify( {"addTagPrompt": 'enter username'}, {"delimiters": [null]});
+		//addEditorsEl.tagify('add');
 	}
 
 	
@@ -790,11 +819,22 @@ function jsonToDom(pageDataIn){
 		}
 	}
 		
-	//document.getElementById('console1').value = pageData.text;
+//////////Added text::			
+	if(pageData.text != undefined){
+		for(var i=0; i<pageData.text.length; i++){
+			
+		if(pageData.text[i].user==lastPost){
+			lastTxtDiv.innerHTML+="<br>"+pageData.text[i].text;
+		}
+		else{
+			
+			fillChat(pageData.text[i].user,pageData.text[i].text);
+			//lastPost=pageData.text[i].user;
+		}
 
-	//var bgimage = new Image ();
-	//bgimage.src=
-
+		}
+	}
+////
 	var div3d = document.getElementById("div3d");
 
 	if(pageData.backgroundImageType == undefined){
@@ -865,6 +905,23 @@ loadProfileInfo = function(info){
 		containerDiv.style.display='block';
 		//document.body.appendChild(containerDiv);
 	}
+//switch chat for profile page	
+	var lastPost="";
+	var lastTxtDiv;	
+	if(profileInfo.text != undefined){
+
+	
+		for(var i=0; i<profileInfo.text.length; i++){
+			if(profileInfo.text[i].user==lastPost){
+				lastTxtDiv.innerHTML+="<br>"+profileInfo.text[i].text;
+			}
+			else{			
+				fillChat(profileInfo.text[i].user, profileInfo.text[i].text);
+			}
+		}
+	}
+		
+	//}
 	
 	///fill out pages
 
@@ -923,12 +980,14 @@ loadProfileInfo = function(info){
 	
 			//}		
 		}	
+		document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+
 		document.getElementById('contributePages').style.display='block';
-}
+
+	}
 
 	changeBackground();
 	changeProfileColor()
-
 }
 
 changeProfileColor =function(){
