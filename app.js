@@ -17,8 +17,11 @@ var Schema = mongoose.Schema;
 mongoose.connect('localhost','gifpumper',27017)
 
 
-MemoryStore = express.session.MemoryStore,
-sessionStore = new MemoryStore();
+//MemoryStore = express.session.MemoryStore,
+var MongoStore = require('connect-mongo');
+
+sessionStore = new MongoStore({db:'gifpumper'})
+
 
 
 //TODO:change cookie settings to the right domain
@@ -92,7 +95,8 @@ var imageSchema = new Schema({
 	content : String,
 	contentType : String,
 	opacity : Number,
-	user : String
+	user : String,
+    d2d : {type: Boolean, default: false}
 });
 
 var divSchema = new Schema({
@@ -122,10 +126,11 @@ var versionSchema = new Schema({
   , text 		: [textSchema]
   , contributors : []
   , likes : []
+  , likesN : {type: Number, default:0,min:0}
 });
 	
 var pageSchema = new Schema({
-    pageName    : {type : String, index: { unique: true }}
+    pageName    : {type : String, index: { unique: true },set:toLower}
   , owner 		: String
   , editors		: []
   , images      : [imageSchema]
@@ -140,10 +145,14 @@ var pageSchema = new Schema({
   , versions : [versionSchema]
   , currentVersion: {type: Number, default:0, min:0}
   , likes : []
+  , likesN : {type: Number, default:0,min:0}
+  , vLikes : {type: Number, default:0,min:0}
+  , d2d : {type: Boolean, default: false}
+  , notify : [notifySchema]
 });
 
 var userSchema = new Schema({
-	  username : {type :String,  unique: true }
+	  username : {type :String,  index: { unique: true }, set:toLower}
 	, salt : {type: String}
 	, password : Buffer
 	, email : String 
@@ -157,10 +166,19 @@ var userSchema = new Schema({
 	, backgroundImage : String
 	, background : String
 	, info : String
+	, notify : [notifySchema]
+	, newNotify : Number
+	, nowId : String
 });
 
-//var profilePageSchema = new Schema({
 
+var notifySchema = new Schema({
+	  user: String
+	, page: String
+	, action: String
+	, version: Number
+	, time : { type: Date, default: Date.now }
+});
 
 var textSchema = new Schema({
 	  user : String
@@ -170,7 +188,16 @@ var textSchema = new Schema({
 	, hash : []
 });
 
+var onlineSchema = new Schema({
+	  user : String
+	, page : String
+	, nowId : {type :String,  index: true} 
 
+})
+
+function toLower (v) {
+  return v.toLowerCase();
+}
 
 function hash(msg, key) {
   return crypto.createHmac('sha256', key).update(msg).digest('hex');
@@ -183,6 +210,8 @@ var imageModel = mongoose.model('imageModel', imageSchema);
 var userModel = mongoose.model('userModel', userSchema);
 var textSchema = mongoose.model('textModel', textSchema);
 var versionModel = mongoose.model('versionModel', versionSchema);
+var notifyModel = mongoose.model('notifyModel',notifySchema);
+var onlineModel = mongoose.model('onlineModel',onlineSchema);
 
 //var divSchema = mongoose.model('divModel', divSchema);
 
@@ -200,14 +229,14 @@ app.get('/', function(req, res){
 
 	if (req.session.user) {
 		loggedIn = true;
-		user = req.session.user.username;
+		user = req.session.user;
 		
 		//TODO default page
 				
 		pageModel.findOne({'pageName':'main'},{privacy:true, owner:true},function(err, result){
 			if(!err){
 				var owner=false;
-				if(result.owner == req.session.user.username){
+				if(result.owner == req.session.user){
 					owner=true;
 				}
 				var privacy=result.privacy;
@@ -259,11 +288,11 @@ app.get("/:page/:version?", function(req,res) {
 
 		if (req.session.user) {
 			loggedIn = true;
-			user = req.session.user.username;
+			user = req.session.user;
 					pageModel.findOne({'pageName':req.params.page},{privacy:true, owner:true},function(err, result){
 			if(!err && result != undefined){
 				var owner=false;
-				if(result.owner == req.session.user.username){
+				if(result.owner == req.session.user){
 					owner=true;
 				}
 				var privacy=result.privacy;
@@ -309,14 +338,14 @@ app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
 
 		if (req.session.user) {
 			loggedIn = true;
-			user = req.session.user.username;
+			user = req.session.user;
 			
 			var page = 'profile_'+req.params.user;
 			
 			pageModel.findOne({'pageName':page},{privacy:true, owner:true},function(err, result){
 			if(!err && result != undefined){
 				var owner=false;
-				if(result.owner == req.session.user.username){
+				if(result.owner == req.session.user){
 					owner=true;
 				}
 				var privacy=result.privacy;
@@ -398,7 +427,7 @@ app.post('/login', function(req, res){
 	        // Store the user's primary key 
 	        // in the session store to be retrieved,
 	        // or in this case the entire user object
-	        req.session.user = user;
+	        req.session.user = user.username;
 	        res.redirect('back');
 	      });
 	    } else {
@@ -420,7 +449,6 @@ app.post('/login', function(req, res){
 
 everyone.connected(function(){
 
-  
   	var cookie=this.user.cookie['connect.sid']
 	
 	cookie = parseCookie(cookie)['']
@@ -433,10 +461,29 @@ everyone.connected(function(){
             } 
             else {
             	if(session == undefined || session.user == undefined)
-					oldthis.user.name = 'noob'
+					oldthis.user.name = 'n00b'
 				else {
-					oldthis.user.name = session.user.username;
-                	}
+					oldthis.user.name = session.user;
+					
+					//userModel.update({username:session.user},{$set : {nowId:oldthis.user.clientId}},function(err){
+					//	if(err) console.log(err)
+					//})
+
+					userModel.findOne({username:oldthis.user.name},{notify:{$slice:-20},newNotify:1},function(err, result){
+						if(!err){
+/* 		     	    		callback(null, result,result2) */
+							if(result.newNotify==undefined)
+								result.newNotify=0
+		     	    		oldthis.now.notify(result.notify,result.newNotify)
+		     	    		
+		     	    		userModel.update({username:oldthis.user.name},{$set : {newNotify:0,notify:result.notify, nowId:oldthis.user.clientId}},function(err){
+		     	    				if(err) console.log(err)
+		     	    			})
+		     	    		}
+					})						
+						
+						
+                }
                 console.log(oldthis.user.name + ' connected');
             }
         });	
@@ -464,19 +511,17 @@ everyone.now.updateAll = function(pageData,callback){
     }
 }
 
+/*
 nowjs.on('connect', function () {
-  
-
-  
-
   //this.now.receiveMessage('SERVER', 'Welcome to NowJS.');
 });
+*/
 
-var pagesGroup = {};
 
 
 everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
+	//var pagesGroup = {};
 	var groupName=pageName;
 	if(pageName=="profile")
 		groupName = "profile___"+userProfile;
@@ -495,73 +540,90 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 		var sliceParam = -1;
 
 	var oldthis = this;
-	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20}}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -100}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
           else{
-          	callback(null, result)
-     		if(pagesGroup[groupName] == undefined){
-				pagesGroup[groupName]=nowjs.getGroup(groupName);
-				pagesGroup[groupName].pageUsers={};
-				}
-			pagesGroup[groupName].addUser(oldthis.user.clientId);
-						
+				
+			nowjs.getGroup(groupName).addUser(oldthis.user.clientId);
+			
+			//TODO: not n00b?
+			onlineModel.update({nowId:oldthis.user.clientId},{$set : {page:groupName,user:oldthis.user.name}},{upsert:true},function(err){
+				if(err) console.log(err)
+				});
+				
+			if(nowjs.getGroup(groupName).pageUsers == undefined)
+				nowjs.getGroup(groupName).pageUsers={};
+							
 			oldthis.user.currentPage=groupName;
 			
-			oldthis.now.updatePageUser('add',pagesGroup[groupName].pageUsers,userProfile);
+			nowjs.getGroup('main').now.updateFeed(oldthis.user.name,groupName,'join')
 			
+			oldthis.now.updatePageUser('add',nowjs.getGroup(groupName).pageUsers,userProfile);
 			userModel.findOne({username:oldthis.user.name},{userImage:1},function(err,result){
 			
-				if(!err && oldthis.user.name !='noob'){
-					//console.log(result);
+				if(!err && oldthis.user.name !='n00b'){
 					var userObj = {}
 					if(result.userImage==undefined)
 						result.userImage="";
 					userObj[oldthis.user.name]=result.userImage;
-					//console.log(userObj);
-					pagesGroup[groupName].pageUsers[oldthis.user.clientId]=userObj;
-					pagesGroup[groupName].now.updatePageUser('add',[userObj]);
+					nowjs.getGroup(groupName).pageUsers[oldthis.user.clientId]=userObj;
+					nowjs.getGroup(groupName).now.updatePageUser('add',[userObj]);
 				
 				}
 				else console.log(err)
-				if(oldthis.user.name=='noob'){
+				if(oldthis.user.name=='n00b'){
 					var userObj = {}
-					userObj={'noob':null};
-					pagesGroup[groupName].pageUsers[oldthis.user.clientId]=userObj;
-					pagesGroup[groupName].now.updatePageUser('add',[userObj]);
+					userObj={'n00b':null};
+					nowjs.getGroup(groupName).pageUsers[oldthis.user.clientId]=userObj;
+					nowjs.getGroup(groupName).now.updatePageUser('add',[userObj]);
 				}
-				
-
 			})
+
+		callback(null, result)
+
      	}
      });
 }
 
+onlineModel.remove({},function(err){});
 
+everyone.now.getAllUsers = function(callback){
+
+	onlineModel.find({},{user:1,page:1,_id:0},function(err,res){
+		if(!err)
+			callback(res)
+	})
+}
 
 everyone.now.leavePage = function(userProfile, callback){	
-
+	
 	if(this.user.currentPage != null){
-	
-	pagesGroup[this.user.currentPage].exclude(this.user.clientId).now.updatePageUser('delete',this.user.name,userProfile);
-	
-	//if(this.user.currentPage != "main" && this.user.currentPage != "profile")
-	delete pagesGroup[this.user.currentPage].pageUsers[this.user.clientId];
-	pagesGroup[this.user.currentPage].removeUser(this.user.clientId);
+		nowjs.getGroup(this.user.currentPage).exclude(this.user.clientId).now.updatePageUser('delete',this.user.name,userProfile);
+		
+		//if(this.user.currentPage != "main" && this.user.currentPage != "profile")
+		delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
+		nowjs.getGroup(this.user.currentPage).removeUser(this.user.clientId);
+		nowjs.getGroup('main').now.updateFeed(this.user.name,this.user.currentPage,'leave')
 
-
-	this.user.currentPage = null;
-	callback();
-	}
+		this.user.currentPage = null;
+		callback();
+		
+	}	
 };
 
 nowjs.on('disconnect', function(){
+	
+	userModel.update({username:this.user.name},{$set : {nowId:null}},function(err){
+		if(err) console.log(err)
+	})
+	nowjs.getGroup('main').now.updateFeed(this.user.name,this.user.currentPage,'leave')
 
-	pagesGroup[this.user.currentPage].now.updatePageUser('delete',this.user.name);
-	delete pagesGroup[this.user.currentPage].pageUsers[this.user.clientId];
+	delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
+	nowjs.getGroup(this.user.currentPage).now.updatePageUser('delete',this.user.name);
 	//pagesGroup[this.user.currentPage].removeUser(this.user.clientId);
-
+	onlineModel.remove({nowId:this.user.clientId},function(err){});
 });
 
 
@@ -576,13 +638,9 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 	oldthis=this;
 	if(this.user.pagePermissions==undefined)
 		this.user.pagePermissions={};
-		
-
 	
 	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true, editors:true},function(err, result){
 		if(!err && result !=undefined){
-			//console.log(result)
-			//if(result==undefined)
 			
 			var owner=false;
 			if(result.owner == oldthis.user.name){
@@ -591,7 +649,6 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 			}
 			else oldthis.user.pagePermissions[pageName]=result.privacy;
 			
-			//console.log(result)
 			if(result.editors!=undefined){
 				for(var i=0;i<result.editors.length;i++){
 					if(result.editors[i]==oldthis.user.name && !owner){
@@ -606,16 +663,13 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 				pageName = "profile___"+userProfile;
 				if(userProfile == oldthis.user.name)
 					oldthis.user.pagePermissions[pageName]='owner';
-				else if(oldthis.user.name == 'noob')
+				else if(oldthis.user.name == 'n00b')
 					oldthis.user.pagePermissions[pageName]=3;
 				else 
 					oldthis.user.pagePermissions[pageName]=2;
-					
 			}
-			
-					
 			oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner);
-			callback(null, oldthis.user.name);	
+			callback(null, oldthis.user.name,oldthis.user.pagePermissions[pageName]);	
 		}
 		
 	})
@@ -636,109 +690,42 @@ everyone.now.updateElement = function(pageName, _id, property, value, all, callb
 		return;
     oldthis = this;
 
-	var n = "images."+"$"+"."+property;
-	var index = {};                
-	index[n] = value;
-
-	pageModel.findOne({"pageName":pageName, "images._id":_id}, function(error, result){
-		
-		
-		if(all){
-			result.images.forEach(function(image){
-				image[property]=value;
-				});
-			}
-		else {
-			
-			if(result.images.id(_id) != undefined)
-				result.images.id(_id)[property]=value;
-			else{
-		  		pagesGroup[pageName].now.deleteResponce(_id, false);	
-			 	return; 
-			 }
-			}
-		result.save(function (error,result) {
-		if(!error)
-			if(all)
-				pagesGroup[pageName].now.pushChanges(result);
-			else if(property == 'url')
-				pagesGroup[pageName].now.updateChanges(_id,property,value);
-			else
-				pagesGroup[pageName].exclude(oldthis.user.clientId).now.updateChanges(_id,property,value);
-		});
-	});	
-
+	nowjs.getGroup(pageName).exclude(oldthis.user.clientId).now.updateChanges(_id,property,value);
 }
 
 
-everyone.now.editElement = function(pageName, _id, element, all, callback){
+everyone.now.editElement = function(pageName, _id, element, all, position, callback){
     
    	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>1)
 		return;
     oldthis = this;
 	
 	pageModel.findOne({"pageName":pageName, "images._id":_id}, function(error, result){
-
-		console.log(element);
-	
-		//delete element._id;
+		//console.log(element);		
+		if(all && element.type=='image'){
+			result.images.forEach(function(image){
+				if(image.type=="image")
+					image=element;
+				});
+			}
+		else
 		result.images.id(_id).set(element);
-		//result.images.update({_id:_id},[element]);
 		
 		result.save(function (error,result) {
 			if(!error){
-				pagesGroup[pageName].now.newImg(element);
+				if(position)
+					nowjs.getGroup(pageName).exclude(oldthis.user.clientId).now.newImg(element);
+				else
+					nowjs.getGroup(pageName).now.newImg(element);
 			
 				}
 				//console.log(images)
 			else console.log(error)
 		})
-
-	//delete element._id;
-	//console.log(element);
-	//pageModel.update({"pageName":pageName, "images._id":_id},{$set : {"images.$.backgroundColor":'yellow'}},{upsert: true}, function(error){
-	//pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
-		
-/*
-		if(all){
-			result.images.forEach(function(image){
-				image[property]=value;
-				});
-			}
-		else {
-			
-			if(result.images.id(_id) != undefined)
-				
-				result.images.id(_id).update(element);
-				
-				
-			else{
-		  		pagesGroup[pageName].now.deleteResponce(_id, false);	
-			 	return; 
-			 }
-			}
-*/
-		//result.save(function (error,result) {
 		if(error){console.log(error)}
-/*
-			if(all)
-				pagesGroup[pageName].now.pushChanges(result);
-			else
-				pagesGroup[pageName].now.updateEditChanges(_id,result.images.id(_id),value);
-*/
-		//});
 	});	
-
 }
 
-
-/*
-everyone.now.setUserPage = function(pageName){
-	if(pagesGroup[pageName] == undefined)
-		pagesGroup[pageName]=require("now").getGroup(pageName);
-	pagesGroup[pageName].addUser(this.user.clientId);
-}
-*/
 
 ///////
 ///ADD
@@ -753,16 +740,20 @@ everyone.now.addNewImg = function(pageName, imgObj, number, scrollTop, scrollLef
 		var img= new imageModel(imgObj);
 
 		img.user = this.user.name;
-		
-		var thereIsError=false;
 
 		pageModel.update({"pageName":pageName}, {$push: {"images" : img}}, function (err,result) {
-		  if (err)
-		  	thereIsError=true;
-		});
-		if(!thereIsError)
-			pagesGroup[pageName].now.newImg(img);
+			if (!err){
+				var notify = {};//new notifyModel();
+				notify.user = oldthis.user.name;
+				notify.action = 'update'
+				notify.page = pageName;
+				nowjs.getGroup(pageName).now.newImg(img);
+				nowjs.getGroup('main').now.notify([notify],null, true)		
+			}
+			else console.log(err)
+		})
 	}
+
 };
 
 everyone.now.updateUserPic = function(username, url,callback){
@@ -792,7 +783,7 @@ everyone.now.deleteImage=function(pageName,imgId, all){
 			result.images=[];
 			result.save(function (error) {
 				if(!error)
-			  		pagesGroup[pageName].now.deleteResponce(imgId, all);	
+			  		nowjs.getGroup(pageName).now.deleteResponce(imgId, all);	
 				});
 			});				
 	}
@@ -800,12 +791,12 @@ everyone.now.deleteImage=function(pageName,imgId, all){
 		pageModel.findOne({"pageName":pageName}, function(error, result){
 			
 			if(result.images.id(imgId) == undefined)
-		  		pagesGroup[pageName].now.deleteResponce(imgId, all);
+		  		nowjs.getGroup(pageName).now.deleteResponce(imgId, all);
 		  	else{	
 				result.images.id(imgId).remove();
 				result.save(function (error) {
 				if(!error)
-			  		pagesGroup[pageName].now.deleteResponce(imgId, all);	
+			  		nowjs.getGroup(pageName).now.deleteResponce(imgId, all);	
 				});
 			}
 		});				
@@ -827,14 +818,14 @@ everyone.now.setBackground=function(pageName, type, background){
 		var background = 'url('+background+')';
 		pageModel.update({"pageName":pageName},{$set: {backgroundImage:background}}, function(err){
 			if(!err)
-				pagesGroup[pageName].now.backgroundResponce(type, background);
+				nowjs.getGroup(pageName).now.backgroundResponce(type, background);
 			else console.log(err)
 		});
 	}
 	if(type=="background"){
 		pageModel.update({"pageName":pageName},{$set: {background:background}}, function(err){
 			if(!err)
-				pagesGroup[pageName].now.backgroundResponce(type, background);
+				nowjs.getGroup(pageName).now.backgroundResponce(type, background);
 			else console.log(err)
 		});
 	}
@@ -929,15 +920,20 @@ everyone.now.updateUsers = function(users, callback){
 /////////
 
 
-everyone.now.setPrivacy = function(pageName, privacy,editors,callback){
+everyone.now.setPrivacy = function(pageName, privacy,editors,_2d,callback){
 
+	if(_2d)
+		var d2d=true;
+	else
+		var d2d=false;
+		
 	if (this.user.pagePermissions[pageName] !='owner')
 		return;
-	pageModel.update({"pageName":pageName},{$set :{"privacy":privacy,editors:editors}}, function(err){
+	pageModel.update({"pageName":pageName},{$set :{"privacy":privacy,editors:editors,d2d:d2d}}, function(err){
 		if(err)	callback(err);
 		else{
 			callback(null);
-			pagesGroup[pageName].now.pagePrivacy(privacy);
+			nowjs.getGroup(pageName).now.pagePrivacy(privacy,d2d);
 		}	
 	})
 };
@@ -950,7 +946,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 
 	var oldthis1=this;
 	var name = this.user.name;
-	if (this.user.name == 'noob'){
+	if (this.user.name == 'n00b'){
 		callback("please log in to create page");
 		return;
 	}
@@ -1028,6 +1024,9 @@ everyone.now.deletePage = function(pageName,callback){
 everyone.now.submitComment = function(pageName,textObject, userProfile){
 
 
+	if(this.user.name=='n00b')
+		return;
+		
 	var oldthis = this;	
 	//TODO: permissions
 	var groupName=pageName;
@@ -1045,30 +1044,29 @@ everyone.now.submitComment = function(pageName,textObject, userProfile){
 		  	thereIsError=true;
 
 		else if(!thereIsError)
-			pagesGroup[groupName].now.updateText(oldthis.user.name,txt.text);
+			nowjs.getGroup(pageName).now.updateText(oldthis.user.name,txt.text);
 					});
 
 	}
-		else{ 
-		pagesGroup[groupName].now.updateText(this.user.name,textObject.text);
+	else{ 
+		//nowjs.getGroup(pageName).now.updateText(this.user.name,textObject.text);
 		pageModel.update({"pageName":pageName}, {$push: {"text" : txt}}, function (err,result) {
-		  if (err)
-		  	thereIsError=true;
-		
-		if(!thereIsError)
-			pagesGroup[pageName].now.updateText(this.user.name,txt.text);
+			if (err) console.log(err)
+			else
+				nowjs.getGroup(pageName).now.updateText(oldthis.user.name,txt.text);
 			});
 	}
 }
 
 	
 
+
 everyone.now.loadProfileInfo = function(user, callback){
 
 	userModel.findOne({username:user}, { password : 0, salt:0 },function(error,result){
 		if(!error){
 				
-			pageModel.find({$or :[{owner:user},{"images.user":user}]},['pageName','likes','contributors','owner'],function(error,result2){
+			pageModel.find({$or :[{owner:user},{"images.user":user}]},{'pageName':1,'likes':1,'likesN':1,'vLikes':1,'contributors':1,'owner':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(error,result2){
 				result.pages=result2;
 				callback(result);
 			})
@@ -1076,15 +1074,24 @@ everyone.now.loadProfileInfo = function(user, callback){
 	})	
 }
 
+
+
+
 everyone.now.loadMainPage = function(user, callback){
 
-	userModel.find({}, { password : 0, salt:0 },function(error,result){
+	userModel.find({}, { password : 0, salt:0 }).sort('username',1).run(function(error,result){
 		if(!error){
 			var responce = {}
 			responce.users = result;	
-			pageModel.find({},['pageName','likes','contributors','owner'],function(error,result2){
-				responce.pages=result2;
-				callback(responce);
+			//pageModel.find({},['pageName','likes','likesN','contributors','owner','versions']).sort('likesN',-1,'pageName',1).run(function(err,result2){
+			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
+
+				if(err)
+					console.log(err)
+				else{
+					responce.pages=result2;
+					callback(responce);
+				}
 			})
 		}
 	})
@@ -1183,6 +1190,148 @@ everyone.now.deletePageVersion = function(id,callback){
 			callback(error)
 	})
 
+}
+
+////////////
+///LIKE
+////////
+
+everyone.now.likePage = function(action, version, callback){
+
+	var oldthis = this;
+	if(this.user.name=='n00b'){
+		callback("you must be registered to do this!")
+		return;
+	}
+	var pageName = this.user.currentPage;
+	if(action=='like'){
+		if(version == undefined)
+			var ver = 0;
+		else{
+			var ver = {};
+			ver['$slice']=[version, 1];
+			}
+
+		if(version==undefined){
+			pageModel.findOne({pageName:pageName, likes:{$nin:[this.user.name]}},{likes:1,likesN:1,owner:1,'images.user':1},function(err,result){
+			
+				if(!err && result != null){
+					pageModel.update({pageName:pageName},{$addToSet : {likes:oldthis.user.name},$inc:{likesN:1}},function(err){
+						if(err) console.log(err)
+					})	
+					callback(null)
+					notifyUsers(result.images,result.owner,oldthis.user.name,'like',pageName);				
+
+				}
+				else callback(err)
+				
+			})
+		}
+		
+		if(version!=undefined){
+		
+			var query = {}
+			query['versions.'+version+'.likes']={$nin:[this.user.name]};
+			query['pageName']=pageName;
+			pageModel.findOne(query,{likes:1,likesN:1,owner:1,versions:ver},function(err,result){
+			
+				if(!err && result != null){
+					pageModel.update({pageName:pageName,'versions.currentVersion':version},{$addToSet : {'versions.$.likes':oldthis.user.name},$inc:{likesN:1,'versions.$.likesN':1}},function(err){
+						if(err) console.log(err)
+					})	
+					
+					callback(null)
+					notifyUsers(result.versions[0].images,result.owner,oldthis.user.name,'like',pageName,version);	
+
+				}
+				else callback(err)
+			})
+		}					
+	}
+	else if (action=='unlike'){
+		if(version==undefined)
+			pageModel.update({pageName:pageName},{$pull:{likes:this.user.name},$inc:{likesN:-1}},function(err){
+					if(!err)
+					callback(null)
+				else callback(err)
+			})
+		else {
+			var pullObj = {}
+			pullObj['versions.'+version+'.likes']=this.user.name;
+			var pullObj2 = {}
+			pullObj2['versions.'+version+'.likesN']=-1;
+			//console.log(pullObj2);
+			
+			pageModel.update({pageName:pageName, 'versions.currentVersion':version},{$pull:{'versions.$.likes':this.user.name},$inc:{'versions.$.likesN':-1,likesN:-1}},function(err){
+					if(!err)
+						callback(null)
+					else callback(err)
+				})
+			}
+		}
+}
+
+
+var lastNotify={}
+notifyUsers = function(images,_owner,user,action,pageName,version){
+	
+	var contributors={}
+	for (var i=0;i<=images.length;i++){
+	
+		if(i==images.length)
+			var owner = _owner;
+		else
+			var owner = images[i].user
+	
+		var notify = new notifyModel();
+			notify.user = user;
+			notify.action = action;
+			notify.page = pageName;
+			if(version!=undefined){
+				notify.version = version;
+		}
+		
+		if(lastNotify.user!=notify.user && lastNotify.page!=notify.page && lastNotify.action!=notify.action && lastNotify.version!=notify.version)
+			console.log(lastNotify)
+			pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
+				if(err) console.log(err);
+			})
+		
+		lastNotify=notify;
+				
+		//TODO:store main notifications in db?
+		nowjs.getGroup('main').now.notify([notify],null, true)		
+		
+		if(user==owner)
+			continue;
+	
+		if(owner==undefined || contributors[owner]!=undefined)
+			continue;
+		else contributors[owner]=1;
+			
+			userModel.findOne({username:owner},{notify:1,nowId:1,newNotify:1},function(err,result2){
+			if(!err){
+				var nowId = result2.nowId;
+	
+				if(result2.notify == undefined)
+					result2.notify=[];
+					
+				result2.notify.push(notify);
+				if(nowId){
+					nowjs.getClient(nowId, function() { 
+						if(this.user!=undefined){
+							console.log(notify)
+							this.now.notify([notify])
+						}
+					}); 
+				}
+				else result2.newNotify++;	
+				result2.save(function(err){
+					if(err) console.log(err)
+				})
+			}
+		})
+	}
 }
 
 

@@ -69,6 +69,10 @@
       br
     br  
   
+  |2D element? 
+  input(type='checkbox', id='add2d')
+  br
+
   div(style="padding:0px")
     input#add.button(style='width:175px;', type='button', name='addGif', value='add', onclick="addNewImg()")
   .x(style='position:absolute; right:0; top:0; border: 1px white;')
@@ -118,6 +122,9 @@
     |height: 
     input#editHeight(style='width:50px;display:inline;', type='text') 
   
+  |2D element? 
+  input(type='checkbox', id='edit2d')
+  br
   div(style="padding:0px")
     input#replace.button(style='width:160px;', type='button', name='replace', value='replace', onclick="replaceImg()")
     
@@ -224,11 +231,15 @@ input#lastId(type='hidden', name='lastId')
   | *you must login to create your own page
   .x
     a(href='javascript:openMenu(\'moreMenu\');') x
-//
+
 ////page settings/////
 
 #pageMenu.uiClosed(name='pageMenu', style='left:400px;')
-  form(name='privacy')
+  form(name='privacyForm')
+    //|2D page? 
+    //input(type='checkbox', id='2d')
+    //br
+    //br
     | Set Page Privacy:
     br
     -var check = false
@@ -324,23 +335,27 @@ input#lastId(type='hidden', name='lastId')
 
 #menuContainer(style="z-index:1000;top:5px;left:5px;position:fixed;")
   -if(loggedIn)
-    #editElementButton.menuButton.dropButton
-      a(href='javascript:buttonPress("editElement");') Elements
+    #editElementButton.menuButton.dropButton(onclick='javascript:buttonPress("editElement");')
+      |Elements
     | 
-    #editPageButton.menuButton.dropButton
-      a(href='javascript:buttonPress("editPage");') Page
+    #editPageButton.menuButton.dropButton(onclick='javascript:buttonPress("editPage");')
+      |Page
     | 
-    #animateButton.menuButton
-      a(href='javascript:animate();javascript:buttonPress("animate");') Animate
+    #animateButton.menuButton(onclick='javascript:animate();javascript:buttonPress("animate");')
+      |Animate
     | 
-    #helpButton.menuButton
-      a(href='javascript:openMenu(\'helpMenu\');javascript:buttonPress("help");') Help
+    #helpButton.menuButton(onclick='javascript:openMenu(\'helpMenu\');buttonPress("help");')
+      |Help
   -else
     a(href='/') GIFPUMPER.COM
   |       
-  #pageName(style="display:inline;")    
+  #pageName(style="display:inline;")
+  | 
+  #likePageButton.menuButton
+    a(href='javascript:likePage();')
+      #likeButtonText(style="display:inline;")
 
-#editElementMenu.menu(style="display:none;top:20px;left:5px;position:fixed;")
+#editElementMenu.menu(style="display:none;position:fixed;")
       //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
         |-elements 
       div.menuDiv 
@@ -354,7 +369,7 @@ input#lastId(type='hidden', name='lastId')
       div.menuDiv 
         a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
    
-#editPageMenu.menu(style="display:none;top:20px;left:78px;position:fixed;")
+#editPageMenu.menu(style="display:none;position:fixed;")
       //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
         |-page 
       div.menuDiv 
@@ -401,6 +416,8 @@ input#lastId(type='hidden', name='lastId')
       a(href='javascript:openMenu(\'loginMenu\');') Login 
     -if(loggedIn)
       //div.menuButtonP
+      div.notifyBox
+        //div.insideNotify(style="width:20px;height:20px;position:relative")
       a(href="javascript:goToPage(user, 'profile');") My Profile 
       | | 
       a(href='javascript:logOut();') Logout 
@@ -411,7 +428,7 @@ input#lastId(type='hidden', name='lastId')
 
 #online.moveable(style="top:5px; right:10px; cursor:moveable")
    //div.headBar
-   div(style="height:18px; padding:2px;") users online:
+   div(style="height:18px; padding:2px;") users on this page:
 
 
 
@@ -431,28 +448,46 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
   div(style="position:absolute;bottom:-15px;right:5px;font-size:13")
     //a(href="javascript:openMenu(\'addMenu\');")
       |Edit Profile Pic
-   
+
+#mainFeedDiv.shadow.userPages
+  div(style="padding:5px;font-size:20px;")
+    span.label1(style="z-index:20000")
+      |active right now:
+  #activeNow
+
+#feed.shadow.userPages
+  div(style="padding:5px;font-size:20px;")
+    span.label1(style="z-index:20000")
+      |feed:
+  #feedContainer
+      
+      
 #userPages.shadow.userPages
   div(style="padding:5px;font-size:20px;")
-    a()
+    span.label1(style="z-index:20000")
       |pages:
   #pagesList.pageList
 
 #contributePages.shadow.userPages
   div(style="padding:5px;font-size:20px;")
-    a()
+    span.label1(style="z-index:2000000")
       |users:
   #cList.pageList
  
 //#versionNav(style="z-index:1000;bottom:5px;left:5px;position:fixed;")
 
-#prevVersionDiv(style="display:none;z-index:1000;top:50%;left:5px;position:fixed;")
+#prevVersionDiv.shadow(style="display:none;z-index:1000;top:50%;left:0px;position:fixed;")
      a(href="javascript:goToPage(pageData.pageName, null, prevVersion)")
        img(src='http://mousepointers.net/wp-content/uploads/2008/05/arrow-left.gif')
-#nextVersionDiv(style="display:inline;display:none;z-index:1000;top:50%;right:5px;position:fixed;")  
+#nextVersionDiv.shadow(style="display:inline;display:none;z-index:1000;top:50%;right:0px;position:fixed;")  
      a(href="javascript:goToPage(pageData.pageName, null, nextVersion)")
        img(src="http://mousepointers.net/wp-content/uploads/2008/05/arrow-right.gif")   	  
 
+//#whoLikes(style="display:none;padding:5px; position:relative;font-size:12px")
+  .x
+    a(href='javascript:$(\'#whoLikes\').hide();') x
+ 
+#notifyDiv.menu
  
 ///////////////
 ////////MAIN

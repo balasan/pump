@@ -4,8 +4,6 @@
 
 var pageData;
 
-
-
 now.ready(function(){
 	// "Hello World!" will print on server
 	//now.logStuff("Hello World!");
@@ -22,11 +20,14 @@ function loadData(){
 
 	if(nowReady && windowReady){
 	
-		if(myName==undefined)
-			myName="noob"
-		now.getPagePermissions(pageName,userProfile, function(err,name){
+		if(currentUser==undefined){
+			currentUser="n00b"
+			privacy=null;
+			}
+		now.getPagePermissions(pageName,userProfile, function(err,name,_permissions){
 			if (!err)
-				myName = name;
+				privacy=_permissions;
+				currentUser=name;
 				now.loadAll(pageName,userProfile,version,loadAll)
 		})
 	}
@@ -48,7 +49,9 @@ now.pushChanges = function(pageData){
 }    	
 
 now.setPagePermissions = function(_permissions, _owner){
-	var permissions = _permissions;
+	privacy = _permissions;
+	if (privacy=='owner')
+		privacy=0;
 	var owner = _owner;
 	if(owner){
 		$("#settingsButton").show();
@@ -62,20 +65,23 @@ now.setPagePermissions = function(_permissions, _owner){
 }
 
 
-function loadAll(error, pageData){
+function loadAll(error, pageData, notifications){
 	if(error != null){
 		
 		//TODO: re-enable this
-		//alert('PLEASE LOG IN TO VIEW PROFILES')
-		alert(error)
+		alert('PLEASE LOGIN TO DO THIS')
+		//alert(error)
 		window.location= "/"
 		console.log(error)
 		return;
 	}
-	
+		
 	var lastVersion=pageData.currentVersion;
 	
-	
+	if(pageData.pageName=='main')
+		now.getAllUsers(function(allPages){fillOnline(allPages)})
+		
+		
 	if(version != undefined){
 		if(version>0)
 			prevVersion=version-1;
@@ -93,13 +99,15 @@ function loadAll(error, pageData){
 			prevVersion=lastVersion-1;	
 		jsonToDom(pageData);
 	}
+
+
 }
 
 /////////////
 //PAGE USERS
 ///////////
 
-var noobs=0;
+var n00bs=0;
 
 var defaultIcon = new Image();
 
@@ -108,11 +116,6 @@ defaultIcon.src = 'http://dump.fm/images/20110926/1317014842765-dumpfm-FAUXreal-
 defaultIcon.style.width = '20px';
 
 now.updatePageUser = function(action, userArray, profileName){
-
-/*
-	if(pageName=='profile' && userProfile != profileName)
-		return;
-*/
 
 	if(action == 'add'){
 		
@@ -137,7 +140,7 @@ now.updatePageUser = function(action, userArray, profileName){
 				
 				newDiv.appendChild(userIcon);
 				
-				if(user!="noob")
+				if(user!="n00b")
 					newDiv.innerHTML += " <b><a href='/profile/"+user+"'>"+user+"</a></b> ";
 				else
 					newDiv.innerHTML += " <b>"+user+"</b>";
@@ -147,14 +150,14 @@ now.updatePageUser = function(action, userArray, profileName){
 				newDiv.style.paddingBottom="2px";
 
 				document.getElementById('online').appendChild(newDiv);
-				if (user=='noob')
-					noobs++;
+				if (user=='n00b')
+					n00bs++;
 			}
-			else if(user=='noob'){
-				noobs++;
-				document.getElementById('noob').innerHTML="";
-				document.getElementById('noob').appendChild(defaultIcon);
-				document.getElementById('noob').innerHTML+="<b>"+noobs+" noobs</b>";
+			else if(user=='n00b'){
+				n00bs++;
+				document.getElementById('n00b').innerHTML="";
+				document.getElementById('n00b').appendChild(defaultIcon);
+				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00bs</b>";
 			}
 		}
 	}	
@@ -163,18 +166,18 @@ now.updatePageUser = function(action, userArray, profileName){
 		
 /* 	for(var user in userArray){ */
 		var user = userArray;
-		if(user!='noob' || noobs == 1)
+		if(user!='n00b' || n00bs == 1)
 			document.getElementById('online').removeChild(document.getElementById(user));		
-		else if (user == 'noob'){
-			noobs--;
-			if(noobs>1){
-				document.getElementById('noob').innerHTML="";
-				document.getElementById('noob').appendChild(defaultIcon);
-				document.getElementById('noob').innerHTML+="<b>"+noobs+" noobs</b>";				}
+		else if (user == 'n00b'){
+			n00bs--;
+			if(n00bs>1){
+				document.getElementById('n00b').innerHTML="";
+				document.getElementById('n00b').appendChild(defaultIcon);
+				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00bs</b>";				}
 			else{
-				document.getElementById('noob').innerHTML="";
-				document.getElementById('noob').appendChild(defaultIcon);
-				document.getElementById('noob').innerHTML+="<b>"+noobs+" noob</b>";				}
+				document.getElementById('n00b').innerHTML="";
+				document.getElementById('n00b').appendChild(defaultIcon);
+				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00b</b>";				}
 		}
 	//}
 	}
@@ -187,6 +190,12 @@ now.updatePageUser = function(action, userArray, profileName){
 
 function addNewImg(){
 
+		if(version!=undefined){
+			alert("You can't edit saved versions")
+			return;
+		}
+
+		var is2d = $('#add2d').is(':checked'); 
 
 		var imgUrl = document.getElementById('gifUrlA').value;
 
@@ -214,6 +223,8 @@ function addNewImg(){
 		}
 		
 		var addObject = {};
+		
+		addObject.d2d=is2d;
 		
 		//TODO RESET RADIOS!
 		
@@ -288,11 +299,14 @@ now.newImg = function(img){
 
 function deleteImage(){
 
+	if(version!=undefined){
+		alert("You can't edit saved versions")
+		return;
+	}
+
 	var deleteType = "";
 	var	len = document.f1.deleteType.length;
 	var lastId =pageData.lastId;
-
-
 
 	for (i = 0; i <len; i++) {
 		if (document.f1.deleteType[i].checked) {
@@ -329,6 +343,12 @@ now.deleteResponce = function(imgId, all){
 /////////
 
 function replaceImg(){
+	
+	if(version!=undefined){
+		alert("You can't edit saved versions")
+		return;
+	}
+	
 	var replace = "";
 	var	len = document.f2.replaceType.length;
 	var lastId =pageData.lastId;
@@ -355,12 +375,12 @@ function replaceImg(){
 		editElement.content = $("#editContent").val();
 	editElement.backgroundColor = $("#editBackgroundColor").val()
 	editElement.backgroundImage = $("#editBackgroundImage").val()
-	
+	editElement.d2d=$('#edit2d').is(':checked');
 
 	//var newUrl = document.getElementById('gifUrlR').value;
 	
 	//now.updateElement(pageName, lastId, 'url', newUrl, all, null);
-	now.editElement(pageName, lastId,editElement,all, null);	
+	now.editElement(pageName, lastId,editElement,all,false, null);	
 }
 
 /////////
@@ -368,9 +388,13 @@ function replaceImg(){
 ///////
 
 function updateElement(element, property, value){
+
+	if(version!=undefined){
+		alert("You can't edit saved versions")
+		return;
+	}
 	
 	var all = false;
-
 	now.updateElement(pageName, element.id, property, value, all, function(error,response){
 		if(error!=null)
 			console.debug("there was an error")
@@ -380,9 +404,14 @@ function updateElement(element, property, value){
 }
 
 now.updateChanges = function(_id, property, value){
-			pageData.images[_id][property]=value;
-			pageData.images[_id].id=_id;
-			imageToDom(pageData.images[_id]);
+	if(version!=undefined){
+		alert("You can't edit saved versions")
+		return;
+	}
+			
+	pageData.images[_id][property]=value;
+	pageData.images[_id].id=_id;
+	imageToDom(pageData.images[_id]);
 }
 
 
@@ -392,24 +421,49 @@ now.updateChanges = function(_id, property, value){
 
 function setPrivacy(){
 	var setPrivacy;
-	var	len = document.privacy.privacy.length;
+	
+	var is2d = $('#2d').is(':checked'); 
+	
+	var	len = document.privacyForm.privacy.length;
 	for (i = 0; i <len; i++) {
-		if (document.privacy.privacy[i].checked) {
-			setPrivacy = document.privacy.privacy[i].value;
+		if (document.privacyForm.privacy[i].checked) {
+			setPrivacy = document.privacyForm.privacy[i].value;
 		}		
 	}
 	
 	var editors = addEditorsEl.tagify('serialize').split(',');
 	
-	now.setPrivacy(pageName, setPrivacy,editors, function(error){		
+	now.setPrivacy(pageName, setPrivacy,editors,is2d, function(error){		
 		if(!error) openMenu('pageMenu');
 		}
 	);
 }
 
-	//TODO: better notification of privay
-	now.pagePrivacy = function(setPrivacy){
+//TODO: better notification of privacy
+now.pagePrivacy = function(setPrivacy,d2d){
 	privacy = setPrivacy;
+	if(pageData.editors != undefined){
+
+		if(currentUser==pageData.owner)
+			privacy  =0;
+		
+		else if(jQuery.inArray(currentUser, pageData.editors)!=-1)
+			privacy = 0;
+			
+	}
+
+/*
+	if (d2d){
+		//$('#div3d, #mainDiv').css('webkitTransform','none');
+		document.getElementById('div3d').style.webkitTransformStyle='flat';
+		document.getElementById('mainDiv').style.webkitTransformStyle='flat';
+	}
+	else{
+		document.getElementById('div3d').style.webkitTransformStyle='preserve-3d';
+		document.getElementById('mainDiv').style.webkitTransformStyle='preserve-3d';	
+	}
+*/
+	
 }
 
 
@@ -433,7 +487,12 @@ function addPage(copyPage){
 
 function deletePage(){
 
-	var r=confirm("ARE YOU SURE YOU WANT TO DELETE THIS PAGE?");
+	if(version!=undefined){
+		alert("this will delete the main page and all versions")
+		return;
+	}
+
+	var r=confirm("ARE YOU SURE YOU WANT TO DELETE THIS PAGE AND ALL SAVED VERSIONS?");
 	if (r==true)
 	  {
 		now.deletePage(pageName, function(error){		
@@ -450,8 +509,12 @@ function deletePage(){
 
 function saveVersion(){
 
-	now.saveVersion(function(err,savedVersion){
+	if(version!=undefined){
+		alert("You can't save this version again")
+		return;
+	}
 
+	now.saveVersion(function(err,savedVersion){
 		if(err)
 			alert(err)
 		else {alert("This version of the page has been SAVED as version " + savedVersion);
@@ -492,69 +555,16 @@ function deleteVersion(){
 	}
 }
 
-//////////
-////IMAGE
-////////
-
-function imageToDom(image, property){
-
-	var img = document.getElementById(image._id);
-	pageData.images[image._id]=image;
-
-	var contentType = image.contentType;
-	if(contentType==undefined)
-		contentType="image"
-
-	if(img == undefined){
-		
-		if(contentType=="image")
-			img = document.createElement('img');
-		else{
-			img = document.createElement('div');
-
-		}
-		img.id = image._id;
-		img.style.position = 'absolute';
-		img.className = 'editableElement';
-		img.style.cursor='move';
-		img.style.zIndex = 100; 
-		document.getElementById("mainDiv").appendChild(img);	
-
-	}
-	
-	//TODO: optimise this
-	
-	if(contentType=="image" && img.src != image.url)
-		img.src=image.url;
-	else{				
-		if(image.backgroundColor != undefined)
-			img.style.backgroundColor = image.backgroundColor;
-		if(image.backgroundImage != undefined)
-			img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
-		if(image.content != undefined)
-			img.innerHTML = image.content;
-		img.style.paddingTop="10px";
-		img.style.webkitTransformStyle= "preserve-3d";
-
-	}
-	img.style.left = image.left;
-	img.style.top = image.top;	
-	img.style.width = image.width;
-	img.style.height = image.height;
-	
-	
-	var z = image.z;
-	var anglex = image.anglex
-	var angley = image.angley;
-	var angler = image.angler;
-	
-	var transform = 'translateZ('+ z + 'px)'+' '+ 'rotateY('+ anglex+'deg)'+ ' ' + 'rotateX('+angley +'deg)'+' '+'rotateZ('+angler+'deg)';
-	
-	img.style.webkitTransform = transform;
-		
-}
+///////////////
+///BACKGROUND
+///////////
 
 function setBackground(type){
+
+	if(version!=undefined){
+		alert("You can't edit saved versions")
+		return;
+	}
 
 	if(type=="backgroundImage"){
 		var background = document.getElementById('backgroundImage').value;
@@ -590,6 +600,8 @@ now.backgroundResponce = function(type, background){
 
 }
 
+
+
 ////////////
 ///TXT/////
 //////////
@@ -603,6 +615,8 @@ function fillChat(user, text) {
 	document.getElementById('chatBox').appendChild(newTxtDiv);
 	lastPost=user;
 	lastTxtDiv=newTxtDiv;
+	document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+
 }
 
 
@@ -619,6 +633,8 @@ function doResize() {
                 txtbox.rows = txtbox.rows + 1; 
 			}
 		}
+		
+		
 }
 
 function enter(evt){
@@ -686,318 +702,179 @@ function searchUsers(){
 
 }
 
+
 /////////
-////PAGE
+///LIKE
 ///////
 
+likePage = function(){
 
-function jsonToDom(pageDataIn){
-	
-	
-	pageData = pageDataIn;
+	var action;
+	if(liked==-1){
+		action='like';
+		}
+	else{
+		action='unlike';
+		}
 
-	
-	if(lastPost!=undefined)
-		lastPost="";	
-	
-	document.body.style.backgroundColor = '';
-	document.body.style.backgroundImage = '';
-
-	document.getElementById("mainDiv").innerHTML="";
-	document.getElementById("mainDiv").style.webkitTransform ='rotateX(0deg)' + ' ' + 'rotateY(0deg)';
-
-	document.getElementById('userPages').style.display='none';
-	document.getElementById('pagesList').innerHTML="";
-	document.getElementById('contributePages').style.display='none';
-	document.getElementById('cList').innerHTML="";
-
-	document.getElementById('profileContainer').style.display='none';
-	//document.getElementById('profileContainer').innerHTML="";
-	
-	document.getElementById('chatBox').innerHTML="";
-
-	addEditorsEl.tagify('removeAll');
-	addEditorsEl.tagify('inputField').val('')
-	addEditorsEl.val('');
-
-	if(pageData.editors != undefined){
-	
-		var editorsText="";
-
-		for(var k = 0;k<pageData.editors.length;k++){
-			//editorsText+=pageData.editors[k]+", "
-			
-			addEditorsEl.tagify('inputField').val(pageData.editors[k])
-			addEditorsEl.tagify('add');
-
-			}
-			
-		//addEditorsEl.tagify.val(editorsText)
+	now.likePage(action, version,function(err){
 		
-		//addEditorsEl.tagify('inputField').val(editorsText)
-		//addEditorsEl.val(editorsText).show()
-
-		//addEditorsEl.tagify( {"addTagPrompt": 'enter username'}, {"delimiters": [null]});
-		//addEditorsEl.tagify('add');
-	}
-
-	
-	$("#userImage").remove();
-	$("#userName").remove();
-	
-	if(prevVersion!=undefined)
-	  $("#prevVersionDiv").show();
-	else
-	  $("#prevVersionDiv").hide();
-	if(version!=undefined)
-	  $("#nextVersionDiv").show();
-	else
-	  $("#nextVersionDiv").hide();
-
-
-	if(pageData.pageName != "main" && pageData.pageName != "profile")
-		document.getElementById('pageName').innerHTML = pageData.pageName + " by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a>";
-	else
-		document.getElementById('pageName').innerHTML="";
-
-	if(pageData.images != undefined){
-		for(var i=0; i<pageData.images.length; i++){
-			
-			var contentType = pageData.images[i].contentType;
-			if(contentType==undefined)
-				contentType="image";
-			
-			pageData.images[pageData.images[i]._id]=pageData.images[i];
-			var img = document.getElementById(pageData.images[i]._id);
-			
-			if(img == undefined){
-				
-				if(contentType=="image")
-					img = document.createElement('img');
-				else{
-					img = document.createElement('div');
-					if(pageData.images[i].backgroundColor != undefined)
-						img.style.backgroundColor = pageData.images[i].backgroundColor;
-					if(pageData.images[i].backgroundImage != undefined)
-						img.style.backgroundImage = 'url('+ pageData.images[i].backgroundImage + ')';
-				}
-				img.id = pageData.images[i]._id;
-				img.style.position = 'absolute';
-				img.className = 'editableElement';
-				img.style.cursor='move';
-				img.style.zIndex = 100; 
-			}
-
-			//TODO: optimise this
-			
-			if(contentType=="image" && img.src != pageData.images[i].url)
-				img.src=pageData.images[i].url;
+		if(err==null){		
+			buttonPress("likePage")
+			if(action=="like"){
+				pageData.likesN++
+				$('#likeButtonText').html(pageData.likesN + ' unlike page');
+				liked = 0;
+				}	
 			else{
-				if(pageData.images[i].content != undefined)
-					img.innerHTML = pageData.images[i].content;
-				img.style.paddingTop="10px";
-				img.style.webkitTransformStyle= "preserve-3d";
-
-
-			}
-			
-			img.style.left = pageData.images[i].left;
-			img.style.top = pageData.images[i].top;	
-			img.style.width = pageData.images[i].width;
-			img.style.height = pageData.images[i].height;	
-			img.style.opacity = pageData.images[i].opacity;
-			
-			var z = pageData.images[i].z;
-			var anglex = pageData.images[i].anglex
-			var angley = pageData.images[i].angley;
-			var angler = pageData.images[i].angler;
-			
-			var transform = 'translateZ('+ z + 'px)'+' '+ 'rotateY('+ anglex+'deg)'+ ' ' + 'rotateX('+angley +'deg)'+' '+'rotateZ('+angler+'deg)';
-			
-			img.style.webkitTransform = transform;					
-			document.getElementById("mainDiv").appendChild(img);	
+				liked = -1;
+				pageData.likesN--
+				$('#likeButtonText').html(pageData.likesN + ' like page');	
+				}
 		}
-	}
-		
-//////////Added text::			
-	if(pageData.text != undefined){
-		for(var i=0; i<pageData.text.length; i++){
-			
-		if(pageData.text[i].user==lastPost){
-			lastTxtDiv.innerHTML+="<br>"+pageData.text[i].text;
-		}
-		else{
-			
-			fillChat(pageData.text[i].user,pageData.text[i].text);
-			//lastPost=pageData.text[i].user;
-		}
-
-		}
-	}
-////
-	var div3d = document.getElementById("div3d");
-
-	if(pageData.backgroundImageType == undefined){
-		//document.body.style.backgroundImage = "";
-		document.body.style.backgroundImage=pageData.backgroundImage;
-	}
-	
-	if(pageData.backgroundImageType == 0)
-		document.body.style.backgroundImage = pageData.backgroundImage;
-
-	if(pageData.backgroundImageType == 1){
-		var bgimg = '-webkit-gradient(' + pageData.backgroundImage +')'
-		document.body.style.backgroundImage = bgimg;	
-	}
-
-	if(pageData.backgroundImageType == 2){
-		document.body.style.backgroundImage=pageData.backgroundImage;
-	}
-	
-	document.body.style.backgroundColor = pageData.background;
-
-	
-	if(pageName=="profile")
-		now.loadProfileInfo( userProfile,loadProfileInfo);		
-
-	//TODO: customise for user
-	if(pageName=="main")
-		now.loadMainPage( null,loadProfileInfo);	
+	})
 }
 
-var profileInfo={}
+var lastNote;
+var lastMainNote;
 
-loadProfileInfo = function(info){
+now.notify = function(_notify,newN,main){
 
-	profileInfo=info;
-	
-	document.body.style.backgroundColor=profileInfo.background;
-	document.body.style.backgroundImage=profileInfo.backgroundImage;
-
-	if(pageName=="profile"){
-		document.getElementById('profileContainer').style.display="block"
-		var containerDiv=document.getElementById('profileContainer');
-		//containerDiv.id="profileContainer";
-		//containerDiv.className="shadow";
-		//var r = Math.random()
-		//containerDiv.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
-		
-		var userNameDiv=document.createElement('div');
-		userNameDiv.id="userName";
-		userNameDiv.innerHTML="<a href='javascript:changeProfileColor()'>"+profileInfo.username+"</a>"
-		containerDiv.appendChild(userNameDiv);
-		
-		var url;
-		if(profileInfo.userImage=="")
-			url = "http://dump.fm/images/20110926/1317014842765-dumpfm-FAUXreal-1297659023374-dumpfm-frankhats-yes.gif"	
-		else
-			url=profileInfo.userImage;
-		
-		userImage = document.createElement('img');
-		userImage.id = 'userImage';
-	
-		userImage.style.zIndex = 100; 
-		userImage.src = url;
-		userImage.style.width = "93%";
-		userImage.style.height = "auto";
-	
-		containerDiv.appendChild(userImage);
-		containerDiv.style.display='block';
-		//document.body.appendChild(containerDiv);
-	}
-//switch chat for profile page	
-	var lastPost="";
-	var lastTxtDiv;	
-	if(profileInfo.text != undefined){
-
-	
-		for(var i=0; i<profileInfo.text.length; i++){
-			if(profileInfo.text[i].user==lastPost){
-				lastTxtDiv.innerHTML+="<br>"+profileInfo.text[i].text;
-			}
-			else{			
-				fillChat(profileInfo.text[i].user, profileInfo.text[i].text);
-			}
-		}
+	if(!windowReady){
+		setTimeout(function(){now.notify(_notify,newN)},300);
+		return;
 	}
 		
-	//}
-	
-	///fill out pages
 
-	for(var i =0;i<profileInfo.pages.length;i++){
-	
-		var thisPage=profileInfo.pages[i];
-	
-		if(thisPage.pageName!= "profile" && thisPage.pageName!= "main"){
-			newDiv = document.createElement('div');
-			newDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
-			newDiv.style.paddingBottom="1px";
-			newDiv.style.position='relative'
-	
-			infoDiv = document.createElement('div');
+	for(var n=0;n<_notify.length;n++){
+		if(main && lastMainNote &&lastMainNote.version ==_notify[n].version && lastMainNote.user==_notify[n].user && lastMainNote.page==_notify[n].page && lastMainNote.action==_notify[n].action)
+			continue;
+		if(!main && lastNote &&lastNote.version ==_notify[n].version && lastNote.user==_notify[n].user && lastNote.page==_notify[n].page && lastNote.action==_notify[n].action)
+			continue;
+		if(_notify[n].action=='like')
+			var actionVerb='liked'
+		else if(_notify[n].action=='update')
+			var actionVerb='updated'
+						
+			if(newN==undefined && !main)
+				notify+=1;
+			else notify=newN;
+			if(!notify)
+				$(".notifyBox").html("n");
+			else
+				$(".notifyBox").html(notify);
+			$(".notifyBox").css('padding','2px 4px 2px 4px');
+			
+			var note = document.createElement('div');
+			note.style.padding = '2px';
+			note.style.marginLeft = '6px';
 
-			infoDiv.id=thisPage._id;
-			infoDiv.className="infoDiv";
+			note.style.postion='relative';
+			note.style.fontSize='12px';
+			if(_notify[n].version !=undefined)
+				note.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
+			else
+				note.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
 			
-			var infoTxt=""
-			if(pageName=="profile"){
-				if(thisPage.owner==profileInfo.username)
-					infoTxt +='owner'
-				else
-					infoTxt +='contributor'
-			}			
-			
-			if(thisPage.likes!=undefined && thisPage.likes.length > 0)
-				infoTxt += " "+thisPage.likes.length+" likes"; 
-			
-			if(thisPage.contributors != undefined && thisPage.contributors.length > 0)
-				infoTxt += " "+thisPage.contributors.length+" contributors"; 
-	
-			infoDiv.innerHTML = infoTxt;
-			newDiv.appendChild(infoDiv);
+			note.style.display='none';
+			if(!main){
+				$('#notifyDiv').prepend($(note));
+					lastNote=_notify[n];
+				}
+			else{
+				$('#feedContainer').prepend($(note));
+					lastMainNote=_notify[n];
+				}
 
-			document.getElementById('pagesList').appendChild(newDiv);
-		}
+			
+			$(note).slideDown('fast',function(){changeBackground();});
 	}
-	document.getElementById('userPages').style.display='block';
+}
 
-/*
-	if(pageName=="main")
-		var lastDiv = "users"
-	if(pageName=="profile")
-		var lastDiv = "contributedTo"
-*/
-	if(pageName=="main"){
-		for(var i =0;i<profileInfo.users.length;i++){
-		
-			//if(profileInfo.users[i].pageName!= "profile_"+profileInfo.username){
-				newDiv = document.createElement('div');
-				newDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.users[i].username+"\",\"profile\")'>"+profileInfo.users[i].username+"</a>";
-				newDiv.style.paddingBottom="1px";
-				
-			document.getElementById('cList').appendChild(newDiv);
+//GET INFO ON REQUEST?
+var lastLikeDiv=null;
+showLikes = function(index,el){
+
+	whoLikes = document.getElementById('whoLikes');
+
+	var element = el.currentTarget;
+	element.currentTarget = el.currentTarget;
 	
-			//}		
+	if(whoLikes != undefined && whoLikes.style.display!='none'){
+		
+		$(whoLikes).animate({height:'0px'}, 300, function(){
+			whoLikes.style.display='none';
+		
+			if(lastLikeDiv!=element.currentTarget){
+				showLikes(index,element)
+				}
+			
+		});
+		return;
+
+	}
+	
+	if(whoLikes == undefined){
+		var whoLikes = document.createElement('div');
+		whoLikes.id='whoLikes';
+		whoLikes.style.position='relative';
+		whoLikes.style.fontSize="12px"
+		whoLikes.style.paddingLeft="5px"
+		whoLikes.style.overflow='hidden';
+	}	
+
+	whoLikes.style.height='auto';
+	
+	//$(whoLikes).offset({top:$(el).offset.top,left:$(el).offset.left})
+	//whoLikes.innerHTML = "";
+	$('div').remove('.liker')
+	for(var i = 0;i<profileInfo.pages[index].likes.length;i++){
+		var liker = document.createElement('div');
+		liker.style.padding = '2px';
+		liker.innerHTML="<a href='javascript:goToPage(\""+profileInfo.pages[index].likes[i]+"\",\"profile\")'>"+profileInfo.pages[index].likes[i]+"</a>";
+		liker.className='liker';
+		liker.style.display='inline';
+		whoLikes.appendChild(liker);
+		liker=undefined;
+		
+	}
+	$(whoLikes).show();
+
+	el.currentTarget.parentNode.appendChild(whoLikes);	
+	var height = $(whoLikes).height();
+
+	$(whoLikes).height(0);
+	$(whoLikes).animate({height:height+'px'}, 300, function(){
+			okToAnimate=true;
+			changeBackground();
+
+		});
+
+	lastLikeDiv=el.currentTarget;
+}
+
+//////////
+///FEED//
+////////
+
+now.updateFeed = function(user,page,action){
+
+	if(page.split('profile___')[0]=='' || page=='main')
+		return
+	
+	if(action == 'leave'){
+		for(var n=0;n<onlineObj[page].length;n++){
+				if(onlineObj[page][n]==user)
+					onlineObj[page].splice(n,1);			
 		}	
-		document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-
-		document.getElementById('contributePages').style.display='block';
-
 	}
-
-	changeBackground();
-	changeProfileColor()
+	else if(action =='join'){
+		if(onlineObj[page]==undefined)
+			onlineObj[page]=[];
+		onlineObj[page].push(user);
+	}
+	fillOnline()
 }
 
-changeProfileColor =function(){
-	var r = Math.random()
-	var color=bgColorList[Math.floor(r*bgColorList.length)];
-	var r = Math.random()
-	var color2=bgColorList[Math.floor(r*bgColorList.length)];
-	containerDiv=document.getElementById('profileContainer');
-	document.getElementById('userPages').style.backgroundColor='rgba(255,255,255,.85)';
-	document.getElementById('contributePages').style.backgroundColor='rgba(255,255,255,.85)';
 
-	containerDiv.style.backgroundColor=color;
-}
+

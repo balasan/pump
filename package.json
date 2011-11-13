@@ -12,5 +12,6 @@
 	, "mongoose-auth" : ">=0.0.11"
 	, "mongoose-types" : ">=1.0.3"
 	, "connect" : ">=1.7.1"
+	, "connect-mongo" : ">= 0.1.5"
   }
 }

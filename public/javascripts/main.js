@@ -7,6 +7,12 @@ var pageName = tokens[3];
 var version=undefined;
 var prevVersion=undefined;
 var nextVersion=undefined;
+var liked=-1;
+var permissions;
+var currentUser;
+var notify=0;
+var onlineObj = {}
+
 
 var mainPage = false;
 var profile = false;
@@ -20,7 +26,7 @@ if (pageName == ''){
 	var mainPage = true;
 }
 
-
+var privacy=0;
 
 if (pageName == "profile"){
 
@@ -59,8 +65,7 @@ ajax.pageName = pageName;
 ajax.pageNumber = 111;
 ajax.doNotRefresh = false;
 
-//var privacy = 0;
-//var doNotRefresh = false;
+var privacy = null;
 
 //#######################
 //MOVE AND RESIZE INITS##
@@ -71,7 +76,6 @@ var dragOK=false;     // True if we're allowed to move the element under mouse
 var dragXoffset=0;    // How much we've moved the element on the horozontal
 var dragYoffset=0;    // How much we've moved the element on the verticle
 
-//window.onload = document.body.style.backgroundColor = "white";
 
 //#######################
 //MOVE and RESIZE FUNCTIONS
@@ -84,17 +88,15 @@ var zindex;
 var clickX;
 var clickY;
 
-
-
 var updateTransform = false;
 
 
-	
 function moveHandler(e){
+
   
 	ajax.doNotRefresh = true;
 
-	if(privacy == 2)
+	if(privacy >= 2)
 	return false;
   
   	if (e == null) { 
@@ -109,13 +111,12 @@ function moveHandler(e){
   	
 	if (e.button<=1&&dragOK){
 	     
-	     
 		if (e.shiftKey) {
 	
 			selObj.style.width=e.clientX-clickX-i_width+'px';
 			selObj.style.height=e.clientY-clickY-i_height+'px';
 
-			updateElement(selObj,"width",selObj.style.width);
+			updateElement(selObj,"width", selObj.style.width);
 			updateElement(selObj,"height",selObj.style.height);
 			            
 	    }
@@ -152,7 +153,7 @@ function moveHandler(e){
 	
 	
 		}    	
-		else if (isR) {
+		else if (isR && !pageData.images[selObj.id].d2d) {
 		        	
 /*
 		    z = parseInt(selObj.getAttribute("data-z"));
@@ -184,7 +185,7 @@ function moveHandler(e){
 			
 	
 		}    	
-		else if (isS) {
+		else if (isS && !pageData.images[selObj.id].d2d) {
 		
 		    //document.write(selObj.getAttribute("data-angley"));
 			
@@ -243,49 +244,50 @@ function moveHandler(e){
 
 function cleanup(e) {
 	   		    
-  document.onmousemove=null;
-  document.onmouseup=null;
+	document.onmousemove=null;
+	changeBackground();
+	document.onmouseup=changeBackground;
+	
+	selObj.style.cursor=orgCursor;
+	dragOK=false;
+	
+	if (updateTransform == true && !pageData.images[selObj.id].d2d) {
+		pageData.images[selObj.id].anglex = anglex;
+		pageData.images[selObj.id].angley = angley;
+		pageData.images[selObj.id].angler = angler;
+		pageData.images[selObj.id].z = z;
+	}
+	
+	
+	pageData.images[selObj.id].left = selObj.style.left;
+	pageData.images[selObj.id].top = selObj.style.top;
+	pageData.images[selObj.id].width = selObj.style.width;
+	pageData.images[selObj.id].height = selObj.style.height;
+	
 
-  selObj.style.cursor=orgCursor;
-  dragOK=false;
-  
-  if (updateTransform == true) {
-  
-  			
-   			pageData.images[selObj.id].anglex = anglex;
-  			pageData.images[selObj.id].angley = angley;
-  			pageData.images[selObj.id].angler = angler;
-  			pageData.images[selObj.id].z = z;
-  	       	//selObj.setAttribute("data-z",z);
-   			//selObj.setAttribute("data-anglex",anglex);
-  			//selObj.setAttribute("data-angley",angley);
- 			//selObj.setAttribute("data-angler",angler);
-  }
-  
-  updateTransform = false;
-  
-  //document.getElementById('lastId').value = selObj.id;
+	updateTransform = false;
+	//var sendObj=pageData.images[selObj.id]
+	if(nonSafari2d[selObj.id]){
+		pageData.images[selObj.id].d2d=false;
+		}
+		
+	now.editElement(pageName, selObj.id,pageData.images[selObj.id],false,true,null);	
 
-
-
-
- // $("#"+previousId).removeClass("selected");
-
-  
-  
-  //ajax.ajaxFunction("element");
-  //updateElement(selObj);
-
-  var IE = document.all?true:false
-
-  if (!IE) document.captureEvents(Event.MOUSEMOVE)
-
-  document.onmousemove = getMouseXY;
-
-  clickX=null;
-  clickY=null;
-  //doNotRefresh = false;
-
+	if(nonSafari2d[selObj.id]){
+		pageData.images[selObj.id].d2d=true;
+	}
+	//document.getElementById('lastId').value = selObj.id;
+	// $("#"+previousId).removeClass("selected");
+	//ajax.ajaxFunction("element");
+	//updateElement(selObj);
+	
+	var IE = document.all?true:false
+	//if (!IE) document.captureEvents(Event.MOUSEMOVE)
+	
+	document.onmousemove = getMouseXY;
+	
+	clickX=null;
+	clickY=null;
 }
    
 
@@ -293,19 +295,20 @@ function cleanup(e) {
 
 function dragHandler(e){
   
-  document.getElementById("inputBox").blur();
+  //document.getElementById("inputBox").blur();
+  
+  if(version!=undefined || privacy>=2)
+     return;  
   
   var htype='-moz-grabbing';
   
-  
   if (e == null) { e = window.event; htype='move';} 
-  
-
-  		
+    		
   var target = e.target != null ? e.target : e.srcElement;
   selObj=target;
   selObj=document.getElementById(selObj.id);
   
+ 
   
   if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
 		 $(".selected").removeClass("selected");
@@ -357,7 +360,7 @@ function dragHandler(e){
 
 document.onmousedown=dragHandler;
 
-
+document.onmouseup=changeBackground;
 
 function commentsEnter(){
 ajax.doNotRefresh = true;
@@ -448,7 +451,7 @@ document.onkeydown=function(e){
 				
 				//document.getElementById(menuType).className = 'uiClosed';
 				document.getElementById(menuType).style.display="none";
-				createCookie(menuType,"uiClosed",90);
+				createCookie(menuType,"none",90);
 			}
 			else {
 			
@@ -467,7 +470,7 @@ document.onkeydown=function(e){
 				console.log(document.getElementById(menuType).style.top);
 				
 				//document.write(document.getElementById(menuType).className);
-				createCookie(menuType,"uiOpen",90);
+				createCookie(menuType,"block",90);
 				
 				
 				var bgcolorlist=new Array("#668187", "#66CCFF", "#FCFF00", "#C27FFF", "#FF00AA", "#F90606", "#8FBC8F", "#70DB93")
@@ -496,7 +499,9 @@ document.onkeydown=function(e){
 var colorList=new Array("rgba(0,72,234,1)", "rgba(96,0,234,1)", "rgba(143,188,143,1)", "rgba(102,129,135,1)", "rgba(102,204,255,1)", "rgba(252,255,0,1)", "rgba(194,127,255,1)", "rgba(0,95,21,1)", "rgba(255,0,170,1)", "rgba(249,6,6,1)", "rgba(112,219,147,1)")
 
 
-var bgColorList=new Array("rgba(0,72,234,.85)", "rgba(96,0,234,.85)", "rgba(143,188,143,.85)", "rgba(102,129,135,1.85)", "rgba(102,204,255,.85)", "rgba(252,255,0,.85)", "rgba(194,127,255,.85)", "rgba(0,95,21,.85)", "rgba(255,0,170,.85)", "rgba(249,6,6,.85)", "rgba(112,219,147,.85)")
+var bgColorList=new Array("rgba(0,72,234,.85)", "rgba(96,0,234,.85)", "rgba(143,188,143,.85)", "rgba(102,129,135,.85)", "rgba(102,204,255,.85)", "rgba(252,255,0,.85)", "rgba(194,127,255,.85)", "rgba(0,95,21,.85)", "rgba(255,0,170,.85)", "rgba(249,6,6,.85)", "rgba(112,219,147,.85)")
+
+var bgColorList2=new Array("rgba(0,72,234,.75)", "rgba(96,0,234,.75)", "rgba(143,188,143,.75)", "rgba(102,129,135,.75)", "rgba(102,204,255,.75)", "rgba(194,127,255,.75)", "rgba(0,95,21,.75)", "rgba(255,0,170,.75)", "rgba(249,6,6,.75)", "rgba(112,219,147,.75)")
 
 //for clicking on menus
 function openMenu(menuType){
@@ -505,7 +510,7 @@ function openMenu(menuType){
 				
 		//document.getElementById(menuType).className = 'uiClosed';
 		document.getElementById(menuType).style.display="none";
-		createCookie(menuType,"uiClosed",90);
+		createCookie(menuType,"none",90);
 	}
 	else {
 	
@@ -520,7 +525,7 @@ function openMenu(menuType){
 		document.getElementById(menuType).className = 'uiOpen';
 		//document.getElementById(menuType).style.top = 200 + document.body.scrollTop;
 		document.getElementById(menuType).style.display = "block";
-		createCookie(menuType,"uiOpen",90);
+		createCookie(menuType,"block",90);
 		
 		var r = Math.random()
 		document.getElementById(menuType).style.backgroundColor=colorList[Math.floor(r*colorList.length)];
@@ -556,7 +561,7 @@ function eraseCookie(name) {
 	createCookie(name,"",-1);
 }
 
-eraseCookie("connect.sid");
+//eraseCookie("connect.sid");
 
 window.addEventListener("scroll", recenter, false);
 
@@ -574,56 +579,7 @@ function recenter(){
 
 
 	var sTop = document.body.scrollTop;
-	var sLeft = document.body.scrollLeft;
-	
-/*
-	var chat = document.getElementById("online");
-	chat.style.top = 10 + sTop+"px";
-	chat.style.right = 10 - sLeft+"px";
-*/
-
-
-/*
-	$('#online').css('right',5 - document.body.scrollLeft+"px");
-	$('#online').css('top',5 + document.body.scrollTop+"px");
-
-
-    $('#chat').css('bottom', 5 - document.body.scrollTop + 'px');
-    $('#chat').css('right', 5 - document.body.scrollLeft + 'px');
-
-    $('#chatButton').css('bottom', 5 - document.body.scrollTop + 'px');
-    $('#chatButton').css('right', 5 - document.body.scrollLeft + 'px');
-    $('.uiOpen').css('top', 70 + document.body.scrollTop + 'px');
-    $('.uiOpen').css('left', 110 + document.body.scrollLeft + 'px');
-*/
-    
-/*
-
-	$('#online').animate({
-	    top: 10 + document.body.scrollTop + 'px',
-	    right: 10 - document.body.scrollLeft + 'px',
-	  }, 40,'linear',null);
-
-	$('#chat').animate({
-	    bottom:  10 - document.body.scrollTop + 'px',
-	    right: 10 - document.body.scrollLeft + 'px',
-	  }, 40,'linear',null);
-	  
-	$('#chatButton').animate({
-	    bottom: 10- document.body.scrollTop + 'px',
-	    right: 10 - document.body.scrollLeft + 'px',
-	  }, 40,'linear',null);	 
-
-
-	//TODO:	ui elements!  
-
-	$('.uiOpen').animate({
-	    top: 70 + document.body.scrollTop + 'px',
-	    left: 110 + document.body.scrollLeft + 'px',
-	  }, 40,'linear',null);	 
-*/
-
-	  	  
+	var sLeft = document.body.scrollLeft;  	  
 
 	var yCenter = document.body.scrollTop + window.innerHeight / 2;
 	var xCenter = document.body.scrollLeft + window.innerWidth / 2;
@@ -643,41 +599,40 @@ function recenter(){
 */
 	
 	//TODO: CHROME BUG?
-	if(is_chrome){
+	if(is_chrome || is_firefox){
 		div3d.style.webkitPerspectiveOriginX=transformX;
 		div3d.style.webkitPerspectiveOriginY=transformY;
+		div3d.style.MozPerspectiveOriginX=transformX;
+		div3d.style.MozPerspectiveOriginY=transformY;
 	}
 	
 	div3d.style.webkitTransformOriginX = transformX;
 	div3d.style.webkitTransformOriginY = transformY;
-	
+	div3d.style.MozTransformOriginX = transformX;
+	div3d.style.MozTransformOriginY = transformY;
+		
 	mainDiv.style.webkitTransformOriginX = transformX;
 	mainDiv.style.webkitTransformOriginY = transformY;
+	mainDiv.style.MozTransformOriginX = transformX;
+	mainDiv.style.MozTransformOriginY = transformY;
 	
 	mainDiv.style.webkitPerspectiveOriginX=transformX;
 	mainDiv.style.webkitPerspectiveOriginY=transformY;
-
+	mainDiv.style.MozPerspectiveOriginX=transformX;
+	mainDiv.style.MozPerspectiveOriginY=transformY;
 	
 	//console.log(xCenter +" " + yCenter);
-	
-/*
-	var elements = document.querySelectorAll('.fixed');
-					for(var i=0;i<elements.length;i++){
-					
-					var scroll = document.body.scrollTop;
-					elements[i].style.webkitTransform = 'translateY(' + scroll +'px)';
-					console.log(scroll);
-				}
-*/
-
 
 }
 
 windowReady=false;
 nowReady=false;
 var addEditorsEl;
+var IE = document.all?true:false
 
 window.onload = function() { 
+
+
 
 	console.log('onload');
 	
@@ -685,33 +640,70 @@ window.onload = function() {
 	var r = Math.random()
 	var chatTop = document.getElementById('chatTop');
 	chatTop.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
-	
+
+	//ajax.ajaxFunction('refresh');	
 	recenter()
-	//ajax.ajaxFunction('refresh');
-	
-	if(readCookie('loginMenu') && !loggedIn){
-		
-		document.getElementById('loginMenu').className = readCookie('loginMenu');
-	}	
 	changeBackground();
 	
+/*
 	$(".menuDiv").mouseover(function(){
-/* 		$(this).css("background-color",'rgba(240,240,240,.7)'); */
-/* 		$(this).css("border-width",'1px'); */
+		$(this).css("background-color",'rgba(240,240,240,.7)');
+		$(this).css("border-width",'1px');
 	})
 
 	$(".menuDiv").mouseout(function(){
-/* 		$(this).css("border-width",'0px'); */
 		$(this).css("background",'none');
-	})	
+	})
+*/	
 	
 		$().ready(function() {
 		
-		  //$('textarea.tinymce').aloha();
+		
+
+		if (!IE) window.captureEvents(Event.MOUSEMOVE)
+			window.onmousemove = getMouseXY;
+		
+			//$( "#chatBox" ).resizable({ handles: 'n, e, s, w' });
+		
+
+		    var notifyPostion=false;
+			$('.notifyBox').click(function(){
+				
+				if(!notifyPostion){
+/*
+					$('#notifyDiv').position({ 
+						of: $('.notifyBox'), 
+		    			my:"left top",
+		    			at:"left bottom" })
+			   			notifyPostion=true;
+*/
+		   		}
+				$('#notifyDiv').toggle();
+				$('.notifyBox').html('n');
+				notify=0;
+				})
+
+			if(loggedIn){
+				$('#editElementMenu').position({ 
+							of: $('#editElementButton'), 
+			    			my:"left top",
+			    			at:"left bottom" })
+			    			
+	   			$('#editPageMenu').position({ 
+					of: $('#editPageButton'), 
+	    			my:"left top",
+	    			at:"left bottom" })	
+    		}	
+		
+	
+		
+			if(readCookie('loginMenu') && !loggedIn){
+				document.getElementById('loginMenu').style.display = readCookie('loginMenu');
+				document.getElementById('loginMenu').className ='uiOpen';
+			}
 
 			addEditorsEl = $('textarea.addEditors')
-			//addEditorsEl.tagify();
-			//$('textarea.addEditors').( {delimiters: [null]} );
+
 			addEditorsEl.tagify( {"addTagPrompt": 'enter username'},{delimiters: [null]});
 			
 			$('.tagify-container').keyup(searchUsers)
@@ -722,25 +714,7 @@ window.onload = function() {
 		windowReady=true;
 		loadData();
 
-/* 		$('.menu').okshadow(); */
-
-
-/*
-		$('a').okshadow({		  
-		 //color: 'blue',
-		  textShadow: true,
-*/
-		  //transparent: true,
-		  //xMax: 0,
-		  //yMax: 0,
-/* 		  fuzzMin: 0, */
-/* 		  fuzz: 40 */
-	
-	//	  });
-	
 	});
-	
-	
 	
 };
 
@@ -748,7 +722,6 @@ window.onload = function() {
 
 
 setupTinymce = function(){
-
 
 		$('textarea.tinymce').tinymce({
 			// Location of TinyMCE script
@@ -775,7 +748,9 @@ setupTinymce = function(){
 			theme_advanced_statusbar_location : "bottom",
 			theme_advanced_resizing : true,
 			// Example content CSS (should be your site CSS)
-			content_css : "/stylesheets/gifpumper.css",
+			
+			//TODO: SERVER update url
+			content_css : "public/stylesheets/gifpumper.css",
 			theme_advanced_font_sizes : "8px,10px,12px,14px,18px,24px,36px,50px,100px",
     		font_size_style_values : "medium,medium,medium,medium,medium,medium,medium,medium,medium",
 
@@ -798,8 +773,6 @@ setupTinymce = function(){
 		
 /* 		$('textarea.tinymce').css('position','fixed'); */
 
-
-
 }
 
 
@@ -808,10 +781,7 @@ setupTinymce = function(){
 //setTimeout("ajaxFunction('refresh')",2000);
 //document.getElementById("ui").style.visibility = readCookie('menu');
 
-var IE = document.all?true:false
 
-if (!IE) window.captureEvents(Event.MOUSEMOVE)
-	window.onmousemove = getMouseXY;
 
 //var loggedIn = parseInt();
 
@@ -830,8 +800,14 @@ function animate(){
 }
 
 var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+var is_safari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
+var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+if(is_chrome)
+	is_safari=false;
 
 if(!Modernizr.csstransforms3d){
+
 
 	if (is_chrome){
 		alert("OH BOY, EITHER YOUR VERSION OF CHROME NEEDS AN UPDATE OR YOU DON'T HAVE A VERY GOOD GRAPHICS CARD : (");
@@ -938,6 +914,7 @@ function buttonPress(id){
 		$(editButton).data("okshadow").setoption({color:""});
 		}
 
+	changeBackground();
 
 }
 
@@ -997,9 +974,12 @@ goToPage = function(page, type, _version){
 	window.history.pushState("", "", url);
 	pageData=null;
 	$(".usersOnline").remove();
-	noobs=0;
+	n00bs=0;
+	//document.body.style.backgroundImage="url('http://www.oppenheim.com.au/wp-content/uploads/2007/08/ajax-loader-1.gif')"
 
 	now.leavePage(userProfile,loadData)
+
+
 	//console.log('done');
 }
 
@@ -1036,6 +1016,18 @@ fillEditMenu = function(){
 	$("#editMedia").val(pageData.images[id].content)
 	$("#editBackgroundColor").val(pageData.images[id].backgroundColor)
 	$("#editBackgroundImage").val(pageData.images[id].backgroundImage)
-	
+	$('#edit2d').prop("checked", pageData.images[id].d2d);
 
+
+}
+
+
+function disableSelection(target){
+	if (typeof target.onselectstart!="undefined") //IE route
+		target.onselectstart=function(){return false}
+	else if (typeof target.style.MozUserSelect!="undefined") //Firefox route
+		target.style.MozUserSelect="none"
+	else //All other route (ie: Opera)
+		target.onmousedown=function(){return false}
+	target.style.cursor = "default"
 }
