@@ -360,13 +360,17 @@ input#lastId(type='hidden', name='lastId')
         |-elements 
       div.menuDiv 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
-      //div.menuDiv 
+      div.menuDiv.profileOnly 
+        a(href='javascript:openMenu(\'addMenu\');') ⇧A Profile Image
+      //div.menuDiv.mainMenu  
         a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
-      div.menuDiv 
+      div.menuDiv.mainMenu  
         a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
-      div.menuDiv 
+      div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'editMenu\');fillEditMenu()') ⇧E Edit
-      div.menuDiv 
+      div.menuDiv.mainMenu 
+        a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
+      div.menuDiv.profileOnly 
         a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
    
 #editPageMenu.menu(style="display:none;position:fixed;")
@@ -374,11 +378,11 @@ input#lastId(type='hidden', name='lastId')
         |-page 
       div.menuDiv 
         a(href='javascript:openMenu(\'moreMenu\');') ⇧N New
-      div.menuDiv 
+      div.menuDiv
         a(href='javascript:saveVersion();') ⇧S Save Version 
-      #settingsButton.menuDiv(style="display:none") 
+      #settingsButton.menuDiv(style="display:block") 
           a(href='javascript:openMenu(\'pageMenu\');') ⇧P Settings   
-      #deleteVersion.menuDiv(style="display:none") 
+      #deleteVersion.menuDiv(style="display:block") 
           a(href='javascript:deleteVersion();') Delete This Version
       //div.shortCut
 

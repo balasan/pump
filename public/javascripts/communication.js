@@ -42,8 +42,10 @@ now.pushChanges = function(pageData){
 	var totalVersions = pageData.currentVersion;
 */
 
-	if(version != undefined)
-		jsonToDom(pageData.versions[0]);		
+	if(version != undefined){
+		versions[0].text=pageData.text
+		jsonToDom(pageData.versions[0]);
+		}		
 	else
 		jsonToDom(pageData);
 }    	
@@ -57,11 +59,11 @@ now.setPagePermissions = function(_permissions, _owner){
 		$("#settingsButton").show();
 		if(version!=undefined)
 			$("#deleteVersion").show();			
-		}
+	}
 	else{
 		$("#settingsButton").hide();
 		$("#deleteVersion").hide();			
-		}
+	}
 }
 
 
@@ -71,7 +73,7 @@ function loadAll(error, pageData, notifications){
 		//TODO: re-enable this
 		alert('PLEASE LOGIN TO DO THIS')
 		//alert(error)
-		window.location= "/"
+		goToPage('main')
 		console.log(error)
 		return;
 	}
@@ -91,6 +93,7 @@ function loadAll(error, pageData, notifications){
 			nextVersion=undefined;
 		else nextVersion=version+1;	
 
+		pageData.versions[0].text=pageData.text;
 		jsonToDom(pageData.versions[0]);
 
 	}
@@ -99,8 +102,6 @@ function loadAll(error, pageData, notifications){
 			prevVersion=lastVersion-1;	
 		jsonToDom(pageData);
 	}
-
-
 }
 
 /////////////
@@ -108,11 +109,8 @@ function loadAll(error, pageData, notifications){
 ///////////
 
 var n00bs=0;
-
 var defaultIcon = new Image();
-
 defaultIcon.src = 'http://dump.fm/images/20110926/1317014842765-dumpfm-FAUXreal-1297659023374-dumpfm-frankhats-yes.gif';
-
 defaultIcon.style.width = '20px';
 
 now.updatePageUser = function(action, userArray, profileName){
@@ -163,8 +161,6 @@ now.updatePageUser = function(action, userArray, profileName){
 	}	
 	}
 	if(action == 'delete'){
-		
-/* 	for(var user in userArray){ */
 		var user = userArray;
 		if(user!='n00b' || n00bs == 1)
 			document.getElementById('online').removeChild(document.getElementById(user));		
@@ -179,7 +175,6 @@ now.updatePageUser = function(action, userArray, profileName){
 				document.getElementById('n00b').appendChild(defaultIcon);
 				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00b</b>";				}
 		}
-	//}
 	}
 }
 
@@ -194,6 +189,8 @@ function addNewImg(){
 			alert("You can't edit saved versions")
 			return;
 		}
+
+		var number = parseInt(document.getElementById('addNumber').value);
 
 		var is2d = $('#add2d').is(':checked'); 
 
@@ -221,75 +218,88 @@ function addNewImg(){
         		scrollLeft = (document.body.parentElement) ? document.body.parentElement.scrollLeft : 0;	
 			}
 		}
+		var imgArray =[];
+
+		for(var i =0;i<number;i++){
 		
-		var addObject = {};
-		
-		addObject.d2d=is2d;
-		
-		//TODO RESET RADIOS!
-		
-		addObject.top = Math.random()*500 + scrollTop+"px";
-		addObject.left = Math.random()*900 + scrollLeft+"px";
-		
-		if(addType=="div" || addType=="text"){	
-			addObject.height="300px";
-			addObject.width="400px";	
-		}
-		else{
-			addObject.height="auto";
-			addObject.width="auto";		
-		}
-		addObject.z = Math.random()*50;
-		
-		
-		addObject.angler=0;
-		addObject.angley=0;
-		addObject.anglex=0;
-		if ($("input[name='geoPreset']:checked").val() == 'hPlane') {
-			addObject.angley=90;
-			addObject.height="1000px";
-			addObject.width="1000px";
-			addObject.z = -500;
+			var addObject = {};
+			
+			addObject.d2d=is2d;
+			
+			//TODO RESET RADIOS!
+			addObject.top = Math.random()*500 + scrollTop+"px";
+			addObject.left = Math.random()*900 + scrollLeft+"px";
+			
+			if(addType=="div" || addType=="text"){	
+				addObject.height="300px";
+				addObject.width="400px";	
+			}
+			else{
+				addObject.height="auto";
+				addObject.width="auto";		
+			}
+			addObject.z = Math.random()*50;
+			
+			
+			addObject.angler=0;
+			addObject.angley=0;
+			addObject.anglex=0;
+			if ($("input[name='geoPreset']:checked").val() == 'hPlane') {
+				addObject.angley=90;
+				addObject.height="1000px";
+				addObject.width="1000px";
+				addObject.z = -500;
+			}		
+			else if ($("input[name='geoPreset']:checked").val() == 'vPlane') {
+				addObject.anglex=90;
+				addObject.width="1000px";
+				addObject.height="1000px";
+				addObject.z = -500;
+			}	
+	
+			$('input[name="geoPreset"]').attr('checked', false);
+			
+			addObject.contentType=addType;
+	
+			if(addType == "image"){
+				addObject.url = imgUrl;
+			}
+			else if(addType == "media"){
+				addObject.content=document.getElementById("media").value;
+				number=1;
+			}
+			else if(addType =='text'){
+				addObject.content = $('#addContent').val();
+			}
+			if(addType == "div"){
+				addObject.backgroundColor=document.getElementById("divColor").value;
+				addObject.backgroundImage=document.getElementById("divBgUrl").value;
+				number=1;
+			}
+			imgArray.push(addObject);
 		}		
-		else if ($("input[name='geoPreset']:checked").val() == 'vPlane') {
-			addObject.anglex=90;
-			addObject.width="1000px";
-			addObject.height="1000px";
-			addObject.z = -500;
-		}	
-
-		$('input[name="geoPreset"]').attr('checked', false);
-		
-		addObject.contentType=addType;
-
-		if(addType == "image"){
-			addObject.url = imgUrl;
-		}
-		else if(addType == "media"){
-			addObject.content=document.getElementById("media").value;
-			number=1;
-		}
-		else if(addType =='text'){
-			addObject.content = $('#addContent').val();
-		}
-		if(addType == "div"){
-			addObject.backgroundColor=document.getElementById("divColor").value;
-			addObject.backgroundImage=document.getElementById("divBgUrl").value;
-			number=1;
-		}
-				
-		var number = parseInt(document.getElementById('addNumber').value);
-		now.addNewImg(pageName, addObject, number, scrollTop, scrollLeft);
+		now.addNewImg(pageName, imgArray, scrollTop, scrollLeft);
 }
 
 now.newImg = function(img){
 
+	if(version!=undefined)
+		return;
 	//TODO: watch out on page save! not necessary?
-	if(pageData.images[img._id]==undefined)
-		pageData.images.push(img);
-
-	//TODO: make this more efficient?
-	imageToDom(img)
+	if(img.length!=undefined){
+		for(var i=0;i<img.length;i++){
+			if(pageData.images[img._id]==undefined)
+				pageData.images.push(img[i]);
+				imageToDom(img[i])		
+		}
+	}
+	else{	
+		if(pageData.images[img._id]==undefined)
+			pageData.images.push(img);
+	
+		//TODO: make this more efficient?
+		imageToDom(img)
+	}
 
 }
 
@@ -404,8 +414,10 @@ function updateElement(element, property, value){
 }
 
 now.updateChanges = function(_id, property, value){
+
+
 	if(version!=undefined){
-		alert("You can't edit saved versions")
+		//alert("You can't edit saved versions")
 		return;
 	}
 			
@@ -435,6 +447,7 @@ function setPrivacy(){
 	
 	now.setPrivacy(pageName, setPrivacy,editors,is2d, function(error){		
 		if(!error) openMenu('pageMenu');
+		else console.log(error);
 		}
 	);
 }
@@ -481,7 +494,7 @@ function addPage(copyPage){
 	var desiredPageName = document.getElementById('newPage').value;
 	now.addPage(desiredPageName, copyPage, function(error, newPage){
 			if(error) alert(error);
-			else window.location = newPage;		
+			else goToPage(newPage)		
 		})
 }
 
@@ -497,7 +510,7 @@ function deletePage(){
 	  {
 		now.deletePage(pageName, function(error){		
 			if (error != null) alert(error)
-			else window.location = "./";		
+			else goToPage('main');		
 		})
 	  }
 	else
@@ -593,6 +606,11 @@ function setBackground(type){
 
 now.backgroundResponce = function(type, background){
 
+
+	if(version!=undefined)
+		return;
+
+		
 	if(type=="background")
 		document.body.style.backgroundColor = background;
 	if(type=="backgroundImage")
@@ -638,8 +656,16 @@ function doResize() {
 }
 
 function enter(evt){
+	
 	var charCode = (evt.which) ? evt.which : window.event.keyCode; 
 	if (charCode == 13){ 
+		if(currentUser=='n00b'){
+			alert("YOU HAVE TO LOG IN TO DO POST COMMENTS")
+			var inputBox = document.getElementById("inputBox");
+			inputBox.value="";
+			return;
+		}
+
 		
 		evt.preventDefault;
 		var inputBox = document.getElementById("inputBox");
@@ -680,8 +706,9 @@ function searchUsers(){
 
 	var addEditorsEl = $('textarea.addEditors')
 
-
 	var txt = addEditorsEl.tagify('inputField').val();
+	if(txt="")
+		return;
 	
 	now.findUser(txt,function(userArray){
 
@@ -758,11 +785,15 @@ now.notify = function(_notify,newN,main){
 						
 			if(newN==undefined && !main)
 				notify+=1;
-			else notify=newN;
-			if(!notify)
+			else if(!main) notify=newN;
+			if(!notify){
 				$(".notifyBox").html("n");
-			else
+				document.title="gifpumper"	
+				}
+			else{
 				$(".notifyBox").html(notify);
+				document.title="("+notify+") gifpumper"	
+			}
 			$(".notifyBox").css('padding','2px 4px 2px 4px');
 			
 			var note = document.createElement('div');

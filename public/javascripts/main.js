@@ -307,7 +307,8 @@ function dragHandler(e){
   var target = e.target != null ? e.target : e.srcElement;
   selObj=target;
   selObj=document.getElementById(selObj.id);
-  
+  $("#inputBox").blur();
+
  
   
   if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
@@ -316,7 +317,7 @@ function dragHandler(e){
 		 pageData.lastId = selObj.id;
 		 fillEditMenu();
  	 }
- else if($(selObj).hasClass('editableElement')){
+  else if($(selObj).hasClass('editableElement')){
 		$(".selected").removeClass("selected");
  	 	pageData.lastId=null;
 	
@@ -658,7 +659,9 @@ window.onload = function() {
 	
 		$().ready(function() {
 		
-		
+		$(window).bind('hashchange', function (){			
+			console.log(window.location.hash)
+		})		
 
 		if (!IE) window.captureEvents(Event.MOUSEMOVE)
 			window.onmousemove = getMouseXY;
@@ -681,7 +684,8 @@ window.onload = function() {
 				$('#notifyDiv').toggle();
 				$('.notifyBox').html('n');
 				notify=0;
-				})
+				document.title="gifpumper"	
+			})
 
 			if(loggedIn){
 				$('#editElementMenu').position({ 
@@ -694,8 +698,6 @@ window.onload = function() {
 	    			my:"left top",
 	    			at:"left bottom" })	
     		}	
-		
-	
 		
 			if(readCookie('loginMenu') && !loggedIn){
 				document.getElementById('loginMenu').style.display = readCookie('loginMenu');
@@ -807,8 +809,6 @@ if(is_chrome)
 	is_safari=false;
 
 if(!Modernizr.csstransforms3d){
-
-
 	if (is_chrome){
 		alert("OH BOY, EITHER YOUR VERSION OF CHROME NEEDS AN UPDATE OR YOU DON'T HAVE A VERY GOOD GRAPHICS CARD : (");
 	}
@@ -977,7 +977,7 @@ goToPage = function(page, type, _version){
 	n00bs=0;
 	//document.body.style.backgroundImage="url('http://www.oppenheim.com.au/wp-content/uploads/2007/08/ajax-loader-1.gif')"
 
-	now.leavePage(userProfile,loadData)
+	now.leavePage(currentUser,loadData)
 
 
 	//console.log('done');

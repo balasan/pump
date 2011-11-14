@@ -95,12 +95,43 @@ function imageToDom(image, property){
 
 function jsonToDom(pageDataIn){
 	
-	
+
+				
 	pageData = pageDataIn;
 	onlineObj = {}
 	
+	if(pageData.pageName=='profile'){
+		$('#editPageButton').hide();
+		$('#helpButton').hide();
+		$('#animateButton').hide();
+		$('.mainMenu').hide()
+		$('.profileOnly').show()
+	}
+		
+	else{
+		$('#editPageButton').show();
+		$('#helpButton').show();
+		$('#animateButton').show();
+		$('.mainMenu').show()
+		$('.profileOnly').hide()
+
+	}	
+/*
+		
+	if(!owner){
+		$('#settingsButton').hide()
+	}
+	else
+		$('#settingsButton').show()
+	
+	if(version==undefined)
+		$('#deleteVersion').hide()
+	else
+		$('#deleteVersion').show()
+	
 	if(lastPost!=undefined)
 		lastPost="";
+*/
 		
 	document.getElementById('activeNow').innerHTML='';
 	document.getElementById('feed').style.display="none"
@@ -171,7 +202,7 @@ function jsonToDom(pageDataIn){
 
 
 	if(pageData.pageName != "main" && pageData.pageName != "profile")
-		document.getElementById('pageName').innerHTML = pageData.pageName + " by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a> ";
+		document.getElementById('pageName').innerHTML = "<a href='javascript:goToPage(\""+pageData.pageName+"\")'>" +pageData.pageName+"</a> by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a> ";
 	else
 		document.getElementById('pageName').innerHTML="";
 
@@ -195,6 +226,7 @@ function jsonToDom(pageDataIn){
 			}
 		}
 	}
+	document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 
 	var div3d = document.getElementById("div3d");
 

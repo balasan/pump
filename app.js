@@ -265,8 +265,6 @@ app.get('/', function(req, res){
     		}
     	})	
 	}
-	
-
 });
 
 
@@ -276,9 +274,6 @@ app.get("/:page/:version?", function(req,res) {
 
 	if(req.params.page == "javascripts" || req.params.page == "stylesheets")
 		return;
-	//req.params.page = req.params[0];
-	//console.log(req.params.page);
-	//console.log(req.params.version);
 
 	if(req.params.page!='favicon.ico'){
 		var loggedIn = false;
@@ -296,9 +291,7 @@ app.get("/:page/:version?", function(req,res) {
 					owner=true;
 				}
 				var privacy=result.privacy;
-				//oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner)
 			}
-			//else(console.log(err))
 		
 			//TODO: create new page?
 			if(result == undefined)
@@ -349,14 +342,8 @@ app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
 					owner=true;
 				}
 				var privacy=result.privacy;
-				//oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner)
 			}
-			//else(console.log(err))
-		
-			//TODO: create new page?
-			//if(result == undefined)
-	       	//	res.redirect('back');
-			//else
+
 			res.render('index.jade',{ 
 				locals: {
 	        		loggedIn: loggedIn,
@@ -421,9 +408,9 @@ app.post('/login', function(req, res){
 	if(req.body.login){
 	  authenticate(req.body.username, req.body.password, function(err, user){
 	    if (user) {
-	      // Regenerate session when signing in
-	      // to prevent fixation 
-	      req.session.regenerate(function(){
+	      	// Regenerate session when signing in
+	      	// to prevent fixation 
+	      	req.session.regenerate(function(){
 	        // Store the user's primary key 
 	        // in the session store to be retrieved,
 	        // or in this case the entire user object
@@ -527,8 +514,8 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 		groupName = "profile___"+userProfile;
 	
 	console.log(groupName);
-		
-	if ((this.user.pagePermissions[pageName] == undefined || (this.user.pagePermissions[pageName]==3) && this.user.pagePermissions[pageName]!='owner')){
+	console.log(this.user.pagePermissions[pageName]);
+	if (this.user.pagePermissions[groupName] == undefined || (this.user.pagePermissions[groupName]==3 && this.user.pagePermissions[groupName]!='owner')){
 		//console.log(this.user.pagePermissions[pageName])
 		callback("This page is private")
 		return;
@@ -600,8 +587,7 @@ everyone.now.getAllUsers = function(callback){
 everyone.now.leavePage = function(userProfile, callback){	
 	
 	if(this.user.currentPage != null){
-		nowjs.getGroup(this.user.currentPage).exclude(this.user.clientId).now.updatePageUser('delete',this.user.name,userProfile);
-		
+		nowjs.getGroup(this.user.currentPage).exclude(this.user.clientId).now.updatePageUser('delete',this.user.name,userProfile);		
 		//if(this.user.currentPage != "main" && this.user.currentPage != "profile")
 		delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
 		nowjs.getGroup(this.user.currentPage).removeUser(this.user.clientId);
@@ -609,8 +595,8 @@ everyone.now.leavePage = function(userProfile, callback){
 
 		this.user.currentPage = null;
 		callback();
-		
-	}	
+	}
+	else callback();	
 };
 
 nowjs.on('disconnect', function(){
@@ -620,7 +606,8 @@ nowjs.on('disconnect', function(){
 	})
 	nowjs.getGroup('main').now.updateFeed(this.user.name,this.user.currentPage,'leave')
 
-	delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
+	if(nowjs.getGroup(this.user.currentPage).pageUsers!=undefined)
+		delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
 	nowjs.getGroup(this.user.currentPage).now.updatePageUser('delete',this.user.name);
 	//pagesGroup[this.user.currentPage].removeUser(this.user.clientId);
 	onlineModel.remove({nowId:this.user.clientId},function(err){});
@@ -659,6 +646,10 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 			if(oldthis.user.name=="gifpumper"){
 				oldthis.user.pagePermissions[pageName]='owner';
 			}
+			
+			if(oldthis.user.name == 'n00b' && result.privacy<2)
+				oldthis.user.pagePermissions[pageName]=2;
+			
 			if(pageName=="profile"){
 				pageName = "profile___"+userProfile;
 				if(userProfile == oldthis.user.name)
@@ -668,6 +659,9 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 				else 
 					oldthis.user.pagePermissions[pageName]=2;
 			}
+
+
+			
 			oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner);
 			callback(null, oldthis.user.name,oldthis.user.pagePermissions[pageName]);	
 		}
@@ -731,28 +725,29 @@ everyone.now.editElement = function(pageName, _id, element, all, position, callb
 ///ADD
 /////
 
-everyone.now.addNewImg = function(pageName, imgObj, number, scrollTop, scrollLeft){
+everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft){
 
 	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
 			return;
 
-	for(var i=0; i<number; i++){
-		var img= new imageModel(imgObj);
-
-		img.user = this.user.name;
-
-		pageModel.update({"pageName":pageName}, {$push: {"images" : img}}, function (err,result) {
-			if (!err){
-				var notify = {};//new notifyModel();
-				notify.user = oldthis.user.name;
-				notify.action = 'update'
-				notify.page = pageName;
-				nowjs.getGroup(pageName).now.newImg(img);
-				nowjs.getGroup('main').now.notify([notify],null, true)		
-			}
-			else console.log(err)
-		})
+	var imgs=[]
+	for(var i=0; i<imgArray.length; i++){
+		imgArray[i].user = this.user.name;
+		imgs.push(new imageModel(imgArray[i]));
 	}
+
+	pageModel.update({"pageName":pageName}, {$pushAll: {"images" : imgs}}, function (err,result) {
+		if (!err){
+			var notify = {};//new notifyModel();
+			notify.user = oldthis.user.name;
+			notify.action = 'update'
+			notify.page = pageName;
+			nowjs.getGroup(pageName).now.newImg(imgs);
+			nowjs.getGroup('main').now.notify([notify],null, true)		
+		}
+		else console.log(err)
+	})
+	
 
 };
 
@@ -886,28 +881,7 @@ everyone.now.updateUsers = function(users, callback){
 		users[i].salt = randomString();
 		users[i].password = hash(users[i].password, users[i].salt);
 		var user={}		
-		user[i] = new userModel(users[i]);
-		
-/*
-		var profilePage={};
-		profilePage.pageName = "profile_"+users[i].username;
-		profilePage.owner = users[i].username;
-		profilePage.profilePage = true;
-		profilePage.privacy = 2;
-
-		tmpPage={}
-		tmpPage[i] = new pageModel(profilePage)
-		
-		//user.set(users[i]);
-		//console.log(user[i])
-		//console.log(tmpPage[i])
-
-		tmpPage[i].save(function (err) {	    
-	    	if(err) console.log(err);
-	    	else console.log(tmpPage[i]);
-	    });
-*/
-	    		
+		user[i] = new userModel(users[i]);    		
 		user[i].save(function (err) {	    
 	    	if(err) callback("there was an error, most likely the username you chose has already been taken");
 	    	else callback(null);
@@ -934,7 +908,7 @@ everyone.now.setPrivacy = function(pageName, privacy,editors,_2d,callback){
 		else{
 			callback(null);
 			nowjs.getGroup(pageName).now.pagePrivacy(privacy,d2d);
-		}	
+		}
 	})
 };
 
@@ -1124,7 +1098,7 @@ everyone.now.saveVersion = function(callback){
 	if (this.user.pagePermissions[pageName] !='owner' && this.user.pagePermissions[pageName] != 0)
 		return;
 		
-	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0},function(error,result){
+	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0,text:0},function(error,result){
 		if(!error){
 			var newVersion ={}
 			newVersion = result;
@@ -1275,33 +1249,31 @@ everyone.now.likePage = function(action, version, callback){
 var lastNotify={}
 notifyUsers = function(images,_owner,user,action,pageName,version){
 	
+	var notify = new notifyModel();
+	notify.user = user;
+	notify.action = action;
+	notify.page = pageName;
+	if(version!=undefined){
+		notify.version = version;
+	}	
+
+	if(lastNotify.user!=notify.user && lastNotify.page!=notify.page && lastNotify.action!=notify.action && lastNotify.version!=notify.version)		
+	pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
+		if(err) console.log(err);
+	})
+	nowjs.getGroup('main').now.notify([notify],undefined, true)	
+				
+	lastNotify=notify;
+	
 	var contributors={}
 	for (var i=0;i<=images.length;i++){
 	
+		var owner;
 		if(i==images.length)
-			var owner = _owner;
+			owner = _owner;
 		else
-			var owner = images[i].user
-	
-		var notify = new notifyModel();
-			notify.user = user;
-			notify.action = action;
-			notify.page = pageName;
-			if(version!=undefined){
-				notify.version = version;
-		}
-		
-		if(lastNotify.user!=notify.user && lastNotify.page!=notify.page && lastNotify.action!=notify.action && lastNotify.version!=notify.version)
-			console.log(lastNotify)
-			pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
-				if(err) console.log(err);
-			})
-		
-		lastNotify=notify;
-				
-		//TODO:store main notifications in db?
-		nowjs.getGroup('main').now.notify([notify],null, true)		
-		
+			owner = images[i].user
+
 		if(user==owner)
 			continue;
 	
@@ -1309,23 +1281,23 @@ notifyUsers = function(images,_owner,user,action,pageName,version){
 			continue;
 		else contributors[owner]=1;
 			
-			userModel.findOne({username:owner},{notify:1,nowId:1,newNotify:1},function(err,result2){
-			if(!err){
-				var nowId = result2.nowId;
-	
-				if(result2.notify == undefined)
-					result2.notify=[];
-					
-				result2.notify.push(notify);
-				if(nowId){
-					nowjs.getClient(nowId, function() { 
-						if(this.user!=undefined){
-							console.log(notify)
-							this.now.notify([notify])
-						}
-					}); 
-				}
-				else result2.newNotify++;	
+		userModel.findOne({username:owner},{notify:1,nowId:1,newNotify:1},function(err,result2){
+		if(!err){
+			var nowId = result2.nowId;
+
+			if(result2.notify == undefined)
+				result2.notify=[];
+				
+			result2.notify.push(notify);
+			if(nowId){
+				nowjs.getClient(nowId, function() { 
+					if(this.user!=undefined){
+						//console.log(notify)
+						this.now.notify([notify])
+					}
+				}); 
+			}
+			else result2.newNotify++;	
 				result2.save(function(err){
 					if(err) console.log(err)
 				})

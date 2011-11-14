@@ -315,7 +315,8 @@ position:fixed;
 	padding-bottom:10px; 
 	top:5px;
 	right:15px;
-	background-image:url('http://desizntech.info/wp-content/uploads/2010/05/pattern_5.jpg');	
+/* 	background-image:url('http://desizntech.info/wp-content/uploads/2010/05/pattern_5.jpg');	 */
+	background-color:white;
 	opacity:.7;
 	max-height: 250px;
 	width:120px;
@@ -743,6 +744,16 @@ input[type="password"]{
 	width:200px;
 	color:grey;
 
+}
+
+#pageName{
+	padding:2px;
+	margin-left:4px;
+	margin-right:4px;
+	width:300px;
+	color: grey;
+/* 	font-size:14px; */
+/* 	position:fixed; */
 }
 
 .activePages{
