@@ -707,7 +707,7 @@ function searchUsers(){
 	var addEditorsEl = $('textarea.addEditors')
 
 	var txt = addEditorsEl.tagify('inputField').val();
-	if(txt="")
+	if(txt=="")
 		return;
 	
 	now.findUser(txt,function(userArray){

@@ -222,7 +222,7 @@ input#lastId(type='hidden', name='lastId')
 #moreMenu.uiClosed(name='moreMenu', style='left:400px; top:100px; width:160px;')
   | create new page:
   br
-  input(style='width:160px;', type='text',id='newPage', name='newPage', value='enter unique page name', onfocus="value=''")
+  input(style='width:160px;', type='text',id='newPage', name='newPage', placeholder='enter unique page name', onfocus="typing=true", onblur="typing=false")
   br
   input#makeNew.button(type='submit', style='width:78px;', name='makeNew', value='new page',onclick="addPage(false)")
   | 
@@ -269,7 +269,7 @@ input#lastId(type='hidden', name='lastId')
   br
   |add editors:
   br
-  textarea.addEditors(style='width:auto;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value=''", onKeyPress="searchUsers();")
+  textarea.addEditors(style='width:auto;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value='', typing=true",onblur="typing=false", onKeyPress="searchUsers();")
   #searchResults
   input#pageSettings.button(type='submit', style='width:78px;', name='pageSettings', value='Save',onclick='setPrivacy()') 
   | 

@@ -632,12 +632,18 @@ var addEditorsEl;
 var IE = document.all?true:false
 
 window.onload = function() { 
-
-
-
-	console.log('onload');
 	
+	var type = null;
+	if(profile)
+		type="profile"
 	
+
+	//window.history.pushState({page:pageName,type:type,_version:version}, "", "url");
+	window.history.replaceState({page:pageName,type:type,_version:version}, "", document.URL)
+
+	
+	window.addEventListener("popstate", popFunction);
+
 	var r = Math.random()
 	var chatTop = document.getElementById('chatTop');
 	chatTop.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
@@ -657,11 +663,12 @@ window.onload = function() {
 	})
 */	
 	
+	
 		$().ready(function() {
-		
-		$(window).bind('hashchange', function (){			
-			console.log(window.location.hash)
-		})		
+
+		$('input:text').focus(function(){ typing=true;})
+		$('input:text').blur(function(){ typing=false;})
+
 
 		if (!IE) window.captureEvents(Event.MOUSEMOVE)
 			window.onmousemove = getMouseXY;
@@ -709,6 +716,13 @@ window.onload = function() {
 			addEditorsEl.tagify( {"addTagPrompt": 'enter username'},{delimiters: [null]});
 			
 			$('.tagify-container').keyup(searchUsers)
+			
+			addEditorsEl.tagify('inputField').focus(function(){typing=true});
+			addEditorsEl.tagify('inputField').blur(function(){typing=false});
+
+			//$('.tagify-container').focus(function(){typing=true})
+			//$('.tagify-container').blur(function(){typing=false})
+			
 			setupTinymce();
 			
 		$('.menuButton').okshadow();
@@ -947,7 +961,7 @@ registerFunc = function(){
 
 }
 
-goToPage = function(page, type, _version){
+goToPage = function(page, type, _version,back){
 
 	console.log(page + " "+ type);
 	
@@ -968,10 +982,12 @@ goToPage = function(page, type, _version){
 		var url="/"+page
 		
 	if(version!=undefined){
-	
 		url+="/"+version;
 	}
-	window.history.pushState("", "", url);
+	
+	if(!back)
+		window.history.pushState({page:page,type:type,version:version}, "", url);
+	
 	pageData=null;
 	$(".usersOnline").remove();
 	n00bs=0;
@@ -983,7 +999,14 @@ goToPage = function(page, type, _version){
 	//console.log('done');
 }
 
-
+function popFunction(e){
+	console.log(e.state);
+	var back=true;
+	
+	if(e.state!=null)
+		goToPage(e.state.page,e.state.type,e.state.version,back)
+}
+	
 
 
 var addType = "image";
@@ -1031,3 +1054,5 @@ function disableSelection(target){
 		target.onmousedown=function(){return false}
 	target.style.cursor = "default"
 }
+
+

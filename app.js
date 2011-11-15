@@ -152,7 +152,7 @@ var pageSchema = new Schema({
 });
 
 var userSchema = new Schema({
-	  username : {type :String,  index: { unique: true }, set:toLower}
+	  username : {type :String,  index: { unique: true }}
 	, salt : {type: String}
 	, password : Buffer
 	, email : String 
@@ -160,7 +160,7 @@ var userSchema = new Schema({
 	, contributedTo : []
 	, favoritePages : []
 	, favoriteUsers : []
-	, text 		: [textSchema]
+	, text : [textSchema]
 	, likes: []
 	, userImage: {type:String, default:""}
 	, backgroundImage : String
@@ -236,10 +236,10 @@ app.get('/', function(req, res){
 		pageModel.findOne({'pageName':'main'},{privacy:true, owner:true},function(err, result){
 			if(!err){
 				var owner=false;
-				if(result.owner == req.session.user){
+				if(result != null && result.owner == req.session.user){
 					owner=true;
 				}
-				var privacy=result.privacy;
+				else owner=false
 				//oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner)
 			}
 			else(console.log(err))
@@ -877,14 +877,25 @@ function randomString() {
 
 
 everyone.now.updateUsers = function(users, callback){
+	
 	for(var i in users){	
-		users[i].salt = randomString();
-		users[i].password = hash(users[i].password, users[i].salt);
-		var user={}		
-		user[i] = new userModel(users[i]);    		
-		user[i].save(function (err) {	    
-	    	if(err) callback("there was an error, most likely the username you chose has already been taken");
-	    	else callback(null);
+
+		var user = new RegExp("^"+users[i].username+"$",'i');
+		userModel.find({username: user}, { username : 1 },function(error,result){
+			
+			if(result==null){
+				users[i].salt = randomString();
+				users[i].password = hash(users[i].password, users[i].salt);
+				var user={}		
+				user[i] = new userModel(users[i]);    		
+				user[i].save(function (err) {	    
+		    		if(err) callback("there was an error, most likely the username you chose has already been taken");
+		    		else callback(null);
+		    		})
+	    	}
+	    	else{	    	
+	    		callback("there was an error, most likely the username you chose has already been taken");
+	    	}
 	    });
 	}
 }
@@ -1073,12 +1084,12 @@ everyone.now.loadMainPage = function(user, callback){
 
 everyone.now.findUser = function(userTxt, callback){
 
-	var user = new RegExp("^"+userTxt);
-	console.log(user)
+	var user = new RegExp("^"+userTxt,'i');
+	//console.log(user)
 	userModel.find({username: user}, { username : 1 },function(error,result){
 	//userModel.find({username: { $regex : user}}, { username : 1 },function(error,result){
 		if(!error){
-				console.log(result);
+				//console.log(result);
 				callback(result);
 				
 				}
@@ -1257,12 +1268,13 @@ notifyUsers = function(images,_owner,user,action,pageName,version){
 		notify.version = version;
 	}	
 
-	if(lastNotify.user!=notify.user && lastNotify.page!=notify.page && lastNotify.action!=notify.action && lastNotify.version!=notify.version)		
-	pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
-		if(err) console.log(err);
+	if(lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version){		
+		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
+			if(err) console.log(err);
 	})
-	nowjs.getGroup('main').now.notify([notify],undefined, true)	
-				
+	 nowjs.getGroup('main').now.notify([notify],undefined, true)	
+	}
+	//console.log(lastNotify)
 	lastNotify=notify;
 	
 	var contributors={}
