@@ -735,13 +735,13 @@ input[type="password"]{
 }
 
 #notifyDiv{
-	padding:10px;
+	padding:10px 4px 10px 0px;
 	display:none;
 	position:fixed;
 	color:grey;
 	max-height:300px;
 	overflow:auto;
-	width:200px;
+	width:250px;
 	color:grey;
 
 }
@@ -760,6 +760,19 @@ input[type="password"]{
 	padding: 2px 4px 2px 4px;
 	font-size:16px;
 	color:grey;
+}
+
+.thumbContainer{
+	width:40px;
+	height:40px;
+	overflow:hidden;
+	margin:1px 6px 1px 0px;
+	float:left;
+}
+
+.usersOnline{
+
+
 }
 
 .x {

@@ -11,10 +11,19 @@ now.ready(function(){
 
 	nowReady=true;
 	loadData();
-
+	loadNotifications();
 	//now.setUserPage(pageName);
 
 });
+
+function loadNotifications(){
+
+	if(nowReady && windowReady){
+		now.getNotifications();
+	}
+}
+
+
 var myName;
 function loadData(){
 
@@ -49,6 +58,9 @@ now.pushChanges = function(pageData){
 	else
 		jsonToDom(pageData);
 }    	
+
+
+
 
 now.setPagePermissions = function(_permissions, _owner){
 	privacy = _permissions;
@@ -123,29 +135,26 @@ now.updatePageUser = function(action, userArray, profileName){
 			for(var user in username){
 			if(document.getElementById(user)==undefined){
 				var newDiv = document.createElement('div');
+				
 				newDiv.id = user;
 				newDiv.className ="usersOnline"
-				var userIcon = new Image();
+				newDiv.style.padding="0px 7px 2px 7px";
+
+				var imgBox = new imgBoxClass(user,'user',25)
 				
-				if(username[user]){
-					if(userIcon.width>userIcon.height)
-						userIcon.style.width = '20px';
-					else
-						userIcon.style.height = '20px';
-					userIcon.src = username[user];
-				}
-				else userIcon = defaultIcon;
-				
-				newDiv.appendChild(userIcon);
-				
+				var textDiv=document.createElement('div');
 				if(user!="n00b")
-					newDiv.innerHTML += " <b><a href='/profile/"+user+"'>"+user+"</a></b> ";
-				else
-					newDiv.innerHTML += " <b>"+user+"</b>";
-									
-				newDiv.style.paddingLeft="7px";
-				newDiv.style.paddingRight="7px";
-				newDiv.style.paddingBottom="2px";
+					textDiv.innerHTML += " <b><a href='/profile/"+user+"'>"+user+"</a></b> ";
+				else{
+					textDiv.id="n00bText"					
+					textDiv.innerHTML += " <b>"+user+"</b>";
+				}
+				
+				textDiv.style.paddingTop='4px';
+				textDiv.style.height='30px'
+				
+				newDiv.appendChild(imgBox.imgDiv);
+				newDiv.appendChild(textDiv);
 
 				document.getElementById('online').appendChild(newDiv);
 				if (user=='n00b')
@@ -153,9 +162,7 @@ now.updatePageUser = function(action, userArray, profileName){
 			}
 			else if(user=='n00b'){
 				n00bs++;
-				document.getElementById('n00b').innerHTML="";
-				document.getElementById('n00b').appendChild(defaultIcon);
-				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00bs</b>";
+				document.getElementById('n00bText').innerHTML="<b>"+n00bs+" n00bs</b>";
 			}
 		}
 	}	
@@ -167,13 +174,12 @@ now.updatePageUser = function(action, userArray, profileName){
 		else if (user == 'n00b'){
 			n00bs--;
 			if(n00bs>1){
-				document.getElementById('n00b').innerHTML="";
-				document.getElementById('n00b').appendChild(defaultIcon);
-				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00bs</b>";				}
+				if (n00bs==1)
+				document.getElementById('n00bText').innerHTML="<b>"+n00bs+" n00bs</b>";				
+			}
 			else{
-				document.getElementById('n00b').innerHTML="";
-				document.getElementById('n00b').appendChild(defaultIcon);
-				document.getElementById('n00b').innerHTML+="<b>"+n00bs+" n00b</b>";				}
+				document.getElementById('n00bText').innerHTML="<b>n00b</b>";				
+			}
 		}
 	}
 }
@@ -520,6 +526,10 @@ function deletePage(){
 	show_confirm();
 }
 
+///////////
+//VERSIONS
+/////////
+
 function saveVersion(){
 
 	if(version!=undefined){
@@ -530,13 +540,36 @@ function saveVersion(){
 	now.saveVersion(function(err,savedVersion){
 		if(err)
 			alert(err)
-		else {alert("This version of the page has been SAVED as version " + savedVersion);
-			prevVersion = savedVersion;
-			
-			$("#prevVersionDiv").show();
+		else {
+			alert("SAVED VERSION " + savedVersion);
+			//prevVersion = savedVersion;
+			//$("#prevVersionDiv").show();
 		}
 	})
+}
 
+now.updateVersion = function(savedVersion,deleteVersion){
+	//alert("This version of the page has been SAVED as version " + savedVersion);
+	if(deleteVersion){
+		if((prevVersion != undefined && version == undefined) || (version && version>savedVersion)){
+			if(prevVersion==0){
+				prevVersion=undefined;
+				$("#prevVersionDiv").hide();
+				}
+			else prevVersion--;
+		}
+		else if(nextVersion) nextVersion--;
+	return;
+	}
+	
+	if(version==undefined){
+		prevVersion = savedVersion;
+		$("#prevVersionDiv").show();
+	}
+	else{
+		nextVersion = savedVersion;
+	}
+		
 }
 
 function deleteVersion(){
@@ -564,7 +597,7 @@ function deleteVersion(){
 
 		
 
-		show_confirm();	
+		//show_confirm();	
 	}
 }
 
@@ -625,14 +658,23 @@ now.backgroundResponce = function(type, background){
 //////////
 function fillChat(user, text) {
 
-	var newTxtDiv = document.createElement('div');
-	//text.remove(/<script\b[^>]*>(.*?)<\/script>/i)
-	newTxtDiv.innerHTML ="<b><a href='/profile/"+user+"'>"+user+"</a>:</b> " +text;
-	newTxtDiv.style.paddingBottom="1px";
-	//newTxtDiv.innerHTML = newDiv.innerHTML;			
-	document.getElementById('chatBox').appendChild(newTxtDiv);
-	lastPost=user;
-	lastTxtDiv=newTxtDiv;
+	
+	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	text = text.replace(exp,"<a href=\"$1\">$1</a>"); 
+	
+	if(user!=lastPost){
+		var newTxtDiv = document.createElement('div');
+		newTxtDiv.innerHTML ="<b><a href='/profile/"+user+"'>"+user+"</a>:</b> " +text;
+		newTxtDiv.style.paddingBottom="1px";
+		document.getElementById('chatBox').appendChild(newTxtDiv);
+		lastPost=user;
+		lastTxtDiv=newTxtDiv;
+	}
+	else{
+		lastTxtDiv.innerHTML+="<br>"+text;
+	}
+	
+
 	document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 
 }
@@ -642,17 +684,13 @@ var maxrows=6;
 
 function doResize() {
 	var txtbox=document.getElementById("inputBox");
-   
 	if (txtbox.value=="")
 		txtbox.rows=1;
-	   
-     while (txtbox.scrollHeight > txtbox.offsetHeight && txtbox.rows < maxrows) {  
+    while (txtbox.scrollHeight > txtbox.offsetHeight && txtbox.rows < maxrows) {  
             if (txtbox.rows < maxrows) {  
                 txtbox.rows = txtbox.rows + 1; 
 			}
-		}
-		
-		
+		}		
 }
 
 function enter(evt){
@@ -688,6 +726,9 @@ var lastTxtDiv;
 
 now.updateText = function(user, text){
 
+	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	text = text.replace(exp,"<a href=\"$1\">$1</a>"); 
+	
 	if(user==lastPost){
 		lastTxtDiv.innerHTML+="<br>"+text;
 	}
@@ -764,6 +805,7 @@ likePage = function(){
 
 var lastNote;
 var lastMainNote;
+var lastTextDiv;
 
 now.notify = function(_notify,newN,main){
 
@@ -778,10 +820,17 @@ now.notify = function(_notify,newN,main){
 			continue;
 		if(!main && lastNote &&lastNote.version ==_notify[n].version && lastNote.user==_notify[n].user && lastNote.page==_notify[n].page && lastNote.action==_notify[n].action)
 			continue;
+
 		if(_notify[n].action=='like')
 			var actionVerb='liked'
 		else if(_notify[n].action=='update')
 			var actionVerb='updated'
+		else if (_notify[n].action=='version')
+			var actionVerb='saved'
+		else if (_notify[n].action=='new')
+			var actionVerb='created'
+
+			//var actionVerb=_notify[n].action;
 						
 			if(newN==undefined && !main)
 				notify+=1;
@@ -802,49 +851,61 @@ now.notify = function(_notify,newN,main){
 
 			note.style.postion='relative';
 			note.style.fontSize='12px';
+			var textDiv=document.createElement('div');
+			
+			//TODO grouping notifications			
+/*
+		if(main && lastMainNote &&lastMainNote.version ==_notify[n].version && lastMainNote.user==_notify[n].user && lastMainNote.action==_notify[n].action){			
+			continue;			
+		}
+		if(!main && lastNote &&lastNote.version ==_notify[n].version && lastNote.user==_notify[n].user && lastNote.action==_notify[n].action){
+			continue;			
+		}
+*/
+			
+						
 			if(_notify[n].version !=undefined)
-				note.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
+				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
 			else
-				note.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
+				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
 			
 			note.style.display='none';
+			
 			if(!main){
 				$('#notifyDiv').prepend($(note));
 					lastNote=_notify[n];
 				}
-			else{
+			else if(main){
 				$('#feedContainer').prepend($(note));
 					lastMainNote=_notify[n];
 				}
-
+			
+			var imgBox = new imgBoxClass(_notify[n].user,'user',40,true)
+			
+			textDiv.style.paddingTop='4px';
+			textDiv.style.height='40px'
+			lastTextDiv=textDiv;
+			note.appendChild(imgBox.imgDiv);
+			note.appendChild(textDiv);
+			
 			
 			$(note).slideDown('fast',function(){changeBackground();});
 	}
 }
 
-//GET INFO ON REQUEST?
-var lastLikeDiv=null;
-showLikes = function(index,el){
 
+now.updateUsrImg = function(user,url){
+	userImages['user'+user]=url
+	var className = 'user'+user
+	$("."+className).attr("src", url)
+}
+
+
+//GET INFO ON REQUEST?
+var lastLikeId=null;
+showLikes = function(index,id){
 	whoLikes = document.getElementById('whoLikes');
 
-	var element = el.currentTarget;
-	element.currentTarget = el.currentTarget;
-	
-	if(whoLikes != undefined && whoLikes.style.display!='none'){
-		
-		$(whoLikes).animate({height:'0px'}, 300, function(){
-			whoLikes.style.display='none';
-		
-			if(lastLikeDiv!=element.currentTarget){
-				showLikes(index,element)
-				}
-			
-		});
-		return;
-
-	}
-	
 	if(whoLikes == undefined){
 		var whoLikes = document.createElement('div');
 		whoLikes.id='whoLikes';
@@ -852,12 +913,16 @@ showLikes = function(index,el){
 		whoLikes.style.fontSize="12px"
 		whoLikes.style.paddingLeft="5px"
 		whoLikes.style.overflow='hidden';
+		whoLikes.style.display='none';
+	}
+	else if(whoLikes.style.display!='none' && lastLikeId != id){
+		lastLikeId=id;
+		$(whoLikes).slideToggle('fast',function(){showLikes(index,id)});
+		return;
 	}	
 
 	whoLikes.style.height='auto';
 	
-	//$(whoLikes).offset({top:$(el).offset.top,left:$(el).offset.left})
-	//whoLikes.innerHTML = "";
 	$('div').remove('.liker')
 	for(var i = 0;i<profileInfo.pages[index].likes.length;i++){
 		var liker = document.createElement('div');
@@ -867,28 +932,20 @@ showLikes = function(index,el){
 		liker.style.display='inline';
 		whoLikes.appendChild(liker);
 		liker=undefined;
-		
 	}
-	$(whoLikes).show();
 
-	el.currentTarget.parentNode.appendChild(whoLikes);	
+	document.getElementById(id).appendChild(whoLikes);	
 	var height = $(whoLikes).height();
-
-	$(whoLikes).height(0);
-	$(whoLikes).animate({height:height+'px'}, 300, function(){
-			okToAnimate=true;
-			changeBackground();
-
-		});
-
-	lastLikeDiv=el.currentTarget;
+	$(whoLikes).slideToggle();	
+	lastLikeId=id;
+	
 }
 
 //////////
 ///FEED//
 ////////
 
-now.updateFeed = function(user,page,action){
+now.updateFeed = function(user,image,page,action){
 
 	if(page.split('profile___')[0]=='' || page=='main')
 		return

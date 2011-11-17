@@ -19,27 +19,20 @@ function ajax(){
 	var myObject;
 
 	this.someFunction = function(json){        
-	
-		//pageData=JSON.parse(json);
-		
-		pageData=json;
-		//oldthis.pageData.backgroundImageType = 0;
-		//jsonToDom(pageData);
-		
-//		var imgArray=[]
-		
-/*
-		for(var page in pageData){
-		
-			for(var img in pageData[page].pageData.images){
 			
-				imgArray.push(pageData[page].pageData.images[img])
-			}
-				
-			pageData[page].pageData.images=imgArray;
-		}
-*/
+		pageData=json;
+
+
 		for(var page in pageData){
+			
+			var images = pageData[page].pageData.images;	
+			if(images != undefined){
+				for(var i=0; i<pageData[page].pageData.images.length; i++){
+					if(!isUrl(pageData[page].pageData.images[i].url))
+						pageData[page].pageData.images.splice(i,1); 					
+				}	
+				//pageData[page].pageData.text = textArray.reverse();
+			}			
 			
 			var textArray=[]
 			text = pageData[page].pageData.text;	
@@ -203,16 +196,11 @@ function ajax(){
 							document.getElementById("div3d").backgroundImage=oldthis.pageData.backgroundImage;
 			
 						}
-						
-						
 					}
 				}
-	
-
 				if (reqType == "refresh"){
 					//setTimeout(function(){oldthis.ajaxFunction('refresh')},100);
 				}
-							
 				//if(reqType == 'text'){
 				//	doNotRefresh = false;
 				//}
@@ -225,8 +213,6 @@ function ajax(){
 
 		if(reqType == "element"){
 
-			
-			
 			this.pageData.images[selObj.id].left = selObj.style.left;
 			this.pageData.images[selObj.id].top = selObj.style.top;	
 			this.pageData.images[selObj.id].width = selObj.width;
@@ -234,9 +220,7 @@ function ajax(){
 			this.pageData.images[selObj.id].anglex = selObj.getAttribute("data-anglex");
 			this.pageData.images[selObj.id].angley = selObj.getAttribute("data-angley");
 			this.pageData.images[selObj.id].angler = selObj.getAttribute("data-angler");
-			this.pageData.images[selObj.id].z = parseFloat(selObj.getAttribute("data-z"));
-			
-			
+			this.pageData.images[selObj.id].z = parseFloat(selObj.getAttribute("data-z"));			
 			var pageDataTxt = JSON.stringify(this.pageData);
 			var queryString = "pageData=" + pageDataTxt + "&pageName=" + this.pageName + "&pageNumber=" + this.pageNumber +"&reqType=" + 'all';
 			//ajaxRequest.open("GET", "updatedb.php" + queryString, true);

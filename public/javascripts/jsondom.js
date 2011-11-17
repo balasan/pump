@@ -96,7 +96,7 @@ function imageToDom(image, property){
 function jsonToDom(pageDataIn){
 	
 
-				
+	lastPost=null;
 	pageData = pageDataIn;
 	onlineObj = {}
 	
@@ -114,24 +114,8 @@ function jsonToDom(pageDataIn){
 		$('#animateButton').show();
 		$('.mainMenu').show()
 		$('.profileOnly').hide()
-
 	}	
-/*
-		
-	if(!owner){
-		$('#settingsButton').hide()
-	}
-	else
-		$('#settingsButton').show()
-	
-	if(version==undefined)
-		$('#deleteVersion').hide()
-	else
-		$('#deleteVersion').show()
-	
-	if(lastPost!=undefined)
-		lastPost="";
-*/
+
 		
 	document.getElementById('activeNow').innerHTML='';
 	document.getElementById('feed').style.display="none"
@@ -180,7 +164,7 @@ function jsonToDom(pageDataIn){
 		for(var k = 0;k<pageData.editors.length;k++){
 			addEditorsEl.tagify('inputField').val(pageData.editors[k])
 			addEditorsEl.tagify('add');
-			}
+		}
 	}
 
 	if(pageData.pageName=='main' && pageData.notify!=undefined){
@@ -217,26 +201,22 @@ function jsonToDom(pageDataIn){
 //////////Added text::			
 	if(pageData.text != undefined){
 		for(var i=0; i<pageData.text.length; i++){
-				
-			if(pageData.text[i].user==lastPost){
-				lastTxtDiv.innerHTML+="<br>"+pageData.text[i].text;
-			}
-			else{
 				fillChat(pageData.text[i].user,pageData.text[i].text);
-			}
 		}
 	}
 	document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 
 	var div3d = document.getElementById("div3d");
 
+	//TODO: gradients, drop types
 	if(pageData.backgroundImageType == undefined){
-		document.body.style.backgroundImage=pageData.backgroundImage;
+		document.body.style.backgroundImage='url('+pageData.backgroundImage+')';
 	}
 	
 	if(pageData.backgroundImageType == 0)
-		document.body.style.backgroundImage = pageData.backgroundImage;
-
+		document.body.style.backgroundImage ='url('+pageData.backgroundImage+')';
+		
+		
 	if(pageData.backgroundImageType == 1){
 		var bgimg = '-webkit-gradient(' + pageData.backgroundImage +')'
 		document.body.style.backgroundImage = bgimg;	
@@ -316,15 +296,8 @@ loadProfileInfo = function(info){
 	var lastPost="";
 	var lastTxtDiv;	
 	if(profileInfo.text != undefined){
-
-	
 		for(var i=0; i<profileInfo.text.length; i++){
-			if(profileInfo.text[i].user==lastPost){
-				lastTxtDiv.innerHTML+="<br>"+profileInfo.text[i].text;
-			}
-			else{			
-				fillChat(profileInfo.text[i].user, profileInfo.text[i].text);
-			}
+			fillChat(profileInfo.text[i].user, profileInfo.text[i].text);
 		}
 	}
 		
@@ -337,22 +310,23 @@ loadProfileInfo = function(info){
 		var thisPage=profileInfo.pages[i];
 	
 		if(thisPage.pageName!= "profile" && thisPage.pageName!= "main"){
-			newDiv = document.createElement('div');
-			newDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
-			newDiv.style.paddingBottom="1px";
+			var newDiv = document.createElement('div');
+			var txtDiv = document.createElement('div');
+			var infoDiv = document.createElement('div');
 
-			newDiv.style.position='relative'
+			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
+			txtDiv.style.paddingBottom="1px";
+			//txtDiv.style.position='relative'
 	
-			infoDiv = document.createElement('div');
 
 			infoDiv.id=thisPage._id;
 			infoDiv.className="infoDiv";
 			infoDiv.style.paddingTop="2px";
 
-			$('infoDiv').addClass('miniButton');
-			$('newDiv').addClass('miniButton');
+			//$(infoDiv).addClass('miniButton');
+			//$(newDiv).addClass('miniButton');
 
-			
+
 			var infoTxt=""
 			if(pageName=="profile"){
 				if(thisPage.owner==profileInfo.username)
@@ -370,8 +344,10 @@ loadProfileInfo = function(info){
 					infoTxt+=", "+thisPage.versions.length+" v"
 				}
 				vDiv.innerHTML = infoTxt+")"; 
-				newDiv.appendChild(vDiv);
+				txtDiv.appendChild(vDiv);
 			}			
+			
+			
 			
 			if(thisPage.likes!=undefined && thisPage.likes.length > 0){
 				var likeDiv = document.createElement('div')
@@ -381,20 +357,39 @@ loadProfileInfo = function(info){
 				
 				likeDiv.innerHTML = " " +thisPage.likesN+" likes";
 				likeDiv.data={id:i}
-				likeDiv.onclick = function(e){ 
-					disableSelection(e.toElement)
-					showLikes(e.toElement.data.id,e)
-					};
+				
+				likeDiv.onclick = (function(index,id){ 
+					return function(){
+						disableSelection(document.getElementById(id))
+						showLikes(index,id)}
+					})(i,thisPage._id);
+					
 				likeDiv.style.display = "inline"; 
 				likeDiv.className="miniButton";
 
 			}
 						
+			txtDiv.style.minHeight='30px'
+			newDiv.style.marginBottom='4px';
+			
+/*
+			var div1 = document.createElement('div');
+			div1.style.width='20px';
+			div1.style.height='20px';
+			div1.onclick=null;
+			newDiv.appendChild(div1);
+*/
+			var imgBox = new imgBoxClass(thisPage.pageName,'page',30,true);
+			newDiv.appendChild(imgBox.imgDiv);
+
 			//infoDiv.innerHTML = infoTxt;
 			if(likeDiv != undefined)
 				infoDiv.appendChild(likeDiv);
-			newDiv.appendChild(infoDiv);
+			txtDiv.appendChild(infoDiv);
+			newDiv.appendChild(txtDiv);
 
+
+			//txtDiv.style.zIndex=100000000
 			//$("newDiv").addClass("miniButton")
 			likeDiv=undefined;
 			document.getElementById('pagesList').appendChild(newDiv);
@@ -475,8 +470,6 @@ fillOnline = function(onlineNow){
 		var page = key.split('profile___')
 		if(page[0]=='' || key=='main' || onlineObj[key].length==0){
 			continue;
-			//newObj.page=page[1];
-			//newObj.type='profile'
 			}
 		else{
 			newObj.page=key;
@@ -503,19 +496,28 @@ fillOnline = function(onlineNow){
 		onlineDiv.style.marginLeft='6px';
 		onlineDiv.style.color='white';
 		
+		txtDiv = document.createElement('div');
+		txtDiv.style.height='50px'
+		txtDiv.style.overflow='auto'
+		var imgBox = new imgBoxClass(onlineArr[i].page,'page',50,true);
+		
 		if(onlineArr[i].type==null)
-			onlineDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\")'>"+onlineArr[i].page+"</a>: ";		
-		else onlineDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\",\"profile\")'>"+onlineArr[i].page+"</a>: ";		
+			txtDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\")'>"+onlineArr[i].page+"</a>: ";		
+		else txtDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\",\"profile\")'>"+onlineArr[i].page+"</a>: ";		
 			
-		onlineDiv.id='activePages'+onlineArr[i].page;
+		txtDiv.id='activePages'+onlineArr[i].page;
+		
 		for(var n=0;n<onlineArr[i].users.length;n++){
+		
 			var usrDiv = document.createElement('div');
 			usrDiv.innerHTML="<a href='javascript:goToPage(\""+onlineArr[i].users[n]+"\",\"profile\")'>"+onlineArr[i].users[n]+"</a> "
 			usrDiv.style.display='inline'
 			usrDiv.style.fontSize='12px'
 			usrDiv.id='onlineUser'+onlineArr[i].users[n];
-			onlineDiv.appendChild(usrDiv);
+			txtDiv.appendChild(usrDiv);
 		}
+		onlineDiv.appendChild(imgBox.imgDiv)
+		onlineDiv.appendChild(txtDiv)
 		onlineDiv.className='activePages'
 		mainOnlineDiv.appendChild(onlineDiv)
 		

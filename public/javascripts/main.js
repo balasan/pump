@@ -12,7 +12,7 @@ var permissions;
 var currentUser;
 var notify=0;
 var onlineObj = {}
-
+var userImages = {};
 
 var mainPage = false;
 var profile = false;
@@ -729,7 +729,7 @@ window.onload = function() {
 
 		windowReady=true;
 		loadData();
-
+		loadNotifications();
 	});
 	
 };
@@ -970,6 +970,10 @@ goToPage = function(page, type, _version,back){
 	nextVersion=undefined;
 	prevVersion=undefined;
 
+	lastNote=null;
+	lastMainNote=null;
+	lastTextDiv=null;
+
 	if(type=="profile"){
 		var url="/profile/"+page;
 		pageName = "profile";
@@ -992,6 +996,8 @@ goToPage = function(page, type, _version,back){
 	$(".usersOnline").remove();
 	n00bs=0;
 	//document.body.style.backgroundImage="url('http://www.oppenheim.com.au/wp-content/uploads/2007/08/ajax-loader-1.gif')"
+
+
 
 	now.leavePage(currentUser,loadData)
 
