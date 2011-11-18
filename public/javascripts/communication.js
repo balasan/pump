@@ -284,7 +284,9 @@ function addNewImg(){
 			}
 			imgArray.push(addObject);
 		}		
-		now.addNewImg(pageName, imgArray, scrollTop, scrollLeft);
+		now.addNewImg(pageName, imgArray, scrollTop, scrollLeft,function(err){
+			alert(err)
+			});
 }
 
 now.newImg = function(img){
@@ -336,7 +338,9 @@ function deleteImage(){
 	if(!all && lastId == undefined)
 		return;
 
-	now.deleteImage(pageName, lastId, all);
+	now.deleteImage(pageName, lastId, all,function(err){
+			alert(err)
+	});
 	
 	$("input[name=deleteType]").filter("[value=one]").attr("checked",true);	
 }
@@ -791,13 +795,13 @@ likePage = function(){
 			buttonPress("likePage")
 			if(action=="like"){
 				pageData.likesN++
-				$('#likeButtonText').html(pageData.likesN + ' unlike page');
+				$('#likeButtonText').html(pageData.likesN + ' unlike');
 				liked = 0;
 				}	
 			else{
 				liked = -1;
 				pageData.likesN--
-				$('#likeButtonText').html(pageData.likesN + ' like page');	
+				$('#likeButtonText').html(pageData.likesN + ' like');	
 				}
 		}
 	})
@@ -806,6 +810,7 @@ likePage = function(){
 var lastNote;
 var lastMainNote;
 var lastTextDiv;
+var lastMainTextDiv;
 
 now.notify = function(_notify,newN,main){
 
@@ -822,7 +827,7 @@ now.notify = function(_notify,newN,main){
 			continue;
 
 		if(_notify[n].action=='like')
-			var actionVerb='liked'
+			var actionVerb='likes'
 		else if(_notify[n].action=='update')
 			var actionVerb='updated'
 		else if (_notify[n].action=='version')
@@ -854,15 +859,22 @@ now.notify = function(_notify,newN,main){
 			var textDiv=document.createElement('div');
 			
 			//TODO grouping notifications			
-/*
-		if(main && lastMainNote &&lastMainNote.version ==_notify[n].version && lastMainNote.user==_notify[n].user && lastMainNote.action==_notify[n].action){			
+
+		if(main && lastMainNote && lastMainNote.user==_notify[n].user && lastMainNote.action==_notify[n].action){
+			if(_notify[n].version !=undefined)
+				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
+			else
+				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";			
 			continue;			
 		}
-		if(!main && lastNote &&lastNote.version ==_notify[n].version && lastNote.user==_notify[n].user && lastNote.action==_notify[n].action){
+		
+		if(!main && lastNote && lastNote.user==_notify[n].user && lastNote.action==_notify[n].action){
+			if(_notify[n].version !=undefined)
+				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
+			else
+				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
 			continue;			
 		}
-*/
-			
 						
 			if(_notify[n].version !=undefined)
 				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
@@ -874,20 +886,23 @@ now.notify = function(_notify,newN,main){
 			if(!main){
 				$('#notifyDiv').prepend($(note));
 					lastNote=_notify[n];
-				}
+			}
 			else if(main){
 				$('#feedContainer').prepend($(note));
 					lastMainNote=_notify[n];
-				}
+			}
 			
 			var imgBox = new imgBoxClass(_notify[n].user,'user',40,true)
 			
 			textDiv.style.paddingTop='4px';
-			textDiv.style.height='40px'
-			lastTextDiv=textDiv;
+			textDiv.style.paddingLeft='46px';
+			textDiv.style.minHeight='40px'
+			if(main)
+				lastMainTextDiv=textDiv
+			else
+				lastTextDiv=textDiv;
 			note.appendChild(imgBox.imgDiv);
 			note.appendChild(textDiv);
-			
 			
 			$(note).slideDown('fast',function(){changeBackground();});
 	}
@@ -895,7 +910,9 @@ now.notify = function(_notify,newN,main){
 
 
 now.updateUsrImg = function(user,url){
-	userImages['user'+user]=url
+	if(userImages['user'+user]==undefined)
+		userImages['user'+user]={}		
+	userImages['user'+user].img=url
 	var className = 'user'+user
 	$("."+className).attr("src", url)
 }

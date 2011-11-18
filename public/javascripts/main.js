@@ -378,13 +378,13 @@ function commentsExit(){
 
 var isR = false;
 var isS= false;
-var isCtrl = false;
+var isShift = false;
 var isSpace = false;
-var isRealCtrl = false;
+var isCtrl = false;
 
 document.onkeyup=function(e){
-	if(e.which == 16) isCtrl=false;
-	if(e.which == 17) isRealCtrl=false;
+	if(e.which == 16) isShift=false;
+	if(e.which == 17) isCtrl=false;
 
 	if(e.which == 90) isR=false;
 	if(e.which == 88) isS=false;
@@ -399,8 +399,8 @@ document.onkeydown=function(e){
 
  
 	if(!typing){
-		if(e.which == 16) isCtrl=true;
-		if(e.which == 17) isRealCtrl=true;
+		if(e.which == 16) isShift=true;
+		if(e.which == 17) isCtrl=true;
 		}
 		if(e.which ==90) isR=true;
 		if(e.which ==88) isS=true;
@@ -440,13 +440,20 @@ document.onkeydown=function(e){
  		case 78:
  			menuType = "moreMenu";
  		 	break;
-		default:
+ 		case 80:
+ 			menuType = "pageMenu";
+ 		 	break; 		 	
+ 		case 83:
+ 			if(isShift)
+ 				saveVersion();
+ 		 	break;
+ 		default:
 			menuType = "";
 			break;
 		}
 		
 		
-		if(isCtrl == true && menuType != "") {	
+		if(isShift == true && menuType != "") {	
 			
 			if(document.getElementById(menuType).style.display=="block") {
 				
@@ -483,7 +490,7 @@ document.onkeydown=function(e){
 			return false;
 		}
 		
-		if(e.which == 88 && isRealCtrl == true) {
+		if(e.which == 88 && isCtrl == true) {
 	
 			document.getElementById('delete').click();
 			return false;

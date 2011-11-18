@@ -533,12 +533,6 @@ everyone.now.updateAll = function(pageData,callback){
 	for(var page in pageData){			
 		pageModel.update({pageName:page}, pageData[page]['pageData'],{upsert:true,multi:false}, function(error) {
 	      		if(error) console.log(error)
-	/*
-	      		else
-					pageModel.findOne({pageName:pageData.pageName}, function(error, result){
-						callback(result);
-				});
-	*/
 	    });
     }
 }
@@ -756,10 +750,12 @@ everyone.now.editElement = function(pageName, _id, element, all, position, callb
 ///ADD
 /////
 
-everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft){
+everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft,callback){
 
-	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
-			return;
+	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
+			callback("this page is private, you can't add images")
+			return;	
+		}
 
 	var imgs=[]
 	for(var i=0; i<imgArray.length; i++){
@@ -807,10 +803,12 @@ everyone.now.updateUserPic = function(username, url,callback){
 ///DELETE
 ////////
 
-everyone.now.deleteImage=function(pageName,imgId, all){
+everyone.now.deleteImage=function(pageName,imgId, all,callback){
 
-	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
+	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
+		callback("this page is private, you can't delete images")
 		return;
+	}
 
 	if(all){
 		pageModel.findOne({"pageName":pageName}, function(error, result){
@@ -845,9 +843,10 @@ everyone.now.deleteImage=function(pageName,imgId, all){
 everyone.now.setBackground=function(pageName, type, background){
 
 	//TODO: tweak this
-	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner')
+	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
+		callback("this page is private, you can't edit background")
 		return;
-		
+	}	
 	if(type=="backgroundImage"){
 		var background = 'url('+background+')';
 		pageModel.update({"pageName":pageName},{$set: {backgroundImage:background}}, function(err){
@@ -1107,8 +1106,7 @@ everyone.now.loadMainPage = function(user, callback){
 		if(!error){
 			var responce = {}
 			responce.users = result;	
-			//pageModel.find({},['pageName','likes','likesN','contributors','owner','versions']).sort('likesN',-1,'pageName',1).run(function(err,result2){
-			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
+			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
 
 				if(err)
 					console.log(err)

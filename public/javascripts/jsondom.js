@@ -86,15 +86,11 @@ function imageToDom(image, property){
 }
 
 
-
-
 /////////
 ////PAGE
 ///////
 
-
 function jsonToDom(pageDataIn){
-	
 
 	lastPost=null;
 	pageData = pageDataIn;
@@ -154,9 +150,9 @@ function jsonToDom(pageDataIn){
 		pageData.likesN='';
 	liked = jQuery.inArray(currentUser, pageData.likes);
 	if(liked == -1)
-		$('#likeButtonText').html(pageData.likesN + ' like page');
+		$('#likeButtonText').html(pageData.likesN + ' like');
 	else
-		$('#likeButtonText').html(pageData.likesN + ' unlike page');
+		$('#likeButtonText').html(pageData.likesN + ' unlike');
 		
 
 	if(pageData.editors != undefined){
@@ -227,7 +223,6 @@ function jsonToDom(pageDataIn){
 	}
 	
 	document.body.style.backgroundColor = pageData.background;
-
 	
 	if(pageName=="profile")
 		now.loadProfileInfo( userProfile,loadProfileInfo);		
@@ -244,7 +239,6 @@ function jsonToDom(pageDataIn){
 			at:"left bottom" })
 		$('#notifyDiv').hide();
 	}	
-		
 }
 
 
@@ -309,13 +303,22 @@ loadProfileInfo = function(info){
 	
 		var thisPage=profileInfo.pages[i];
 	
+		if(thisPage.privacy==3 && pageName=="main")
+			continue;
+		else if(thisPage.privacy==3 && currentUser != thisPage.owner)
+			continue;
+	
 		if(thisPage.pageName!= "profile" && thisPage.pageName!= "main"){
+			
 			var newDiv = document.createElement('div');
 			var txtDiv = document.createElement('div');
 			var infoDiv = document.createElement('div');
 
 			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
 			txtDiv.style.paddingBottom="1px";
+			txtDiv.style.paddingLeft="40px";
+			txtDiv.style.paddingTop="2px";
+
 			//txtDiv.style.position='relative'
 	
 
@@ -330,25 +333,32 @@ loadProfileInfo = function(info){
 			var infoTxt=""
 			if(pageName=="profile"){
 				if(thisPage.owner==profileInfo.username)
-					infoTxt +='(owner'
+					infoTxt +=' (owner'
 				else
-					infoTxt +='(contributor'
-		
-				var vDiv = document.createElement('div')
-				vDiv.style.fontSize='11px'
-				vDiv.style.color='grey'
-				vDiv.style.display='inline'
-				vDiv.style.display='inline'
-				vDiv.style.marginLeft='2px'
-				if(thisPage.versions != undefined && thisPage.versions.length > 0){
-					infoTxt+=", "+thisPage.versions.length+" v"
-				}
-				vDiv.innerHTML = infoTxt+")"; 
-				txtDiv.appendChild(vDiv);
-			}			
+					infoTxt +=' (contributor'
+			}
+			else {
+				if(thisPage.privacy==0)
+					infoTxt=' (public'							
+				else if(thisPage.privacy==1)
+					infoTxt=' (semi-public'
+				else 
+					infoTxt=' (private'
+
+			}	
+			var vDiv = document.createElement('div')
+			vDiv.style.fontSize='11px'
+			vDiv.style.color='grey'
+			vDiv.style.display='inline'
+			vDiv.style.marginLeft='2px'
+			if(thisPage.versions != undefined && thisPage.versions.length > 0){
+				infoTxt+=", "+thisPage.versions.length+"v"
+			}
+			vDiv.innerHTML = infoTxt+")"; 
+			txtDiv.appendChild(vDiv);
 			
 			
-			
+						
 			if(thisPage.likes!=undefined && thisPage.likes.length > 0){
 				var likeDiv = document.createElement('div')
 				
@@ -369,42 +379,25 @@ loadProfileInfo = function(info){
 
 			}
 						
-			txtDiv.style.minHeight='30px'
+			txtDiv.style.minHeight='40px'
 			newDiv.style.marginBottom='4px';
 			
-/*
-			var div1 = document.createElement('div');
-			div1.style.width='20px';
-			div1.style.height='20px';
-			div1.onclick=null;
-			newDiv.appendChild(div1);
-*/
-			var imgBox = new imgBoxClass(thisPage.pageName,'page',30,true);
+			var imgBox = new imgBoxClass(thisPage.pageName,'page',40,true);
 			newDiv.appendChild(imgBox.imgDiv);
 
-			//infoDiv.innerHTML = infoTxt;
 			if(likeDiv != undefined)
 				infoDiv.appendChild(likeDiv);
 			txtDiv.appendChild(infoDiv);
 			newDiv.appendChild(txtDiv);
 
-
-			//txtDiv.style.zIndex=100000000
-			//$("newDiv").addClass("miniButton")
 			likeDiv=undefined;
 			document.getElementById('pagesList').appendChild(newDiv);
-
 
 		}
 	}
 	document.getElementById('userPages').style.display='block';
 
-/*
-	if(pageName=="main")
-		var lastDiv = "users"
-	if(pageName=="profile")
-		var lastDiv = "contributedTo"
-*/
+
 	if(pageName=="main"){
 		for(var i =0;i<profileInfo.users.length;i++){
 		
@@ -497,7 +490,7 @@ fillOnline = function(onlineNow){
 		onlineDiv.style.color='white';
 		
 		txtDiv = document.createElement('div');
-		txtDiv.style.height='50px'
+		txtDiv.style.minHeight='50px'
 		txtDiv.style.overflow='auto'
 		var imgBox = new imgBoxClass(onlineArr[i].page,'page',50,true);
 		

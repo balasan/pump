@@ -152,67 +152,72 @@ input#lastId(type='hidden', name='lastId')
 //
 ////add/////
 
-#helpMenu.uiClosed(name='helpMenu', style='left:100px; top:50px;')
-  div(style='background-color:white; padding: 10px; font-size:11; ')
-    | Gifpumper is a communal image collage. All changes are seen by everyone
+#helpMenu.uiClosed(name='helpMenu', style='left:300px;border:1px solid grey; padding:0;padding-top:15px; top:50px; width=300px')
+  div(style='background-color:white;  padding: 15px; width:340px; height:480px;overflow:auto; font-size:14px;color:black')
+    b Rotate Canvas:
+    br
+    //div(style:'margin:-15px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/space_bar.jpeg',height='40px')
+    br
+    br
+    b Move element:
+    br
+    |  click and drag
+    br
+    br
+    b Resize:
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/shift_key.png',height='40px')
+    |  and drag
+    br
+    br
+    b Move forward/back:
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/alt_key.jpg',height='40px')
+    |   drag up/down
+    br
+    br
+    b Rotate around Z:
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_z.png',height='40px')
+    |  drag left/right
+    br
+    br
+    b Rotate around the X/Y:
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='40px')
+    |  drag
+    br
+    br
+    b Delete element: 
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/ctrl%20key.png',height='40px')
+    | 
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='40px')
+    br
+    br
+    br
+    b Tips:
+    br
+    | - set page privacy in Page->Settings menu
+    br
+    | - most menus can be accessed by hitting Shift and the first letter of the menu
+    br
+    | - save versions of pages in Page menu (version cannot be edited, page owner can delete versions)
+    br
+    br
+    b Info:
+    br
+    | Gifpumper is a communal web creation platform. All changes are seen by everyone
     br
     | instantaneously, enabling realtime collaboration between many users.
     br
     br
-    b
-      center Instructions:
+    | For questions, suggestions and feedback post a msg on <a href="javascript: goToPage('balasan','profile')">balasan's profile</a> or on the 
+    a(href='http://www.facebook.com/pages/gifpumpercom/117231671686998') gifpumper facebook page
     br
-    br
-    b Move
-    | image: click and drag
-    br
-    b Resize
-    | : Shift-click and drag
-    br
-    b Move forward/back
-    | : Alt-click and drag up/down
-    br
-    b Rotate
-    | around the
-    b Z
-    | axes: hold Z key & click and drag left/right
-    br
-    b Rotate
-    | around the
-    b X/Y
-    | axes: hold X key & click and drag
-    br
-    b Delete
-    | image: first click on image (drag it to make sure) then Cntrl X
-    br
-    center
-      b Page Management
-    br
-    b Register
-    | : click Login and enter a unique username and password and hit Register
-    br
-    b Create a New Page
-    | : go to More Pages enter new page name and hit New Page
-    br
-    b Save Current Page
-    | : go to to More Pages, enter a new name and hit Save As
-    br
-    | set
-    b Privacy
-    | levels of a page you created in Page Settings/br
-    br
-    center
-      b Tips
-    br
-    | most menus can be accessed by hitting Shift and the first letter of the menu
-    br
-    br
-    | replace and delete will effect the last image that was clicked/dragged
-    br
-    center -------------
-    br
-    | for questions and suggestions please go to the
-    a(href='http://www.facebook.com/pages/gifpumpercom/117231671686998') facebook page
+    br 
+    | gifpumper was created by Slava Balasanov
     br
   .x
     a(href='javascript:openMenu(\'helpMenu\');') x
@@ -358,7 +363,7 @@ input#lastId(type='hidden', name='lastId')
 #editElementMenu.menu(style="display:none;position:fixed;")
       //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
         |-elements 
-      div.menuDiv 
+      div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
       div.menuDiv.profileOnly 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Profile Image
@@ -492,6 +497,8 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
     a(href='javascript:$(\'#whoLikes\').hide();') x
  
 #notifyDiv.menu
+
+#alertDiv(style="padding:10px;background:white;display:none")
  
 ///////////////
 ////////MAIN
