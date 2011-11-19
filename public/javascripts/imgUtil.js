@@ -6,6 +6,8 @@ function imgBoxClass(name,type,size,shadow){
 	
 	this.imgDiv = document.createElement('div')
 	this.imgDiv.className="thumbContainer";			
+	$(this.imgDiv).addClass(type+name+"div");			
+
 	this.imgDiv.style.width=size+"px";
 	this.imgDiv.style.height=size+"px";
 	this.imgDiv.style.cursor='pointer'
@@ -66,12 +68,19 @@ function imgBoxClass(name,type,size,shadow){
 					self.loadImg(_url,page,'page')
 				else if(_img!=undefined && isUrl(_img))
 					self.loadImg(_img,page,'page')
-				else
-					self.imgDiv.style.backgroundColor=color 
+				else{
+					$(".page"+page+"div").css('backgroundColor',color) 
+					userImages[type+name].color=color;
+					userImages[type+name].img=null;
+							}
 				})
 	}
 	else if(userImages[type+name].img!='loading'){
-		this.img.src=userImages[type+name].img;
+
+		if(userImages[type+name].img!=null)
+			this.img.src=userImages[type+name].img;
+		else
+			this.imgDiv.style.backgroundColor=userImages[type+name].color
 	}
 
 	if(shadow)

@@ -760,12 +760,14 @@ everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft,call
 	var imgs=[]
 	for(var i=0; i<imgArray.length; i++){
 		
-		if(!isUrl(imgArray[i].url))
+		if(imgArray[i].type=='image' && !isUrl(imgArray[i].url)){
+			callback("invalid image url")
 			continue;
+		}
 		imgArray[i].user = this.user.name;
 		imgs.push(new imageModel(imgArray[i]));
 	}
-
+	console.log(imgs);
 	pageModel.update({"pageName":pageName}, {$pushAll: {"images" : imgs}}, function (err,result) {
 		if (!err){
 			var notify = {};//new notifyModel();
@@ -1062,18 +1064,16 @@ everyone.now.submitComment = function(pageName,textObject, userProfile){
 	if(pageName=="profile"){
 		groupName = "profile___"+userProfile;
 		userModel.update({"username":userProfile}, {$push: {"text" : txt}}, function (err) {
-				console.log("This is groupName %", groupName);
-		  if (err)
-		  	thereIsError=true;
-
-		else if(!thereIsError)
-			nowjs.getGroup(pageName).now.updateText(oldthis.user.name,txt.text);
+				//console.log("This is groupName %", groupName);
+		  if (err) console.log(err)
+		  else
+			nowjs.getGroup(groupName).now.updateText(oldthis.user.name,txt.text);
 					});
 
 	}
 	else{ 
 		//nowjs.getGroup(pageName).now.updateText(this.user.name,textObject.text);
-		pageModel.update({"pageName":pageName}, {$push: {"text" : txt}}, function (err,result) {
+		pageModel.update({"pageName":pageName}, {$push: {"text" : txt}}, function (err) {
 			if (err) console.log(err)
 			else
 				nowjs.getGroup(pageName).now.updateText(oldthis.user.name,txt.text);
