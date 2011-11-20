@@ -120,7 +120,7 @@ function moveHandler(e){
 			updateElement(selObj,"height",selObj.style.height);
 			            
 	    }
-		else if (e.altKey) {
+		else if (e.altKey && !pageData.images[selObj.id].d2d) {
 	    	
 	    	//zindex = Math.round((e.clientX-clickX)/10);
 /*
@@ -1049,7 +1049,17 @@ fillEditMenu = function(){
 		 
 	$("#editImage").val(pageData.images[id].url)
 	$("#editContent").val(pageData.images[id].content)
-	$("#editMedia").val(pageData.images[id].content)
+	
+	$('.mediaEdit').val('');
+	if(pageData.images[id].contentType=='youtube')
+		$("#editYoutubeUrl").val(pageData.images[id].content)
+	else if(pageData.images[id].contentType=='vimeo')
+		$("#editVimeoUrl").val(pageData.images[id].content)
+	else if(pageData.images[id].contentType=='soundCloud')
+		$("#editSoundCloud").val(pageData.images[id].content)
+	else
+		$("#editMedia").val(pageData.images[id].content)
+	
 	$("#editBackgroundColor").val(pageData.images[id].backgroundColor)
 	$("#editBackgroundImage").val(pageData.images[id].backgroundImage)
 	$('#edit2d').prop("checked", pageData.images[id].d2d);

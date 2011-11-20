@@ -36,7 +36,7 @@ function imageToDom(image, property){
 			img.style.backgroundColor = image.backgroundColor;
 		if(image.backgroundImage != undefined)
 			img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
-		if(image.content != undefined)
+		if(image.content != undefined && contentType!='youtube' && contentType!='soundCloud' && contentType!='vimeo')
 			img.innerHTML = image.content;
 		img.style.padding="30px";
 		//img.style.webkitTransformStyle= "preserve-3d";
@@ -58,6 +58,44 @@ function imageToDom(image, property){
 
 		}
 	}
+	
+	if(contentType=="youtube"){
+	
+		var video_id = image.content.split('v=')[1];
+		var ampersandPosition = video_id.indexOf('&');
+		if(ampersandPosition != -1) {
+		  video_id = video_id.substring(0, ampersandPosition);
+		}	
+		
+		img.innerHTML='<object width="100%" height="100%">\
+		<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US"></param>\
+		<param name="allowFullScreen" value="true"></param>\
+		<param name="allowscriptaccess" value="always"></param>\
+		<param value="transparent" name="wmode">\
+		<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
+	
+	}
+	else if(contentType=="soundCloud"){
+		var scUrl = image.content;
+		scUrl=scUrl.split('url=')[1]
+		scUrl=scUrl.split('\"><')[0]
+		img.innerHTML='<object height="100%" width="100%">\
+		<param name="movie" value="https://player.soundcloud.com/player.swf?url='+scUrl+'"></param>\
+		<param name="allowscriptaccess" value="always"></param> \
+		<param value="transparent" name="wmode">\
+		<embed wmode="transparent" allowscriptaccess="always" height="100%" src="https://player.soundcloud.com/player.swf?url='+scUrl+'" type="application/x-shockwave-flash" width="100%"></embed> </object>'
+	}
+	else if(contentType=="vimeo"){
+		var vimeoId = image.content;
+		vimeoId=vimeoId.split('vimeo.com/')[1];
+		img.innerHTML='<object width="100%" height="100%"><param name="allowfullscreen" value="true" />\
+		<param name="allowscriptaccess" value="always" />\
+		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" />\
+		<param value="transparent" name="wmode">\
+		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
+	
+	}
+	
 	img.style.left = image.left;
 	img.style.top = image.top;	
 	img.style.width = image.width;

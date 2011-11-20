@@ -1066,9 +1066,11 @@ everyone.now.submitComment = function(pageName,textObject, userProfile){
 		userModel.update({"username":userProfile}, {$push: {"text" : txt}}, function (err) {
 				//console.log("This is groupName %", groupName);
 		  if (err) console.log(err)
-		  else
+		  else{
+			notifyUsers([],userProfile,oldthis.user.name,oldthis.user.image,'msg','');	
 			nowjs.getGroup(groupName).now.updateText(oldthis.user.name,txt.text);
-					});
+			}
+		});
 
 	}
 	else{ 
@@ -1309,7 +1311,7 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 		notify.version = version;
 	}	
 
-	if(lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version){		
+	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
 		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
 			if(err) console.log(err);
 	})

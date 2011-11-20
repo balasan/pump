@@ -271,8 +271,33 @@ function addNewImg(){
 				addObject.url = imgUrl;
 			}
 			else if(addType == "media"){
-				addObject.content=document.getElementById("media").value;
+			
+				if($("#youtubeUrl").val()!=""){
+					addType == 'youtube'
+				    addObject.content=$("#youtubeUrl").val()
+				    addObject.contentType='youtube';
+				    addObject.width='450px'
+				    addObject.height='300px'
+				}
+				else if($("#soundCloud").val()!=""){
+					addType == 'soundCloud'
+				    addObject.content=$("#soundCloud").val()
+				    addObject.contentType='soundCloud';
+				    addObject.width='300px'
+				    addObject.height='81px'				
+				}
+				else if($("#vimeoUrl").val()!=""){
+					addType == 'vimeo'
+				    addObject.content=$("#vimeoUrl").val()
+				    addObject.contentType='vimeo';
+				    addObject.width='450px'
+				    addObject.height='300px'				
+				}
+				else{
+					addObject.content=document.getElementById("media").value;
+				}
 				number=1;
+				
 			}
 			else if(addType =='text'){
 				addObject.content = $('#addContent').val();
@@ -504,7 +529,10 @@ function addPage(copyPage){
 	var desiredPageName = document.getElementById('newPage').value;
 	now.addPage(desiredPageName, copyPage, function(error, newPage){
 			if(error) alert(error);
-			else goToPage(newPage)		
+			else {
+				openMenu('moreMenu');
+				goToPage(newPage)
+				}		
 		})
 }
 
@@ -520,7 +548,10 @@ function deletePage(){
 	  {
 		now.deletePage(pageName, function(error){		
 			if (error != null) alert(error)
-			else goToPage('main');		
+			else{
+			 openMenu('pageSettings');
+			 goToPage('main');
+			 }		
 		})
 	  }
 	else
@@ -834,6 +865,8 @@ now.notify = function(_notify,newN,main){
 			var actionVerb='saved'
 		else if (_notify[n].action=='new')
 			var actionVerb='created'
+		else if (_notify[n].action=='msg')
+			var actionVerb='messaged you'
 
 			//var actionVerb=_notify[n].action;
 						

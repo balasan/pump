@@ -42,10 +42,25 @@
   #textContainer(style="padding:5px;display:none")
     textarea#addContent.tinymce
   
-  #mediaContainer(style="padding:5px;display:none")
-    | 
+  #mediaContainer(style="padding:5px;display:none; ")
+    | youtube link:
     br
-    textarea(style='width:160px;height:100px', type='text', name='embed', id="media", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    input.mediaAdd(style='width:220px;', type='text', id='youtubeUrl', placeholder='http://youtube.com/xxxx',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | vimeo link:
+    br
+    input.mediaAdd(style='width:220px;', type='text', id='vimeoUrl', placeholder='http://vimeo.com/555555',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | soundcloud embed:
+    br
+    textarea.mediaAdd(style='width:220px;', type='text', id='soundCloud', placeholder='paste soundcloud embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | other:
+    br
+    textarea(style='width:220px; height:40px', type='text', name='embed', id="media", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
     br
   #divContainer(style="padding:5px;display:none")
     | background color:
@@ -103,9 +118,24 @@
     textarea#editContent.editType.tinymce
   
   #editMediaContainer(style="padding:5px;display:none")
-    | 
+    | youtube link:
     br
-    textarea.editType(style='width:160px;height:100px', type='text', name='embed', id="editMedia", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    input.mediaEdit(style='width:220px;', type='text', id='editYoutubeUrl', placeholder='http://youtube.com/xxxx',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | vimeo link:
+    br
+    input.mediaEdit(style='width:220px;', type='text', id='editVimeoUrl', placeholder='http://vimeo.com/555555',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | soundcloud embed:
+    br
+    textarea.mediaEdit(style='width:220px;', type='text', id='editSoundCloud', placeholder='paste soundcloud embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
+    | other:
+    br
+    textarea.editType.mediaEdit(style='width:220px;height:100px', type='text', name='embed', id="editMedia", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
     br
   #editDivContainer(style="padding:5px;display:none")
     | background color:
