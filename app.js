@@ -922,14 +922,15 @@ everyone.now.updateUsers = function(users, callback){
 
 		var user = new RegExp("^"+users[i].username+"$",'i');
 		userModel.find({username: user}, { username : 1 },function(error,result){
-			
-			if(result==null){
+			if(result[0]==undefined){
+				console.log(result)
 				users[i].salt = randomString();
 				users[i].password = hash(users[i].password, users[i].salt);
 				var user={}		
 				user[i] = new userModel(users[i]);    		
 				user[i].save(function (err) {	    
-		    		if(err) callback("there was an error, most likely the username you chose has already been taken");
+		    		if(err){ callback("there was an error, most likely the username you chose has already been taken");
+		    		console.log(err)}
 		    		else callback(null);
 		    		})
 	    	}

@@ -27,6 +27,7 @@ function loadNotifications(){
 var myName;
 function loadData(){
 
+	$('#loadingImg').show();
 	if(nowReady && windowReady){
 	
 		if(currentUser==undefined){
@@ -905,14 +906,14 @@ now.notify = function(_notify,newN,main){
 			if(_notify[n].version !=undefined)
 				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
 			else
-				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
+				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\")'>"+_notify[n].page+"</a>";
 			continue;			
 		}
 						
 			if(_notify[n].version !=undefined)
 				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
 			else
-				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";
+				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\")'>"+_notify[n].page+"</a>";
 			
 			note.style.display='none';
 			

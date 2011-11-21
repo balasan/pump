@@ -781,6 +781,14 @@ input[type="password"]{
 	left:5px;
 }
 
+#loadingImg{
+
+	-webkit-transform: translate(0px, 0px)  scale(1) translateZ(20000px);
+	-moz-transform: translate(0px, 0px)  scale(1) translateZ(20000px);
+	-o-transform: translate(0px, 0px)  scale(1) translateZ(20000px);
+	-transform: translate(0px, 0px)  scale(1) translateZ(20000px);
+}
+
 .x {
 	position: absolute;
 	font-family: Courier New, Courier New, monospace;	

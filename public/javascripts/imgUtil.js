@@ -13,7 +13,8 @@ function imgBoxClass(name,type,size,shadow){
 	this.imgDiv.style.cursor='pointer'
 	
 	this.imgDiv.appendChild(this.img);
-	
+	$(this.img).hide();
+
 	this.loadImg = function(url,user,type){
 		
 			var className = type+user
@@ -45,11 +46,25 @@ function imgBoxClass(name,type,size,shadow){
 	}
 	
 	
-	this.img.addEventListener('load',(function(img,div,size){return function(){
-			self.cropImg(img,size);
-			self.imgDiv.appendChild(self.img);
+/*
+	this.img.addEventListener('load',(function(img,div,size,self){
+			
+
+			return function(){
+				self.cropImg(_img,size);
+				self.imgDiv.appendChild(self.img);
 			}
-		})(self.img,self.imgDiv,size))
+		})(self.img,self.imgDiv,size,self))
+*/
+
+	this.img.onload=(function(_img,_div,size,_self){
+			
+
+			return function(){
+				_self.cropImg(_img,size);
+				$(_img).show();
+			}
+		})(self.img,self.imgDiv,size,self)
 	
 	if(userImages[type+name]==undefined){
 		userImages[type+name]={}
@@ -72,7 +87,7 @@ function imgBoxClass(name,type,size,shadow){
 					$(".page"+page+"div").css('backgroundColor',color) 
 					userImages[type+name].color=color;
 					userImages[type+name].img=null;
-							}
+					}
 				})
 	}
 	else if(userImages[type+name].img!='loading'){

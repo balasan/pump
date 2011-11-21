@@ -277,6 +277,9 @@ function jsonToDom(pageDataIn){
 			at:"left bottom" })
 		$('#notifyDiv').hide();
 	}	
+
+	$('#loadingImg').hide();
+
 }
 
 
@@ -458,6 +461,7 @@ loadProfileInfo = function(info){
 
 	changeBackground();
 	changeProfileColor()
+
 }
 
 changeProfileColor =function(){
