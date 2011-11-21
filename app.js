@@ -842,7 +842,7 @@ everyone.now.deleteImage=function(pageName,imgId, all,callback){
 //BACKGROUND
 ///////////
 
-everyone.now.setBackground=function(pageName, type, background){
+everyone.now.setBackground=function(pageName, type, background,callback){
 
 	//TODO: tweak this
 	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
@@ -850,7 +850,7 @@ everyone.now.setBackground=function(pageName, type, background){
 		return;
 	}	
 	if(type=="backgroundImage"){
-		var background = 'url('+background+')';
+		//var background = 'url('+background+')';
 		pageModel.update({"pageName":pageName},{$set: {backgroundImage:background}}, function(err){
 			if(!err)
 				nowjs.getGroup(pageName).now.backgroundResponce(type, background);

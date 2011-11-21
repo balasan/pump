@@ -665,12 +665,14 @@ function setBackground(type){
 				if(type=="background")
 					document.body.style.backgroundColor = background;
 				if(type=="backgroundImage")
-					document.body.style.backgroundImage = 'url('+background+')';			
+					document.body.style.backgroundImage = background;			
 			}
 		});
 	}
 	else
-		now.setBackground(pageName, type, background);
+		now.setBackground(pageName, type, background,function(err){
+			alert(err)
+			});
 }
 
 now.backgroundResponce = function(type, background){
@@ -683,7 +685,7 @@ now.backgroundResponce = function(type, background){
 	if(type=="background")
 		document.body.style.backgroundColor = background;
 	if(type=="backgroundImage")
-		document.body.style.backgroundImage = background;
+		document.body.style.backgroundImage = 'url('+ background +')';
 
 }
 
