@@ -447,7 +447,7 @@ app.post('/login', function(req, res){
 ///INITS
 ///////
 
-var inviteCode= {pumpItp:1,pumpEyebeam:1,innerPump:1,fbPump:1,319Pump:1}
+var inviteCode= {pumpItp:1,pumpEyebeam:1,innerPump:1,fbPump:1,'319Pump':1}
 everyone.now.checkInvite = function(invite,callback){
 
 	if(inviteCode[invite]!=undefined)
