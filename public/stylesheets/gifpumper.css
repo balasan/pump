@@ -789,6 +789,14 @@ input[type="password"]{
 	-transform: translate(0px, 0px)  scale(1) translateZ(20000px);
 }
 
+.twoD{
+
+	-webkit-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
+	-moz-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
+	-o-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
+	-transform: translate(0px, 0px)  scale(1) translateZ(10000px);
+}
+
 .x {
 	position: absolute;
 	font-family: Courier New, Courier New, monospace;	

@@ -53,8 +53,8 @@ else{
 }
 
 
-var ajax = new ajax();
-ajax.pageName = pageName;
+//var ajax = new ajax();
+//ajax.pageName = pageName;
 
 
 
@@ -62,8 +62,8 @@ ajax.pageName = pageName;
 ////animations
 //////////////////
 
-ajax.pageNumber = 111;
-ajax.doNotRefresh = false;
+//ajax.pageNumber = 111;
+//ajax.doNotRefresh = false;
 
 var privacy = null;
 
@@ -94,7 +94,7 @@ var updateTransform = false;
 function moveHandler(e){
 
   
-	ajax.doNotRefresh = true;
+	//ajax.doNotRefresh = true;
 
 	if(privacy >= 2)
 	return false;
@@ -307,10 +307,13 @@ function dragHandler(e){
   var target = e.target != null ? e.target : e.srcElement;
   selObj=target;
   selObj=document.getElementById(selObj.id);
+  
+  //if(selObj==null)
+  //	return false;
+  
   $("#inputBox").blur();
 
  
-  
   if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
 		 $(".selected").removeClass("selected");
  		 $(selObj).addClass("selected");
@@ -363,9 +366,11 @@ document.onmousedown=dragHandler;
 
 document.onmouseup=changeBackground;
 
+/*
 function commentsEnter(){
 ajax.doNotRefresh = true;
 }
+*/
 
 function commentsExit(){
 //doNotRefresh = false;
@@ -397,6 +402,11 @@ var typing = false;
 //shortcut keys	
 document.onkeydown=function(e){
 
+	if(e.which == 27){
+	
+		$('#chat, #online, #rightMenu, #menuContainer').toggle();
+	
+	}
  
 	if(!typing){
 		if(e.which == 16) isShift=true;
@@ -655,7 +665,6 @@ window.onload = function() {
 	var chatTop = document.getElementById('chatTop');
 	chatTop.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
 
-	//ajax.ajaxFunction('refresh');	
 	recenter()
 	changeBackground();
 	
@@ -701,7 +710,7 @@ window.onload = function() {
 				document.title="gifpumper"	
 			})
 
-			if(loggedIn){
+			//if(loggedIn){
 				$('#editElementMenu').position({ 
 							of: $('#editElementButton'), 
 			    			my:"left top",
@@ -711,7 +720,7 @@ window.onload = function() {
 					of: $('#editPageButton'), 
 	    			my:"left top",
 	    			at:"left bottom" })	
-    		}	
+    		//}	
 		
 			if(readCookie('loginMenu') && !loggedIn){
 				document.getElementById('loginMenu').style.display = readCookie('loginMenu');
@@ -773,7 +782,7 @@ setupTinymce = function(){
 			// Example content CSS (should be your site CSS)
 			
 			//TODO: SERVER update url
-			content_css : "public/stylesheets/gifpumper.css",
+			content_css : "/public/stylesheets/gifpumper.css",
 			theme_advanced_font_sizes : "8px,10px,12px,14px,18px,24px,36px,50px,100px",
     		font_size_style_values : "medium,medium,medium,medium,medium,medium,medium,medium,medium",
 
@@ -840,33 +849,28 @@ if(!Modernizr.csstransforms3d){
 
 
 
-function getUsers(){						
-	var script = document.createElement("script");					
-	script.src = "http://momentsound.com/gifpumper_beta/updatedb.php?reqType=users&callback=usersReturn";
-	document.body.appendChild(script);
-}
 
-function usersReturn(users){        
-	
-		var myUsers = users;	
-		myUsers['admin'] = {username: "gifpumper",password:"giveme93"};
-		now.updateUsers(myUsers,null)
-		//now.updateAll(pageData,jsonToDom);	
-}
 
 var registering=false;
 
 function switchToRegister(){
 
-	var regElements = document.querySelectorAll(".regClass")
-		for(var i=0; i<regElements.length;i++){
-			regElements[i].style.display='inline';
+	var inviteCode=prompt("Please enter the invitation code");
+
+	now.checkInvite(inviteCode,function(right){
+		if(right){	
+			var regElements = document.querySelectorAll(".regClass")
+				for(var i=0; i<regElements.length;i++){
+					regElements[i].style.display='inline';
+				}
+			var logElements = document.querySelectorAll(".loginClass")
+				for(var i=0; i<logElements.length;i++){
+					logElements[i].style.display='none';
+				}
+			registering=true;
 		}
-	var logElements = document.querySelectorAll(".loginClass")
-		for(var i=0; i<logElements.length;i++){
-			logElements[i].style.display='none';
-		}
-	registering=true;
+		else alert('Sorry, invitation code is incorrect : (')
+	})
 
 }
 

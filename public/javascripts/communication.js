@@ -38,6 +38,18 @@ function loadData(){
 			if (!err)
 				privacy=_permissions;
 				currentUser=name;
+				if(currentUser=='n00b'){
+					if(pageName!='invite'){
+						window.location='/invite';
+						pageName=='invite'
+					}
+					//window.history.pushState({page:'invite'}, "", '/invite');
+					$('#invite').show();
+					$('#chat').hide();
+					//animate();
+				}
+				else{ $('#invite').hide();
+				}
 				now.loadAll(pageName,userProfile,version,loadAll)
 		})
 	}
@@ -86,7 +98,8 @@ function loadAll(error, pageData, notifications){
 		//TODO: re-enable this
 		alert('PLEASE LOGIN TO DO THIS')
 		//alert(error)
-		goToPage('main')
+		//goToPage('main')
+		window.history.back();
 		console.log(error)
 		return;
 	}
@@ -419,6 +432,13 @@ function replaceImg(){
 		editElement.content = $("#editMedia").val()
 	if( editElement.contentType == "text")
 		editElement.content = $("#editContent").val();
+	if(editElement.contentType == 'youtube')
+		editElement.content = $("#editYoutubeUrl").val();
+	if(editElement.contentType == 'vimeo')
+		editElement.content = $("#editVimeoUrl").val();
+	if(editElement.contentType == 'soundCloud')
+		editElement.content = $("#editSoundCloud").val();
+			
 	editElement.backgroundColor = $("#editBackgroundColor").val()
 	editElement.backgroundImage = $("#editBackgroundImage").val()
 	editElement.d2d=$('#edit2d').is(':checked');
@@ -659,34 +679,48 @@ function setBackground(type){
 		}
 	}
 	
+	if(type=='display')
+		var background = $("input[name='bgType']:checked").val()
+	
 	if(pageName=="profile"){
 		now.setProfileBackground(userProfile, type, background,function(err){
 			if(!err){
 				if(type=="background")
 					document.body.style.backgroundColor = background;
 				if(type=="backgroundImage")
-					document.body.style.backgroundImage = background;			
+					document.body.style.backgroundImage = 'url('+ background +')';
+				if(type=='display'){
+					document.body.style.backgroundSize=background;
+					if(background=='cover')
+						document.body.style.backgroundPosition="center center";
+					else
+						document.body.style.backgroundPosition="left top";
+					}										
 			}
 		});
 	}
 	else
-		now.setBackground(pageName, type, background,function(err){
+		now.setBackground(pageName, type, background, function(err){
 			alert(err)
 			});
 }
 
 now.backgroundResponce = function(type, background){
 
-
 	if(version!=undefined)
 		return;
 
-		
 	if(type=="background")
 		document.body.style.backgroundColor = background;
 	if(type=="backgroundImage")
 		document.body.style.backgroundImage = 'url('+ background +')';
-
+	if(type=='display'){
+		document.body.style.backgroundSize=background;
+		if(background=='cover')
+			document.body.style.backgroundPosition="center center";
+		else
+			document.body.style.backgroundPosition="left top";
+		}	
 }
 
 
@@ -900,7 +934,7 @@ now.notify = function(_notify,newN,main){
 			if(_notify[n].version !=undefined)
 				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
 			else
-				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"profile\")'>"+_notify[n].page+"</a>";			
+				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\")'>"+_notify[n].page+"</a>";			
 			continue;			
 		}
 		

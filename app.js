@@ -39,7 +39,10 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
+  app.use(express.favicon(__dirname + '/public/images/favicon.ico',{ maxAge: 
+2592000000 }));
   app.use('/public', express.static(__dirname + '/public'));
+ 
 //app.use(express.static(your_path));
 });
 
@@ -128,7 +131,7 @@ var versionSchema = new Schema({
 });
 	
 var pageSchema = new Schema({
-    pageName    : {type : String, index: { unique: true },set:toLower}
+    pageName    : {type : String, index: { unique: true }}
   , owner 		: String
   , editors		: []
   , images      : [imageSchema]
@@ -147,6 +150,7 @@ var pageSchema = new Schema({
   , vLikes : {type: Number, default:0,min:0}
   , d2d : {type: Boolean, default: false}
   , notify : [notifySchema]
+  , bgDisplay : String
 });
 
 var userSchema = new Schema({
@@ -163,6 +167,7 @@ var userSchema = new Schema({
 	, userImage: {type:String, default:""}
 	, backgroundImage : String
 	, background : String
+	, bgDisplay : String
 	, info : String
 	, notify : [notifySchema]
 	, newNotify : Number
@@ -279,7 +284,7 @@ app.get("/:page/:version?", function(req,res) {
 	if(req.params.page == "javascripts" || req.params.page == "stylesheets")
 		return;
 
-	if(req.params.page!='favicon.ico'){
+	if(true){//req.params.page!='favicon.ico'){
 		var loggedIn = false;
 		var user = 'not logged in';	
 		var owner= false;
@@ -288,7 +293,11 @@ app.get("/:page/:version?", function(req,res) {
 		if (req.session.user) {
 			loggedIn = true;
 			user = req.session.user;
-					pageModel.findOne({'pageName':req.params.page},{privacy:true, owner:true},function(err, result){
+			
+			//var pageReg = new RegExp("^"+req.params.page+"$",'i')
+			var pageReg = req.params.page;
+			pageModel.findOne({'pageName':pageReg},{privacy:true, owner:true},function(err, result){
+			
 			if(!err && result != undefined){
 				var owner=false;
 				if(result.owner == req.session.user){
@@ -419,7 +428,7 @@ app.post('/login', function(req, res){
 	        // in the session store to be retrieved,
 	        // or in this case the entire user object
 	        req.session.user = user.username;
-	        res.redirect('back');
+	        res.redirect('/');
 	      });
 	    } else {
 	      req.session.error = 'Authentication failed, please check your '
@@ -438,6 +447,16 @@ app.post('/login', function(req, res){
 ///INITS
 ///////
 
+var inviteCode= {pumpItp:1,pumpEyebeam:1,innerPump:1,fbPump:1,319Pump:1}
+everyone.now.checkInvite = function(invite,callback){
+
+	if(inviteCode[invite]!=undefined)
+		callback(true)
+	else
+		callback(false)		
+
+}
+
 everyone.on('join', function(){
 
   	var cookie=this.user.cookie['connect.sid']
@@ -455,28 +474,13 @@ everyone.on('join', function(){
 					oldthis.user.name = 'n00b'
 				else {
 					oldthis.user.name = session.user;
-					oldthis.user.image = 
-					//userModel.update({username:session.user},{$set : {nowId:oldthis.user.clientId}},function(err){
-					//	if(err) console.log(err)
-					//})
+					//oldthis.user.image = 
 
 					userModel.findOne({username:oldthis.user.name},{userImage:1},function(err, result){
 						if(!err){
 						
 							oldthis.user.image=result.userImage;
-/* 		     	    		callback(null, result,result2) */
-							//if(result.newNotify==undefined)
-							//	result.newNotify=0
-		     	    		
-		     	    		//if(oldthis.now.notify != undefined)
-		     	    		//	oldthis.now.notify(result.notify,result.newNotify)
-		     	    		
-/*
-		     	    		userModel.update({username:oldthis.user.name},{$set : {newNotify:0,notify:result.notify, nowId:oldthis.user.clientId}},function(err){
-		     	    				if(err) console.log(err)
-		     	    			})
-		     	    		}
-*/						
+					
 						}
 					})												
                 }
@@ -538,6 +542,48 @@ everyone.now.updateAll = function(pageData,callback){
 }
 
 
+everyone.now.loadProfileInfo = function(user, callback){
+
+	if (this.user.name=='n00b'){
+		return;
+		}
+
+	userModel.findOne({username:user}, { password : 0, salt:0 },function(error,result){
+		if(!error){
+				
+			pageModel.find({$or :[{owner:user},{"images.user":user}]},{'pageName':1,'likes':1,'likesN':1,'vLikes':1,'contributors':1,'owner':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(error,result2){
+				result.pages=result2;
+				callback(result);
+			})
+		}		
+	})	
+}
+
+
+
+everyone.now.loadMainPage = function(user, callback){
+
+	if (this.user.name=='n00b'){
+		return;
+		}
+
+	userModel.find({}, { password : 0, salt:0 }).sort('username',1).run(function(error,result){
+		if(!error){
+			var responce = {}
+			responce.users = result;	
+			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
+
+				if(err)
+					console.log(err)
+				else{
+					responce.pages=result2;
+					callback(responce);
+				}
+			})
+		}
+	})
+}
+
 
 everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
@@ -545,6 +591,11 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	var groupName=pageName;
 	if(pageName=="profile")
 		groupName = "profile___"+userProfile;
+		
+	if (this.user.name=='n00b'){
+		groupName='invite';
+		pageName='invite';
+		}
 	
 	console.log(groupName);
 	console.log(this.user.pagePermissions[pageName]);
@@ -560,12 +611,16 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 		var sliceParam = -1;
 
 	var oldthis = this;
+	
+	//var pageReg = new RegExp("^"+pageName+"$",'i')
+
 	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -100}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
           else{
-				
+          	
+			//pageName=result.pageName;	
 			nowjs.getGroup(groupName).addUser(oldthis.user.clientId);
 			
 			//TODO: not n00b?
@@ -650,6 +705,11 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 	oldthis=this;
 	if(this.user.pagePermissions==undefined)
 		this.user.pagePermissions={};
+
+	if (this.user.name=='n00b'){
+		groupName='invite';
+		pageName='invite';
+		}
 	
 	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true, editors:true},function(err, result){
 		if(!err && result !=undefined){
@@ -684,7 +744,9 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 				else 
 					oldthis.user.pagePermissions[pageName]=2;
 			}
-
+			if(pageName=='invite'){
+				oldthis.user.pagePermissions[pageName]=0;
+			}
 
 			
 			oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner);
@@ -845,6 +907,7 @@ everyone.now.deleteImage=function(pageName,imgId, all,callback){
 everyone.now.setBackground=function(pageName, type, background,callback){
 
 	//TODO: tweak this
+	pageName=this.user.currentPage;
 	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
 		callback("this page is private, you can't edit background")
 		return;
@@ -857,8 +920,15 @@ everyone.now.setBackground=function(pageName, type, background,callback){
 			else console.log(err)
 		});
 	}
-	if(type=="background"){
+	else if(type=="background"){
 		pageModel.update({"pageName":pageName},{$set: {background:background}}, function(err){
+			if(!err)
+				nowjs.getGroup(pageName).now.backgroundResponce(type, background);
+			else console.log(err)
+		});
+	}
+	else if(type=="display"){
+		pageModel.update({"pageName":pageName},{$set: {bgDisplay:background}}, function(err){
 			if(!err)
 				nowjs.getGroup(pageName).now.backgroundResponce(type, background);
 			else console.log(err)
@@ -869,6 +939,7 @@ everyone.now.setBackground=function(pageName, type, background,callback){
 everyone.now.setProfileBackground = function(userProfile, type, background,callback){
 
 	var pageName = "profile___"+userProfile;
+	
 	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
 		
 		console.log(this.user.pagePermissions[pageName])
@@ -890,6 +961,15 @@ everyone.now.setProfileBackground = function(userProfile, type, background,callb
 			if(!err)
 				callback()
 				//pagesGroup[pageName].now.backgroundResponce(type, background);
+			else console.log(err)
+		});
+	}
+	else if(type=="display"){
+		userModel.update({"username":userProfile},{$set: {bgDisplay:background}}, function(err){
+			if(!err){
+				console.log(background)
+				callback()
+				}
 			else console.log(err)
 		});
 	}
@@ -976,56 +1056,59 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 		callback("please log in to create page");
 		return;
 	}
-		var pageInit={};
-		if (copyPageName != undefined){
-			pageModel.findOne({pageName:copyPageName}, { _id : 0 },function(err,result){
-				if(!err){
-					pageInit = result;
-					pageInit.pageName = pageName;
-					pageInit.owner = oldthis1.user.name;
-					pageInit.privacy = 0;
-					pageInit.text=[];
-					pageInit.versions=[];
-				 	pageInit.children=[];
-					pageInit.parent = result.pageName;
-					pageInit.likes = [];
-					
-					var newPage =new pageModel(pageInit);
-					newPage.save(function (error,result) {
-						if(!error){
+	var pageInit={};
+	if (copyPageName != undefined){
+		pageModel.findOne({pageName:copyPageName}, { _id : 0 },function(err,result){
+			if(!err){
+				pageInit = result;
+				pageInit.pageName = pageName;
+				pageInit.owner = oldthis1.user.name;
+				pageInit.privacy = 0;
+				pageInit.text=[];
+				pageInit.versions=[];
+			 	pageInit.children=[];
+				pageInit.parent = result.pageName;
+				pageInit.likes = [];
+				
+				var newPage =new pageModel(pageInit);
+				newPage.save(function (error,result) {
+					if(!error){
 /*
-							userModel.update({username:name}, {$push:{pages:pageName}},function(err){
-								if(err) console.log(err);
-							})
-*/
-							callback(null, pageName);
-						}
-						else callback(error);
-					});
-				}
-			})
-		}
-		else{
-			pageInit.pageName = pageName;
-			var name = oldthis1.user.name;
-			pageInit.owner = name;
-			pageInit.privacy = 0;
-			var newPage = new pageModel(pageInit);
-			//console.log(newPage)
-
-			newPage.save(function (error,result) {
-				if(!error){
-					callback(null, pageName);
-/*
-					userModel.update({username:name}, {$push : {pages:pageName}},function(err){
-						if(err) console.log(err);
+						userModel.update({username:name}, {$push:{pages:pageName}},function(err){
+							if(err) console.log(err);
 						})
 */
+						callback(null, pageName);
 					}
-				else callback(error,null);
-			});
-		}
-		
+					else callback(error);
+				});
+			}
+		})
+	}
+	else{
+		var checkPage = new RegExp("^"+pageName+"$",'i')
+		pageModel.findOne({pageName:checkPage}, { _id : 0 },function(err1,result1){
+			if(!err1 && result1==undefined){
+			
+				pageInit.pageName = pageName;
+				var name = oldthis1.user.name;
+				pageInit.owner = name;
+				pageInit.privacy = 0;
+				var newPage = new pageModel(pageInit);
+				//console.log(newPage)
+	
+				newPage.save(function (error,result) {
+					if(!error){
+						callback(null, pageName);
+						}
+					else callback(error,null);
+				});
+			}
+			else if(result1!=undefined){
+				callback("name already taken, try a different one",null);
+			}
+		})
+	}		
 }
 
 everyone.now.deletePage = function(pageName,callback){
@@ -1085,42 +1168,6 @@ everyone.now.submitComment = function(pageName,textObject, userProfile){
 }
 
 	
-
-
-everyone.now.loadProfileInfo = function(user, callback){
-
-	userModel.findOne({username:user}, { password : 0, salt:0 },function(error,result){
-		if(!error){
-				
-			pageModel.find({$or :[{owner:user},{"images.user":user}]},{'pageName':1,'likes':1,'likesN':1,'vLikes':1,'contributors':1,'owner':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(error,result2){
-				result.pages=result2;
-				callback(result);
-			})
-		}		
-	})	
-}
-
-
-
-
-everyone.now.loadMainPage = function(user, callback){
-
-	userModel.find({}, { password : 0, salt:0 }).sort('username',1).run(function(error,result){
-		if(!error){
-			var responce = {}
-			responce.users = result;	
-			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
-
-				if(err)
-					console.log(err)
-				else{
-					responce.pages=result2;
-					callback(responce);
-				}
-			})
-		}
-	})
-}
 
 everyone.now.findUser = function(userTxt, callback){
 

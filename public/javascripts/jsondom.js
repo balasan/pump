@@ -219,7 +219,7 @@ function jsonToDom(pageDataIn){
 	  $("#nextVersionDiv").hide();
 
 
-	if(pageData.pageName != "main" && pageData.pageName != "profile")
+	if(pageData.pageName != "main" && pageData.pageName != "profile" && pageData.pageName != "invite")
 		document.getElementById('pageName').innerHTML = "<a href='javascript:goToPage(\""+pageData.pageName+"\")'>" +pageData.pageName+"</a> by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a> ";
 	else
 		document.getElementById('pageName').innerHTML="";
@@ -242,6 +242,25 @@ function jsonToDom(pageDataIn){
 
 	var div3d = document.getElementById("div3d");
 
+	if(pageData.bgDisplay!=undefined){
+		document.body.style.backgroundSize=pageData.bgDisplay;
+		if(pageData.bgDisplay=='cover'){
+			$('input:radio[name="bgType"]').filter('[value="cover"]').attr('checked', true);
+			document.body.style.backgroundPosition="center center";
+			}
+		else{
+		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
+			document.body.style.backgroundPosition="left top";
+			}
+		}
+	else{
+		document.body.style.backgroundSize="";
+		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
+		document.body.style.backgroundPosition="left top";	 	
+	}
+	$('#background').val(pageData.background);
+	$('#backgroundImage').val(pageData.backgroundImage);
+
 	//TODO: gradients, drop types
 	if(pageData.backgroundImageType == undefined){
 		document.body.style.backgroundImage='url('+pageData.backgroundImage+')';
@@ -250,17 +269,15 @@ function jsonToDom(pageDataIn){
 	if(pageData.backgroundImageType == 0)
 		document.body.style.backgroundImage ='url('+pageData.backgroundImage+')';
 		
-		
 	if(pageData.backgroundImageType == 1){
 		var bgimg = '-webkit-gradient(' + pageData.backgroundImage +')'
 		document.body.style.backgroundImage = bgimg;	
 	}
-
 	if(pageData.backgroundImageType == 2){
 		document.body.style.backgroundImage=pageData.backgroundImage;
 	}
-	
 	document.body.style.backgroundColor = pageData.background;
+
 	
 	if(pageName=="profile")
 		now.loadProfileInfo( userProfile,loadProfileInfo);		
@@ -293,9 +310,30 @@ var profileInfo={}
 loadProfileInfo = function(info){
 
 	profileInfo=info;
+
+	if(profileInfo.bgDisplay!=undefined){
+		document.body.style.backgroundSize=profileInfo.bgDisplay;
+		if(profileInfo.bgDisplay=='cover'){
+			$('input:radio[name="bgType"]').filter('[value="cover"]').attr('checked', true);
+			document.body.style.backgroundPosition="center center";
+			}
+		else{
+		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
+			document.body.style.backgroundPosition="left top";
+			}
+		}
+	else{
+		document.body.style.backgroundSize="";
+		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
+		document.body.style.backgroundPosition="left top";	 	
+	}
+	$('#background').val(profileInfo.background);
+	$('#backgroundImage').val(profileInfo.backgroundImage);
+
+
 	document.body.style.backgroundColor=profileInfo.background;
 	document.body.style.backgroundImage=profileInfo.backgroundImage;
-
+	
 	if(pageName=="profile"){
 		document.getElementById('profileContainer').style.display="block"
 		var containerDiv=document.getElementById('profileContainer');
@@ -336,7 +374,6 @@ loadProfileInfo = function(info){
 		}
 	}
 		
-	//}
 	
 	///fill out pages
 
@@ -349,7 +386,7 @@ loadProfileInfo = function(info){
 		else if(thisPage.privacy==3 && currentUser != thisPage.owner)
 			continue;
 	
-		if(thisPage.pageName!= "profile" && thisPage.pageName!= "main"){
+		if(thisPage.pageName!= "profile" && thisPage.pageName!= "main" && thisPage.pageName!= "invite"){
 			
 			var newDiv = document.createElement('div');
 			var txtDiv = document.createElement('div');
@@ -503,7 +540,7 @@ fillOnline = function(onlineNow){
 	for(var key in onlineObj){
 		var newObj={}
 		var page = key.split('profile___')
-		if(page[0]=='' || key=='main' || onlineObj[key].length==0){
+		if(page[0]=='' || key=='main' || onlineObj[key].length==0 || key=='invite'){
 			continue;
 			}
 		else{
