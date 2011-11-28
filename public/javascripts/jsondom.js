@@ -75,6 +75,7 @@ function imageToDom(image, property){
 			<param value="transparent" name="wmode">\
 			<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
 		}
+
 	}
 	else if(contentType=="soundCloud"){
 		var scUrl = image.content;

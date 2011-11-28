@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:"gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:"gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -384,7 +384,7 @@ app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
 
 
 
-app.listen(80, "127.0.0.1");
+app.listen(80);
 var nowjs = require("now");
 var everyone = nowjs.initialize(app);
 
