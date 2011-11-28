@@ -40,8 +40,8 @@ function loadData(){
 				currentUser=name;
 				if(currentUser=='n00b'){
 					if(pageName!='invite'){
-						window.location='/invite';
-						pageName=='invite'
+						goToPage('invite')
+						return;
 					}
 					//window.history.pushState({page:'invite'}, "", '/invite');
 					$('#invite').show();

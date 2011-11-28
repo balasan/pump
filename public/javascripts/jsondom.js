@@ -62,18 +62,19 @@ function imageToDom(image, property){
 	if(contentType=="youtube"){
 	
 		var video_id = image.content.split('v=')[1];
-		var ampersandPosition = video_id.indexOf('&');
-		if(ampersandPosition != -1) {
-		  video_id = video_id.substring(0, ampersandPosition);
-		}	
-		
-		img.innerHTML='<object width="100%" height="100%">\
-		<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US"></param>\
-		<param name="allowFullScreen" value="true"></param>\
-		<param name="allowscriptaccess" value="always"></param>\
-		<param value="transparent" name="wmode">\
-		<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
-	
+		if(video_id!=undefined){
+			var ampersandPosition = video_id.indexOf('&');
+			if(ampersandPosition != -1) {
+			  video_id = video_id.substring(0, ampersandPosition);
+			}	
+			
+			img.innerHTML='<object width="100%" height="100%">\
+			<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US"></param>\
+			<param name="allowFullScreen" value="true"></param>\
+			<param name="allowscriptaccess" value="always"></param>\
+			<param value="transparent" name="wmode">\
+			<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
+		}
 	}
 	else if(contentType=="soundCloud"){
 		var scUrl = image.content;
