@@ -163,11 +163,13 @@ now.updatePageUser = function(action, userArray, profileName){
 					textDiv.id="n00bText"					
 					textDiv.innerHTML += " <b>"+user+"</b>";
 				}
-				
+				textDiv.style.textOverflow = 'ellipsis';
+				textDiv.style.overflow='hidden';
+				textDiv.style.width='70%'
 				textDiv.style.paddingTop='4px';
 				textDiv.style.height='30px'
 				
-				newDiv.appendChild(imgBox.imgDiv);
+				newDiv.appendChild(imgBox.imgDiv)
 				newDiv.appendChild(textDiv);
 
 				document.getElementById('online').appendChild(newDiv);
@@ -996,10 +998,11 @@ showLikes = function(index,id){
 	if(whoLikes == undefined){
 		var whoLikes = document.createElement('div');
 		whoLikes.id='whoLikes';
-		whoLikes.style.position='relative';
+		//whoLikes.style.position='relative';
 		whoLikes.style.fontSize="12px"
-		whoLikes.style.paddingLeft="5px"
+		whoLikes.style.paddingLeft="10px"
 		whoLikes.style.overflow='hidden';
+		//whoLikes.style.width='auto'
 		whoLikes.style.display='none';
 	}
 	else if(whoLikes.style.display!='none' && lastLikeId != id){
@@ -1008,21 +1011,26 @@ showLikes = function(index,id){
 		return;
 	}	
 
-	whoLikes.style.height='auto';
+	//whoLikes.style.height='auto';
 	
-	$('div').remove('.liker')
-	for(var i = 0;i<profileInfo.pages[index].likes.length;i++){
-		var liker = document.createElement('div');
-		liker.style.padding = '2px';
-		liker.innerHTML="<a href='javascript:goToPage(\""+profileInfo.pages[index].likes[i]+"\",\"profile\")'>"+profileInfo.pages[index].likes[i]+"</a>";
-		liker.className='liker';
-		liker.style.display='inline';
-		whoLikes.appendChild(liker);
-		liker=undefined;
-	}
+	var liker = document.createElement('div');
+	//liker.style.paddingLeft = '10px';
 
+	whoLikes.innerHTML='';
+	liker.innerHTML="<a href='javascript:goToPage(\""+profileInfo.pages[index].likes[0]+"\",\"profile\")'>"+profileInfo.pages[index].likes[0]+"</a>";
+	for(var i = 1;i<profileInfo.pages[index].likes.length;i++){
+		//var liker = document.createElement('span');
+		liker.innerHTML+=", <a href='javascript:goToPage(\""+profileInfo.pages[index].likes[i]+"\",\"profile\")'>"+profileInfo.pages[index].likes[i]+"</a>";
+		//liker.className='liker';
+		liker.style.display='block';
+		//whoLikes.appendChild(liker);
+		//liker=undefined;
+	}
+	//whoLikes.innerHTML+='<div></div>';
+	whoLikes.appendChild(liker);
+	
 	document.getElementById(id).appendChild(whoLikes);	
-	var height = $(whoLikes).height();
+	//var height = $(whoLikes).height();
 	$(whoLikes).slideToggle();	
 	lastLikeId=id;
 	

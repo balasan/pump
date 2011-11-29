@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:"gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -461,6 +461,11 @@ everyone.on('join', function(){
 
   	var cookie=this.user.cookie['connect.sid']
 	
+	if(cookie==undefined || cookie==null){
+		this.user.name = 'n00b'
+		return;
+	}
+
 	cookie = parseCookie(cookie)['']
 		
 	var oldthis = this;
@@ -474,13 +479,9 @@ everyone.on('join', function(){
 					oldthis.user.name = 'n00b'
 				else {
 					oldthis.user.name = session.user;
-					//oldthis.user.image = 
-
 					userModel.findOne({username:oldthis.user.name},{userImage:1},function(err, result){
 						if(!err){
-						
 							oldthis.user.image=result.userImage;
-					
 						}
 					})												
                 }
