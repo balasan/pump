@@ -101,7 +101,7 @@ body {
 .uiOpen{
 
 	position: fixed;
-	z-index: 1000;
+	z-index: 10001;
 	background-color: fuchsia;
 	opacity: .9;
 	
@@ -441,7 +441,7 @@ position:fixed;
 	border-radius:1px;
 	display:inline;
 	border:none;
-	z-index:1000;
+	z-index:10002;
 
 	background-image:none;
 	padding-left:5px;

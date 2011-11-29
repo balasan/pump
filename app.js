@@ -1074,11 +1074,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 				var newPage =new pageModel(pageInit);
 				newPage.save(function (error,result) {
 					if(!error){
-/*
-						userModel.update({username:name}, {$push:{pages:pageName}},function(err){
-							if(err) console.log(err);
-						})
-*/
+						
 						callback(null, pageName);
 					}
 					else callback(error);
@@ -1100,6 +1096,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 	
 				newPage.save(function (error,result) {
 					if(!error){
+					    notifyUsers([],result.owner,oldthis.user.name,oldthis.user.image,'new',pageName);	
 						callback(null, pageName);
 						}
 					else callback(error,null);
@@ -1363,8 +1360,8 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
 		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
 			if(err) console.log(err);
-	})
-	 nowjs.getGroup('main').now.notify([notify],undefined, true)	
+		})
+	 	nowjs.getGroup('main').now.notify([notify],undefined, true)	
 	}
 	//console.log(lastNotify)
 	lastNotify=notify;
