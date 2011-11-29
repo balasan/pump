@@ -529,9 +529,10 @@ position:fixed;
 	width:auto;
 /* 	padding:0; */
 	background:none;
-	z-index:1000;
-	-webkit-transform: translateZ(10000px);
-	-moz-transform: translateZ(10000px);
+	z-index:10002;
+
+/* 	-webkit-transform: translateZ(10000px); */
+/* 	-moz-transform: translateZ(10000px); */
 
 	background-color: rgba(255,255,255,.7);;
 	box-shadow: 2px 2px 2px  rgba(126, 126, 126, 0.6);
