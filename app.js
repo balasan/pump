@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -729,9 +729,7 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 					}
 				}
 			}
-			if(oldthis.user.name=="gifpumper"){
-				oldthis.user.pagePermissions[pageName]='owner';
-			}
+
 			
 			if(oldthis.user.name == 'n00b' && result.privacy<2)
 				oldthis.user.pagePermissions[pageName]=2;
@@ -747,8 +745,12 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 			}
 			if(pageName=='invite'){
 				oldthis.user.pagePermissions[pageName]=0;
+				if(oldthis.user.name=="balasan"){
+					oldthis.user.pagePermissions[pageName]='owner';
+			}			}
+			if(oldthis.user.name=="gifpumper"){
+				oldthis.user.pagePermissions[pageName]='owner';
 			}
-
 			
 			oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner);
 			callback(null, oldthis.user.name,oldthis.user.pagePermissions[pageName]);	
@@ -815,6 +817,7 @@ everyone.now.editElement = function(pageName, _id, element, all, position, callb
 
 everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft,callback){
 
+	var oldthis = this;
 	if (this.user.pagePermissions[pageName]>0 && this.user.pagePermissions[pageName]!='owner'){
 			callback("this page is private, you can't add images")
 			return;	
@@ -831,6 +834,8 @@ everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft,call
 		imgs.push(new imageModel(imgArray[i]));
 	}
 	console.log(imgs);
+	
+	//TODO: real update feed?
 	pageModel.update({"pageName":pageName}, {$pushAll: {"images" : imgs}}, function (err,result) {
 		if (!err){
 			var notify = {};//new notifyModel();
@@ -1096,7 +1101,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 	
 				newPage.save(function (error,result) {
 					if(!error){
-					    notifyUsers([],result.owner,oldthis.user.name,oldthis.user.image,'new',pageName);	
+					    notifyUsers([],result.owner,oldthis1.user.name,oldthis.user.image,'new',pageName);	
 						callback(null, pageName);
 						}
 					else callback(error,null);

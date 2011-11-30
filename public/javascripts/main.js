@@ -236,9 +236,9 @@ function moveHandler(e){
 	   	//ajax.ajaxFunction("element");
 		//updateElement(selObj);
 
-	    return false;
 	}
     
+	return false;
 
 }
 
@@ -288,6 +288,9 @@ function cleanup(e) {
 	
 	clickX=null;
 	clickY=null;
+	
+	return false;
+
 }
    
 
@@ -298,7 +301,7 @@ function dragHandler(e){
   //document.getElementById("inputBox").blur();
   
   if(version!=undefined || privacy>=2)
-     return;  
+     return false;  
   
   var htype='-moz-grabbing';
   
@@ -357,9 +360,10 @@ function dragHandler(e){
      
      document.onmousemove=moveHandler;
      document.onmouseup=cleanup;
-
      return false;
+
   }
+
 }
 
 document.onmousedown=dragHandler;

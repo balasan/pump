@@ -29,8 +29,10 @@ function imageToDom(image, property){
 	
 	//TODO: optimise this
 	nonSafari2d={}
-	if(contentType=="image" && img.src != image.url)
+	if(contentType=="image" && img.src != image.url){
 		img.src=image.url;
+		img.alt="";
+		}
 	else{				
 		if(image.backgroundColor != undefined)
 			img.style.backgroundColor = image.backgroundColor;
@@ -123,6 +125,7 @@ function imageToDom(image, property){
 	img.style.webkitTransform = transform;
 	img.style.MozTransform = transform;
 
+	return false;
 }
 
 
@@ -500,7 +503,7 @@ loadProfileInfo = function(info){
 
 	changeBackground();
 	changeProfileColor()
-
+	return false;
 }
 
 changeProfileColor =function(){
@@ -519,7 +522,7 @@ changeProfileColor =function(){
 	var r = Math.random()
 	var color=bgColorList2[Math.floor(r*bgColorList2.length)];
 	document.getElementById('feed').style.backgroundColor= color;
-
+	return false;
 }
 
 
@@ -599,6 +602,6 @@ fillOnline = function(onlineNow){
 	
 	$('#feed').show();	
 	changeBackground();
-	
+	return false;
 }
 

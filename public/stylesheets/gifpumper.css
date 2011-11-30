@@ -529,7 +529,8 @@ position:fixed;
 	width:auto;
 /* 	padding:0; */
 	background:none;
-	z-index:1000;
+	z-index:10002;
+
 	-webkit-transform: translateZ(10000px);
 	-moz-transform: translateZ(10000px);
 
