@@ -95,9 +95,8 @@
       | wall plane    
       br
     br  
-  
-  |2D element? 
   input(type='checkbox', id='add2d')
+  |no 3d transforms? 
   br
 
   div(style="padding:0px")
@@ -168,8 +167,8 @@
     |height: 
     input#editHeight(style='width:50px;display:inline;', type='text') 
   
-  |2D element? 
   input(type='checkbox', id='edit2d')
+  |no 3d transforms? 
   br
   div(style="padding:0px")
     input#replace.button(style='width:160px;', type='button', name='replace', value='replace', onclick="replaceImg()")
