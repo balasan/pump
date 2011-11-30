@@ -97,8 +97,21 @@ function imageToDom(image, property){
 		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" />\
 		<param value="transparent" name="wmode">\
 		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
-	
 	}
+	else if(contentType=="mp3"){
+		var mp3url = image.content;
+		img.innerHTML='<object width="100%" height="100%">\
+		<param name="src" value="'+mp3url+'">\
+		<param name="autoplay" value="true">\
+		<param name="controller" value="true">\
+		<param name="bgcolor" value="">\
+		<param name="bgcolor" value="">\
+		<param name="wmode" value="transparent">\
+		<embed wmode="transparent" src="'+mp3url+'" autostart="true" loop="false" width="100%" height="100%"\
+		controller="true" bgcolor=""></embed>\
+		</object>'
+	}
+	
 	
 	img.style.left = image.left;
 	img.style.top = image.top;	

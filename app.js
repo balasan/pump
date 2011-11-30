@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -460,7 +460,7 @@ everyone.now.checkInvite = function(invite,callback){
 everyone.on('join', function(){
 
   	var cookie=this.user.cookie['connect.sid']
-	
+
 	if(cookie==undefined || cookie==null){
 		this.user.name = 'n00b'
 		return;
@@ -638,13 +638,13 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 
 			if(oldthis.user.name=='n00b'){
 				var userObj = {}
-				userObj={'n00b':null};
+				userObj={'n00b':true};
 				nowjs.getGroup(groupName).pageUsers[oldthis.user.clientId]=userObj;
 				nowjs.getGroup(groupName).now.updatePageUser('add',[userObj]);
 			}
 			else{
 				var userObj = {}
-				userObj[oldthis.user.name]=oldthis.user.image;
+				userObj[oldthis.user.name]=true;
 				nowjs.getGroup(groupName).pageUsers[oldthis.user.clientId]=userObj;
 				nowjs.getGroup(groupName).now.updatePageUser('add',[userObj]);			
 			}
@@ -664,6 +664,25 @@ everyone.now.getAllUsers = function(callback){
 	})
 }
 
+everyone.now.leftWindow = function(left){
+
+	
+	if(this.user.currentPage != null){
+
+		if(left){
+			nowjs.getGroup(this.user.currentPage).now.clientLeftWindow(this.user.name,true);
+			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
+			//this.user.active=false;
+			}
+		else{
+			nowjs.getGroup(this.user.currentPage).now.clientLeftWindow(this.user.name,false);
+			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
+			//this.user.active=true;
+			}
+	}
+
+
+}
 
 everyone.now.leavePage = function(userProfile, callback){	
 	

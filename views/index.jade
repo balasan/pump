@@ -65,6 +65,11 @@
     textarea.mediaAdd(style='width:220px;', type='text', id='soundCloud', placeholder='paste soundcloud embed code here',onfocus="typing=true; ", onblur="typing=false;")
     br
     br
+    | mp3/mov embed:
+    br
+    input.mediaAdd(style='width:220px;', type='text', id='mp3', placeholder='http://domain.com/sound.mp3',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    br
     | other:
     br
     textarea(style='width:220px; height:40px', type='text', name='embed', id="media", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
@@ -138,6 +143,10 @@
     | soundcloud embed:
     br
     textarea.mediaEdit(style='width:220px;', type='text', id='editSoundCloud', placeholder='paste soundcloud embed code here',onfocus="typing=true; ", onblur="typing=false;")
+    br
+    | mp3/mov embed:
+    br
+    input.mediaEdit(style='width:220px;', type='text', id='editMp3', placeholder='http://domain.com/sound.mp3',onfocus="typing=true; ", onblur="typing=false;")
     br
     br
     | other:

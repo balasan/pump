@@ -948,6 +948,7 @@ function buttonPress(id){
 }
 
 
+
 registerFunc = function(){
 
 	var regUserName = $("[name=username]").val()
@@ -1065,6 +1066,8 @@ fillEditMenu = function(){
 		$("#editVimeoUrl").val(pageData.images[id].content)
 	else if(pageData.images[id].contentType=='soundCloud')
 		$("#editSoundCloud").val(pageData.images[id].content)
+	else if(pageData.images[id].contentType=='mp3')
+		$("#editMp3").val(pageData.images[id].content)
 	else
 		$("#editMedia").val(pageData.images[id].content)
 	
@@ -1085,5 +1088,8 @@ function disableSelection(target){
 		target.onmousedown=function(){return false}
 	target.style.cursor = "default"
 }
+
+var activeUser=true;
+
 
 

@@ -13,6 +13,8 @@ now.ready(function(){
 	loadData();
 	loadNotifications();
 	//now.setUserPage(pageName);
+	//window.onblur=function(){now.leftWindow(true);activeUser=false}
+	//window.onfocus=function(){now.leftWindow(false);activeUser=true;}
 
 });
 
@@ -20,6 +22,8 @@ function loadNotifications(){
 
 	if(nowReady && windowReady){
 		now.getNotifications();
+		window.onblur=function(){now.leftWindow(true);activeUser=false}
+		window.onfocus=function(){now.leftWindow(false);activeUser=true;}
 	}
 }
 
@@ -139,6 +143,13 @@ var defaultIcon = new Image();
 defaultIcon.src = 'http://dump.fm/images/20110926/1317014842765-dumpfm-FAUXreal-1297659023374-dumpfm-frankhats-yes.gif';
 defaultIcon.style.width = '20px';
 
+now.clientLeftWindow = function(username,left){
+	if(left)
+		$("#"+username).css('opacity','.4')
+	else
+		$("#"+username).css('opacity','1')
+}
+
 now.updatePageUser = function(action, userArray, profileName){
 
 	if(action == 'add'){
@@ -153,6 +164,8 @@ now.updatePageUser = function(action, userArray, profileName){
 				newDiv.id = user;
 				newDiv.className ="usersOnline"
 				newDiv.style.padding="0px 7px 2px 7px";
+				if(username[user]==false)
+					newDiv.style.opacity=".4";
 
 				var imgBox = new imgBoxClass(user,'user',25)
 				
@@ -180,6 +193,7 @@ now.updatePageUser = function(action, userArray, profileName){
 				n00bs++;
 				document.getElementById('n00bText').innerHTML="<b>"+n00bs+" n00bs</b>";
 			}
+				
 		}
 	}	
 	}
@@ -306,6 +320,13 @@ function addNewImg(){
 					addType == 'vimeo'
 				    addObject.content=$("#vimeoUrl").val()
 				    addObject.contentType='vimeo';
+				    addObject.width='450px'
+				    addObject.height='300px'				
+				}
+				else if($("#mp3").val()!=""){
+					addType == 'mp3'
+				    addObject.content=$("#mp3").val()
+				    addObject.contentType='mp3';
 				    addObject.width='450px'
 				    addObject.height='300px'				
 				}
@@ -440,6 +461,8 @@ function replaceImg(){
 		editElement.content = $("#editVimeoUrl").val();
 	if(editElement.contentType == 'soundCloud')
 		editElement.content = $("#editSoundCloud").val();
+	if(editElement.contentType == 'mp3')
+		editElement.content = $("#editMp3").val();
 			
 	editElement.backgroundColor = $("#editBackgroundColor").val()
 	editElement.backgroundImage = $("#editBackgroundImage").val()
