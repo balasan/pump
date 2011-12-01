@@ -97,7 +97,7 @@ function moveHandler(e){
 	//ajax.doNotRefresh = true;
 
 	if(privacy >= 2)
-	return false;
+		return false;
   
   	if (e == null) { 
   		e = window.event 
@@ -301,7 +301,7 @@ function dragHandler(e){
   //document.getElementById("inputBox").blur();
   
   if(version!=undefined || privacy>=2)
-     return false;  
+     return;  
   
   var htype='-moz-grabbing';
   
@@ -948,7 +948,6 @@ function buttonPress(id){
 }
 
 
-
 registerFunc = function(){
 
 	var regUserName = $("[name=username]").val()
@@ -1066,8 +1065,6 @@ fillEditMenu = function(){
 		$("#editVimeoUrl").val(pageData.images[id].content)
 	else if(pageData.images[id].contentType=='soundCloud')
 		$("#editSoundCloud").val(pageData.images[id].content)
-	else if(pageData.images[id].contentType=='mp3')
-		$("#editMp3").val(pageData.images[id].content)
 	else
 		$("#editMedia").val(pageData.images[id].content)
 	
@@ -1088,8 +1085,5 @@ function disableSelection(target){
 		target.onmousedown=function(){return false}
 	target.style.cursor = "default"
 }
-
-var activeUser=true;
-
 
 
