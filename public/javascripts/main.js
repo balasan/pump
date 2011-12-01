@@ -301,7 +301,7 @@ function dragHandler(e){
   //document.getElementById("inputBox").blur();
   
   if(version!=undefined || privacy>=2)
-     return false;  
+     return;  
   
   var htype='-moz-grabbing';
   
