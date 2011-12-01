@@ -1098,7 +1098,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 				var newPage =new pageModel(pageInit);
 				newPage.save(function (error,result) {
 					if(!error){
-						
+					    notifyUsers([],result.owner,oldthis1.user.name,oldthis.user.image,'new',pageName);	
 						callback(null, pageName);
 					}
 					else callback(error);
