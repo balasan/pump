@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -496,7 +496,7 @@ everyone.now.getNotifications = function(){
 	
 	if(this.user.name=='n00b')
 		return;
-	userModel.findOne({username:oldthis.user.name},{notify:{$slice:-100},newNotify:1},function(err, result){
+	userModel.findOne({username:oldthis.user.name},{notify:{$slice:-50},newNotify:1},function(err, result){
 		if(!err){
 			if(result!=null && result.newNotify==undefined)
 				result.newNotify=0	    		
@@ -567,7 +567,6 @@ everyone.now.loadMainPage = function(user, callback){
 	if (this.user.name=='n00b'){
 		return;
 		}
-
 	userModel.find({}, { password : 0, salt:0 }).sort('username',1).run(function(error,result){
 		if(!error){
 			var responce = {}
@@ -615,7 +614,7 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
 	//var pageReg = new RegExp("^"+pageName+"$",'i')
 
-	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -100}}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -50}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
@@ -1083,7 +1082,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 	}
 	var pageInit={};
 	if (copyPageName != undefined){
-		pageModel.findOne({pageName:copyPageName}, { _id : 0, likesN:0, likes:0 },function(err,result){
+		pageModel.findOne({pageName:copyPageName}, { _id : 0 },function(err,result){
 			if(!err){
 				pageInit = result;
 				pageInit.pageName = pageName;
@@ -1219,7 +1218,7 @@ everyone.now.saveVersion = function(callback){
 	if (this.user.pagePermissions[pageName] !='owner' && this.user.pagePermissions[pageName] != 0)
 		return;
 		
-	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0,text:0,likesN:0,likes:0},function(error,result){
+	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0,text:0},function(error,result){
 		if(!error){
 			var newVersion ={}
 			newVersion = result;
@@ -1382,7 +1381,7 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	}	
 
 	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
-		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
+		pageModel.update({pageName:'main'},{$push:{notify:notify}, $pop : {notify : -1}},function(err){
 			if(err) console.log(err);
 		})
 	 	nowjs.getGroup('main').now.notify([notify],undefined, true)	

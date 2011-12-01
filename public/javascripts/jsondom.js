@@ -97,21 +97,8 @@ function imageToDom(image, property){
 		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" />\
 		<param value="transparent" name="wmode">\
 		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
-	}
-	else if(contentType=="mp3"){
-		var mp3url = image.content;
-		img.innerHTML='<object width="100%" height="100%">\
-		<param name="src" value="'+mp3url+'">\
-		<param name="autoplay" value="true">\
-		<param name="controller" value="true">\
-		<param name="bgcolor" value="">\
-		<param name="bgcolor" value="">\
-		<param name="wmode" value="transparent">\
-		<embed wmode="transparent" src="'+mp3url+'" autostart="true" loop="false" width="100%" height="100%"\
-		controller="true" bgcolor=""></embed>\
-		</object>'
-	}
 	
+	}
 	
 	img.style.left = image.left;
 	img.style.top = image.top;	
@@ -284,16 +271,20 @@ function jsonToDom(pageDataIn){
 		document.body.style.backgroundImage='url('+pageData.backgroundImage+')';
 	}
 	
-	if(pageData.backgroundImageType == 0)
-		document.body.style.backgroundImage ='url('+pageData.backgroundImage+')';
+	//if(pageData.backgroundImageType == 0)
+	document.body.style.backgroundImage ='url('+pageData.backgroundImage+')';
 		
+/*
 	if(pageData.backgroundImageType == 1){
 		var bgimg = '-webkit-gradient(' + pageData.backgroundImage +')'
 		document.body.style.backgroundImage = bgimg;	
 	}
+*/
+/*
 	if(pageData.backgroundImageType == 2){
 		document.body.style.backgroundImage=pageData.backgroundImage;
 	}
+*/
 	document.body.style.backgroundColor = pageData.background;
 
 	
@@ -412,7 +403,7 @@ loadProfileInfo = function(info){
 
 			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
 			txtDiv.style.paddingBottom="1px";
-			txtDiv.style.paddingLeft="40px";
+			txtDiv.style.paddingLeft="0px";
 			txtDiv.style.paddingTop="2px";
 
 			//txtDiv.style.position='relative'
@@ -477,6 +468,8 @@ loadProfileInfo = function(info){
 						
 			txtDiv.style.minHeight='40px'
 			newDiv.style.marginBottom='4px';
+			txtDiv.style.overflow = 'hidden';
+			txtDiv.style.textOverflow = 'ellipsis';
 			
 			var imgBox = new imgBoxClass(thisPage.pageName,'page',40,true);
 			newDiv.appendChild(imgBox.imgDiv);
@@ -588,7 +581,9 @@ fillOnline = function(onlineNow){
 		
 		txtDiv = document.createElement('div');
 		txtDiv.style.minHeight='50px'
-		txtDiv.style.overflow='auto'
+		txtDiv.style.overflow = 'hidden';
+		txtDiv.style.textOverflow = 'ellipsis';
+
 		var imgBox = new imgBoxClass(onlineArr[i].page,'page',50,true);
 		
 		if(onlineArr[i].type==null)
