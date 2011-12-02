@@ -11,6 +11,8 @@ function imgBoxClass(name,type,size,shadow){
 	this.imgDiv.style.width=size+"px";
 	this.imgDiv.style.height=size+"px";
 	this.imgDiv.style.cursor='pointer'
+	this.imgDiv.style.borderRadius="2px";
+
 	
 	this.imgDiv.appendChild(this.img);
 	$(this.img).hide();
@@ -25,12 +27,12 @@ function imgBoxClass(name,type,size,shadow){
 
 	}
 	
-	this.cropImg = function(img,size,div){
+	this.cropImg = function(img,size){
 		var height = img.height;
 		var width = img.width;
 		
 		var replaceGif =false
-		if((height > 600 || width > 600))
+		if((height > 400 || width > 400))
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)
@@ -52,25 +54,10 @@ function imgBoxClass(name,type,size,shadow){
 
 		$(img).show();
 		if(replaceGif)
-			freeze_gif(img,div)
-			
+			freeze_gif(img)
 	}
-	
-	
-/*
-	this.img.addEventListener('load',(function(img,div,size,self){
-			
-
-			return function(){
-				self.cropImg(_img,size);
-				self.imgDiv.appendChild(self.img);
-			}
-		})(self.img,self.imgDiv,size,self))
-*/
 
 	this.img.onload=(function(_img,_div,size,_self){
-			
-
 			return function(){
 				_self.cropImg(_img,size,_div);
 				//$(_img).show();
@@ -145,12 +132,12 @@ function freeze_gif(i,div) {
   //c.id=i.id;
   $(c).show();
 
-  //try {
-  //  i.src = c.toDataURL("image/gif"); // if possible, retain all css aspects
-  //} catch(e) { // cross-domain -- mimic original with all its tag attributes
+  try {
+    i.src = c.toDataURL("image/gif"); // if possible, retain all css aspects
+  } catch(e) { // cross-domain -- mimic original with all its tag attributes
     for (var j = 0, a; a = i.attributes[j]; j++)
     	if(a.name=='style')
      	 c.setAttribute(a.name, a.value);
-    div.replaceChild(c, i);
- // }
+    i.parentNode.replaceChild(c, i);
+  }
 }

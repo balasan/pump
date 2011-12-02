@@ -581,26 +581,28 @@ position:fixed;
 
 #mainFeedDiv{
 	display:none;
-	position:fixed;
-	top:100px;
-	left:100px;
-	width:280px;
-	height:200px;
-	overflow:auto;
+/* 	position:fixed; */
+/* 	top:100px; */
+/* 	left:100px; */
+	width:25%;
+/* 	height:200px; */
+/* 	overflow:auto; */
 	color:white;
+	float:left;
+
 }
 
 #feed{
 	display:none;
-	position:fixed;
-	top:330px;
-	left:100px;
-	width:280px;
-	height:210px;
-	overflow:auto;
+	position:relative;
+	top:0px;
+/* 	left:33%; */
+	width:30%;
+/* 	height:210px; */
+/* 	overflow:auto; */
 	background-color: rgba(255,255,255,.85);
 	color:white;
-
+	float:left;
 }
 
 #userName{
@@ -614,8 +616,11 @@ position:fixed;
 }
 
 #userPages{
-	left:410px;
-	
+/* 	left:50%; */
+/* 	overflow:auto; */
+/* 	height: 70%; */
+	float:left;
+/* 	margin:40px auto; */
 }
 #contributePages{
 	left:690px;
@@ -624,13 +629,15 @@ position:fixed;
 }
 .userPages{
 	padding:10px;
-	width:250px;
-	position:fixed;
-	top:100px;
+	width:25%;
+/* 	position:fixed; */
+/* 	top:100px; */
 	display:none;
 	background-color: rgba(255,255,255,.85);
 	color:grey;
-
+	margin:10px;
+	margin-top:40px;
+	border-radius: 3px;
 }
 
 .infoDiv{
@@ -649,19 +656,24 @@ position:fixed;
 
 }
 
+.mainNotify{
+	padding:2px;
+	margin-eft:6px;
+	display:none;
+/* 	position:relative; */
+	font-size:12px;
+	padding-top:6px;
+	padding-bottom:6px;
+	border-bottom:1px grey dotted;
+/* 	border-left:1px grey dotted; */
+
+}
+
 .pageList{
 	max-height: 400px;
 	font-size: 16px;
-	overflow:auto;
 	padding:5px;
-/* 	position:absolute; */
-/* 	top:0px; */
-/* 	width:200px; */
-/* 	padding-top:50px; */
-/* 	background-color:rgba(255,255,255,.8); */
-/* 	box-shadow: -1px -1px 0px  rgba(0, 0, 0, 0.6); */
 	color:grey;
-
 }
 
 

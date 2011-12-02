@@ -336,11 +336,10 @@ loadProfileInfo = function(info){
 		document.body.style.backgroundSize="";
 		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
 		document.body.style.backgroundPosition="left top";	 	
-	}
 	
-	$('#background').val(profileInfo.background);
-	$('#backgroundImage').val(profileInfo.backgroundImage);
-
+		$('#background').val(profileInfo.background);
+		$('#backgroundImage').val(profileInfo.backgroundImage);
+	}
 
 	document.body.style.backgroundColor=profileInfo.background;
 	document.body.style.backgroundImage=profileInfo.backgroundImage;
@@ -375,6 +374,13 @@ loadProfileInfo = function(info){
 		containerDiv.appendChild(userImage);
 		containerDiv.style.display='block';
 		//document.body.appendChild(containerDiv);
+		$('#userPages').css('marginLeft','420px')
+		$('#userPages').css('marginTop','100px')
+
+	}
+	else{ 
+		$('#userPages').css('marginLeft','10px')
+		$('#userPages').css('marginTop','40px')
 	}
 //switch chat for profile page	
 	var lastPost="";
@@ -406,18 +412,11 @@ loadProfileInfo = function(info){
 			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
 			txtDiv.style.paddingBottom="1px";
 			txtDiv.style.paddingLeft="0px";
-			txtDiv.style.paddingTop="2px";
-
-			//txtDiv.style.position='relative'
-	
+			txtDiv.style.paddingTop="2px";	
 
 			infoDiv.id=thisPage._id;
 			infoDiv.className="infoDiv";
 			infoDiv.style.paddingTop="2px";
-
-			//$(infoDiv).addClass('miniButton');
-			//$(newDiv).addClass('miniButton');
-
 
 			var infoTxt=""
 			if(pageName=="profile"){
@@ -468,12 +467,13 @@ loadProfileInfo = function(info){
 
 			}
 						
-			txtDiv.style.minHeight='40px'
+			txtDiv.style.minHeight='150px'
 			newDiv.style.marginBottom='4px';
 			txtDiv.style.overflow = 'hidden';
 			txtDiv.style.textOverflow = 'ellipsis';
+
 			
-			var imgBox = new imgBoxClass(thisPage.pageName,'page',40,true);
+			var imgBox = new imgBoxClass(thisPage.pageName,'page',150,true);
 			newDiv.appendChild(imgBox.imgDiv);
 
 			if(likeDiv != undefined)
@@ -490,23 +490,19 @@ loadProfileInfo = function(info){
 
 
 	if(pageName=="main"){
+/*
 		for(var i =0;i<profileInfo.users.length;i++){
-		
-			//if(profileInfo.users[i].pageName!= "profile_"+profileInfo.username){
 				newDiv = document.createElement('div');
 				newDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.users[i].username+"\",\"profile\")'>"+profileInfo.users[i].username+"</a>";
 				newDiv.style.paddingBottom="1px";
 				newDiv.style.paddingTop="2px";
-				
-			document.getElementById('cList').appendChild(newDiv);
-	
-			//}		
+				document.getElementById('cList').appendChild(newDiv);
 		}
+*/
 		document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-		document.getElementById('contributePages').style.display='block';
+		//document.getElementById('contributePages').style.display='block';
 		document.getElementById('mainFeedDiv').style.display="block"
 		changeProfileColor();
-		//$('#mainFeedDiv').show;
 	}
 
 	changeBackground();
@@ -582,11 +578,12 @@ fillOnline = function(onlineNow){
 		onlineDiv.style.color='white';
 		
 		txtDiv = document.createElement('div');
-		txtDiv.style.minHeight='50px'
+		txtDiv.style.minHeight='100px'
 		txtDiv.style.overflow = 'hidden';
 		txtDiv.style.textOverflow = 'ellipsis';
+		
 
-		var imgBox = new imgBoxClass(onlineArr[i].page,'page',50,true);
+		var imgBox = new imgBoxClass(onlineArr[i].page,'page',100,true);
 		
 		if(onlineArr[i].type==null)
 			txtDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\")'>"+onlineArr[i].page+"</a>: ";		

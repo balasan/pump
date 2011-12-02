@@ -614,7 +614,7 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
 	//var pageReg = new RegExp("^"+pageName+"$",'i')
 
-	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -50}}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -100}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
@@ -1383,6 +1383,9 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
 		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
 			if(err) console.log(err);
+			else pageModel.update({pageName:'main'},{$pop:{notify : -1}},function(err2){
+				if(err2) console.log(err);
+				})
 		})
 	 	nowjs.getGroup('main').now.notify([notify],undefined, true)	
 	}
