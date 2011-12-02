@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -1381,7 +1381,7 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	}	
 
 	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
-		pageModel.update({pageName:'main'},{$push:{notify:notify}, $pop : {notify : -1}},function(err){
+		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
 			if(err) console.log(err);
 		})
 	 	nowjs.getGroup('main').now.notify([notify],undefined, true)	

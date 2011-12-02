@@ -104,6 +104,7 @@ function imageToDom(image, property){
 	img.style.top = image.top;	
 	img.style.width = image.width;
 	img.style.height = image.height;
+	img.style.zIndex=image.z;
 	
 	if(!image.d2d){
 	var z = image.z;
@@ -320,22 +321,23 @@ loadProfileInfo = function(info){
 
 	profileInfo=info;
 
-	if(profileInfo.bgDisplay!=undefined){
+	if(profileInfo.bgDisplay!=undefined && pageName!='main'){
 		document.body.style.backgroundSize=profileInfo.bgDisplay;
 		if(profileInfo.bgDisplay=='cover'){
 			$('input:radio[name="bgType"]').filter('[value="cover"]').attr('checked', true);
 			document.body.style.backgroundPosition="center center";
 			}
 		else{
-		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
+			$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
 			document.body.style.backgroundPosition="left top";
 			}
 		}
-	else{
+	else if(pageName!='main'){
 		document.body.style.backgroundSize="";
 		$('input:radio[name="bgType"]').filter('[value=""]').attr('checked', true);
 		document.body.style.backgroundPosition="left top";	 	
 	}
+	
 	$('#background').val(profileInfo.background);
 	$('#backgroundImage').val(profileInfo.backgroundImage);
 
