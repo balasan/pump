@@ -503,6 +503,8 @@ loadProfileInfo = function(info){
 		//document.getElementById('contributePages').style.display='block';
 		document.getElementById('mainFeedDiv').style.display="block"
 		changeProfileColor();
+		$('#feed').show();	
+
 	}
 
 	changeBackground();
@@ -607,7 +609,6 @@ fillOnline = function(onlineNow){
 		
 	}
 	
-	$('#feed').show();	
 	changeBackground();
 	return false;
 }

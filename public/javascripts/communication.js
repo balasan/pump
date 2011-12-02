@@ -5,15 +5,10 @@
 var pageData;
 
 now.ready(function(){
-	// "Hello World!" will print on server
-	//now.logStuff("Hello World!");
 	console.log('loadingData');
-
 	nowReady=true;
 	loadData();
 	loadNotifications();
-	//now.setUserPage(pageName);
-
 });
 
 function loadNotifications(){
