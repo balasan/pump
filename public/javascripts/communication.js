@@ -923,11 +923,11 @@ now.notify = function(_notify,newN,main){
 			$(".notifyBox").css('padding','2px 4px 2px 4px');
 			
 			var note = document.createElement('div');
-			note.style.padding = '2px';
-			note.style.marginLeft = '6px';
-
-			note.style.postion='relative';
-			note.style.fontSize='12px';
+			note.className="mainNotify"
+			
+			if(!main)
+				note.style.margin='0px';
+			
 			var textDiv=document.createElement('div');
 			textDiv.style.textOverflow = 'ellipsis';
 			textDiv.style.overflow='hidden';
@@ -954,7 +954,6 @@ now.notify = function(_notify,newN,main){
 			else
 				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\")'>"+_notify[n].page+"</a>";
 			
-			note.style.display='none';
 			
 			if(!main){
 				$('#notifyDiv').prepend($(note));
@@ -965,11 +964,11 @@ now.notify = function(_notify,newN,main){
 					lastMainNote=_notify[n];
 			}
 			
-			var imgBox = new imgBoxClass(_notify[n].user,'user',40,true)
+			var imgBox = new imgBoxClass(_notify[n].user,'user',70,true)
 			
 			textDiv.style.paddingTop='4px';
 			//textDiv.style.paddingLeft='46px';
-			textDiv.style.minHeight='40px'
+			textDiv.style.minHeight='70px'
 			if(main)
 				lastMainTextDiv=textDiv
 			else
