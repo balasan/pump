@@ -25,9 +25,15 @@ function imgBoxClass(name,type,size,shadow){
 
 	}
 	
-	this.cropImg = function(img,size){
+	this.cropImg = function(img,size,div){
 		var height = img.height;
 		var width = img.width;
+		
+		var replaceGif =false
+		if((height > 600 || width > 600))
+			replaceGif = true;
+		//if(replaceGif)
+		//   freeze_gif(img)
 	
 		if(width>height){
 			var ratio = size/height;
@@ -43,6 +49,11 @@ function imgBoxClass(name,type,size,shadow){
 			var offset = -(height*ratio-size)/2
 			img.style.marginTop=offset+'px';
 		}
+
+		$(img).show();
+		if(replaceGif)
+			freeze_gif(img,div)
+			
 	}
 	
 	
@@ -61,8 +72,8 @@ function imgBoxClass(name,type,size,shadow){
 			
 
 			return function(){
-				_self.cropImg(_img,size);
-				$(_img).show();
+				_self.cropImg(_img,size,_div);
+				//$(_img).show();
 			}
 		})(self.img,self.imgDiv,size,self)
 	
@@ -119,4 +130,27 @@ function imgBoxClass(name,type,size,shadow){
 function isUrl(s) {
 	var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
 	return regexp.test(s);
+}
+
+function is_gif_image(i) {
+  return /^(?!data:).*\.gif/i.test(i.src);
+}
+
+function freeze_gif(i,div) {
+  var c = document.createElement('canvas');
+  var w = c.width = i.width;
+  var h = c.height = i.height;
+  c.getContext('2d').drawImage(i, 0, 0, w, h);
+  //c.style.display="block";
+  //c.id=i.id;
+  $(c).show();
+
+  //try {
+  //  i.src = c.toDataURL("image/gif"); // if possible, retain all css aspects
+  //} catch(e) { // cross-domain -- mimic original with all its tag attributes
+    for (var j = 0, a; a = i.attributes[j]; j++)
+    	if(a.name=='style')
+     	 c.setAttribute(a.name, a.value);
+    div.replaceChild(c, i);
+ // }
 }
