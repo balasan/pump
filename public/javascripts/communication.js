@@ -5,15 +5,10 @@
 var pageData;
 
 now.ready(function(){
-	// "Hello World!" will print on server
-	//now.logStuff("Hello World!");
 	console.log('loadingData');
-
 	nowReady=true;
 	loadData();
 	loadNotifications();
-	//now.setUserPage(pageName);
-
 });
 
 function loadNotifications(){
@@ -154,7 +149,7 @@ now.updatePageUser = function(action, userArray, profileName){
 				newDiv.className ="usersOnline"
 				newDiv.style.padding="0px 7px 2px 7px";
 
-				var imgBox = new imgBoxClass(user,'user',200)
+				var imgBox = new imgBoxClass(user,'user',25)
 				
 				var textDiv=document.createElement('div');
 				if(user!="n00b")

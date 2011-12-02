@@ -671,12 +671,10 @@ everyone.now.leftWindow = function(left){
 		if(left){
 			nowjs.getGroup(this.user.currentPage).now.clientLeftWindow(this.user.name,true);
 			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
-			//this.user.active=false;
 			}
 		else{
 			nowjs.getGroup(this.user.currentPage).now.clientLeftWindow(this.user.name,false);
 			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
-			//this.user.active=true;
 			}
 	}
 
@@ -1082,7 +1080,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 	}
 	var pageInit={};
 	if (copyPageName != undefined){
-		pageModel.findOne({pageName:copyPageName}, { _id : 0 },function(err,result){
+		pageModel.findOne({pageName:copyPageName}, { _id : 0,likesN:0,likes:0},function(err,result){
 			if(!err){
 				pageInit = result;
 				pageInit.pageName = pageName;
@@ -1218,7 +1216,7 @@ everyone.now.saveVersion = function(callback){
 	if (this.user.pagePermissions[pageName] !='owner' && this.user.pagePermissions[pageName] != 0)
 		return;
 		
-	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0,text:0},function(error,result){
+	pageModel.findOne({pageName:pageName},{versions:0,children:0,_id:0,parent:0,privacy:0,lastId:0,text:0,likesN:0,likes:0},function(error,result){
 		if(!error){
 			var newVersion ={}
 			newVersion = result;
