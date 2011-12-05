@@ -1,7 +1,15 @@
 function imgBoxClass(name,type,size,shadow){
 
+
 	self=this;
 	this.img = new Image();
+	if(name=="srsly?>?>")	
+		console.log(name)
+	var origName = name;
+	//name.replace(/\?/g,"")
+	//name = name.replace(/\?|\]|\s/g,'_')
+	//name=RegExp.escape(name)
+
 	this.img.className=type+name
 	
 	this.imgDiv = document.createElement('div')
@@ -12,7 +20,7 @@ function imgBoxClass(name,type,size,shadow){
 	this.imgDiv.style.height=size+"px";
 	this.imgDiv.style.cursor='pointer'
 	this.imgDiv.style.borderRadius="2px";
-
+	
 	
 	this.imgDiv.appendChild(this.img);
 	$(this.img).hide();
@@ -22,9 +30,12 @@ function imgBoxClass(name,type,size,shadow){
 			var className = type+user
 			if(url==undefined || url=="")
 				url=defaultIcon.src
-			$("."+className).attr("src", url)
-			userImages[type+user].img=url;
-
+				var el = document.getElementsByClassName(className)
+				for (var i = 0; i < el.length; i++){
+					el[i].src=url;				
+				//$("."+className).attr("src", url)
+					userImages[type+user].img=url;
+				}
 	}
 	
 	this.cropImg = function(img,size){
@@ -32,7 +43,7 @@ function imgBoxClass(name,type,size,shadow){
 		var width = img.width;
 		
 		var replaceGif =false
-		if((height > 400 || width > 400))
+		if((height > 500 && width > 500))
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)
@@ -73,18 +84,29 @@ function imgBoxClass(name,type,size,shadow){
 				userImages[type+name].img=defaultIcon.src;
 			}
 			else
-				now.getUserPic(name, function(_url,usr){self.loadImg(_url,usr,'user')})
+				now.getUserPic(origName, function(_url,usr){
+					//usr = usr.replace(/\?|\]|\s/g,'_')
+					self.loadImg(_url,usr,'user')
+					})
 			}
 		if(type=='page')
-			now.getPagePic(name, function(_url,_img,color,page){
+			now.getPagePic(origName, function(_url,_img,color,page){
+
+				//page = page.replace(/\?|\]|\s/g,'_')
+				//page=RegExp.escape(page)
+				console.log(page)
 				if(_url!=undefined && isUrl(_url))
 					self.loadImg(_url,page,'page')
 				else if(_img!=undefined && isUrl(_img))
 					self.loadImg(_img,page,'page')
 				else{
-					$(".page"+page+"div").css('backgroundColor',color) 
-					userImages[type+name].color=color;
-					userImages[type+name].img=null;
+					var el = document.getElementsByClassName("page"+page+"div")
+					for (var i = 0; i < el.length; i++){
+					//$(".page"+page+"div").css('backgroundColor',color) 
+						el[i].style.backgroundColor=color;
+						userImages[type+name].color=color;
+						userImages[type+name].img=null;
+					}
 					}
 				})
 	}
@@ -111,7 +133,7 @@ function imgBoxClass(name,type,size,shadow){
 			    return function() {
 			       goToPage(page);
 			    };
-			})(name);
+			})(origName);
 }
 
 function isUrl(s) {
@@ -121,6 +143,10 @@ function isUrl(s) {
 
 function is_gif_image(i) {
   return /^(?!data:).*\.gif/i.test(i.src);
+}
+
+RegExp.escape = function(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 }
 
 function freeze_gif(i,div) {
