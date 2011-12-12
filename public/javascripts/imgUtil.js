@@ -43,7 +43,7 @@ function imgBoxClass(name,type,size,shadow){
 		var width = img.width;
 		
 		var replaceGif =false
-		if((height > 500 && width > 500))
+		if((height > 600 || width > 800))
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)

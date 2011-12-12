@@ -7,7 +7,7 @@ var pageData;
 now.ready(function(){
 	console.log('loadingData');
 	nowReady=true;
-	loadData();
+	permissions(pageName,userProfile,version);
 	loadNotifications();
 });
 
@@ -15,49 +15,116 @@ function loadNotifications(){
 
 	if(nowReady && windowReady){
 		now.getNotifications();
+		window.onblur=function(){now.leftWindow(true);activeUser=false}
+	    window.onfocus=function(){now.leftWindow(false);activeUser=true;}
 	}
 }
 
+var backButton=true;
+goToPage = function(page, type, _version,back){
+
+	if(back)
+		backButton=true
+	else
+		backButton=false;		
+	
+	pageName = page;
+	version=_version;
+	nextVersion=undefined;
+	prevVersion=undefined;
+
+	lastNote=null;
+	//lastMainNote=null;
+	lastTextDiv=null;
+
+	if(type=="profile"){
+		var url="/profile/"+page;
+		pageName = "profile";
+		userProfile = page;
+		}
+	else if(page=='main'){
+		var url ="/"
+		}
+	else
+		var url="/"+page
+
+		
+	if(version!=undefined){
+		url+="/"+version;
+	}
+	
+	permissions(pageName,userProfile,version,url);
+
+}
 
 var myName;
-function loadData(){
+function permissions(_page,_userProfile,version,url){
 
-	$('#loadingImg').show();
 	if(nowReady && windowReady){
-	
+		$('#loadingImg').show();
+
 		if(currentUser==undefined){
 			currentUser="n00b"
 			privacy=null;
 			}
-		now.getPagePermissions(pageName,userProfile, function(err,name,_permissions){
-			if (!err)
+		now.getPagePermissions(pageName,userProfile,version, function(err,name,_permissions){
+			if (!err){
 				privacy=_permissions;
 				currentUser=name;
-				if(currentUser=='n00b'){
+
+				if(currentUser=='n00b' && (pageName=='main' || pageName=='invite')){
 					if(pageName!='invite'){
 						goToPage('invite')
 						return;
 					}
-					//window.history.pushState({page:'invite'}, "", '/invite');
 					$('#invite').show();
-					$('#chat').hide();
-					//animate();
+					$('.gpui').hide();
 				}
 				else{ $('#invite').hide();
 				}
+				
+				if(pageName=='invite' || currentUser != 'n00b'){
+					$('#loginMenu').show;
+					$('.gpui').show();
+				}
+				else{
+					$('.gpui').hide();
+					//$('#loginMenu').show;
+
+				}
+			
+				
+				var type=null;
+				var tmpPageName=pageName	
+				if(pageName=='profile'){
+					type=pageName;
+					tmpPageName=userProfile;
+				}
+					
+				if(!backButton){
+					console.log(url)
+					var currentScroll=$(window).scrollTop()
+					window.history.pushState({page:tmpPageName,type:type,version:version,scroll:currentScroll}, "", url);
+					}
+				pageData=null;
+				$(".usersOnline").remove();
+				n00bs=0;
+				
 				now.loadAll(pageName,userProfile,version,loadAll)
+			}
+			else{
+				if(err=='noPage'){
+					$('#loadingImg').hide();
+					alert("This page doesn't exist anymore, It might have been deleted by the owner")
+					return;
+					//window.history.back();
+				}
+			}
 		})
 	}
 }
 
 now.pushChanges = function(pageData){
-
-/*
-	var currentPageVersions={}
-	currentVersions[pageData.pageName]=pageData.versions
-	currentVersions[pageData.pageName].reverse;
-	var totalVersions = pageData.currentVersion;
-*/
 
 	if(version != undefined){
 		versions[0].text=pageData.text
@@ -71,33 +138,45 @@ now.pushChanges = function(pageData){
 
 
 now.setPagePermissions = function(_permissions, _owner){
+
+		
 	privacy = _permissions;
 	if (privacy=='owner')
 		privacy=0;
 	var owner = _owner;
 	if(owner){
 		$("#settingsButton").show();
-		if(version!=undefined)
-			$("#deleteVersion").show();			
+		$("#saveButton").show()		
+		//if(version!=undefined)
+		$("#deleteVersion").show();			
 	}
 	else{
 		$("#settingsButton").hide();
-		$("#deleteVersion").hide();			
+		$("#deleteVersion").hide();	
+	}
+	
+	if(privacy<1){
+		$("#saveButton").show()		
+	}
+	else{
+		$("#saveButton").hide()		
 	}
 }
 
 
 function loadAll(error, pageData, notifications){
+
 	if(error != null){
-		
 		//TODO: re-enable this
-		alert('PLEASE LOGIN TO DO THIS')
+		alert('Something went wrong o_O')
 		//alert(error)
 		//goToPage('main')
 		window.history.back();
 		console.log(error)
 		return;
 	}
+	
+
 		
 	var lastVersion=pageData.currentVersion;
 	
@@ -129,12 +208,22 @@ function loadAll(error, pageData, notifications){
 //PAGE USERS
 ///////////
 
+
+now.clientLeftWindow = function(username,left){
+  if(left)
+  	$("#"+username).css('opacity','.4')
+  else
+  	$("#"+username).css('opacity','1')
+}
+
+
+
 var n00bs=0;
 var defaultIcon = new Image();
 defaultIcon.src = 'http://dump.fm/images/20110926/1317014842765-dumpfm-FAUXreal-1297659023374-dumpfm-frankhats-yes.gif';
 defaultIcon.style.width = '20px';
 
-now.updatePageUser = function(action, userArray, profileName){
+now.updatePageUser = function(action, userArray){
 
 	if(action == 'add'){
 		
@@ -160,7 +249,7 @@ now.updatePageUser = function(action, userArray, profileName){
 				}
 				textDiv.style.textOverflow = 'ellipsis';
 				textDiv.style.overflow='hidden';
-				textDiv.style.width='70%'
+				textDiv.style.width='65%'
 				textDiv.style.paddingTop='4px';
 				textDiv.style.height='30px'
 				
@@ -180,7 +269,8 @@ now.updatePageUser = function(action, userArray, profileName){
 	}
 	if(action == 'delete'){
 		var user = userArray;
-		if(user!='n00b' || n00bs == 1)
+		var userEl = document.getElementById(user);
+		if(userEl != undefined && (user!='n00b' || n00bs == 1))
 			document.getElementById('online').removeChild(document.getElementById(user));		
 		else if (user == 'n00b'){
 			n00bs--;
@@ -245,7 +335,7 @@ function addNewImg(){
 			
 			//TODO RESET RADIOS!
 			addObject.top = Math.random()*500 + scrollTop+"px";
-			addObject.left = Math.random()*900 + scrollLeft+"px";
+			addObject.left = -mainDivTrasfrom.x+Math.random()*900 + scrollLeft+"px";
 			
 			if(addType=="div" || addType=="text"){	
 				addObject.height="300px";
@@ -255,12 +345,13 @@ function addNewImg(){
 				addObject.height="auto";
 				addObject.width="auto";		
 			}
-			addObject.z = Math.random()*50;
-			
+			addObject.z = Math.random()*50-mainDivTrasfrom.z;
+			//addObject.left +=mainDivTrasfrom.x
+
 			
 			addObject.angler=0;
+			addObject.anglex=-mainDivTrasfrom.rotY;
 			addObject.angley=0;
-			addObject.anglex=0;
 			if ($("input[name='geoPreset']:checked").val() == 'hPlane') {
 				addObject.angley=90;
 				addObject.height="1000px";
@@ -301,6 +392,13 @@ function addNewImg(){
 					addType == 'vimeo'
 				    addObject.content=$("#vimeoUrl").val()
 				    addObject.contentType='vimeo';
+				    addObject.width='450px'
+				    addObject.height='300px'				
+				}
+				else if($("#mp3").val()!=""){
+					addType == 'mp3'
+				    addObject.content=$("#mp3").val()
+				    addObject.contentType='mp3';
 				    addObject.width='450px'
 				    addObject.height='300px'				
 				}
@@ -435,7 +533,8 @@ function replaceImg(){
 		editElement.content = $("#editVimeoUrl").val();
 	if(editElement.contentType == 'soundCloud')
 		editElement.content = $("#editSoundCloud").val();
-			
+	if(editElement.contentType == 'mp3')
+		editElement.content = $("#editMp3").val();		
 	editElement.backgroundColor = $("#editBackgroundColor").val()
 	editElement.backgroundImage = $("#editBackgroundImage").val()
 	editElement.d2d=$('#edit2d').is(':checked');
@@ -627,6 +726,11 @@ now.updateVersion = function(savedVersion,deleteVersion){
 
 function deleteVersion(){
 
+	if(version==undefined){
+		deletePage();
+		return false;	
+	}
+
 	var r=confirm("ARE YOU SURE YOU WANT TO DELETE THIS VERSION?");
 	
 	if(version!=undefined){ 
@@ -729,7 +833,7 @@ function fillChat(user, text) {
 
 	
 	var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-	text = text.replace(exp,"<a href=\"$1\">$1</a>"); 
+	text = text.replace(exp,"<a href=\"$1\"target=blank>$1</a>"); 
 	
 	if(user!=lastPost){
 		var newTxtDiv = document.createElement('div');
@@ -766,7 +870,7 @@ function enter(evt){
 	
 	var charCode = (evt.which) ? evt.which : window.event.keyCode; 
 	if (charCode == 13){ 
-		if(currentUser=='n00b'){
+		if(currentUser=='n00b' && pageName!='invite'){
 			alert("YOU HAVE TO LOG IN TO DO POST COMMENTS")
 			var inputBox = document.getElementById("inputBox");
 			inputBox.value="";
@@ -857,16 +961,20 @@ likePage = function(){
 	now.likePage(action, version,function(err){
 		
 		if(err==null){		
-			buttonPress("likePage")
+			//buttonPress("likePage")
 			if(action=="like"){
 				pageData.likesN++
-				$('#likeButtonText').html(pageData.likesN + ' unlike');
+				$('#likeButtonText').html(pageData.likesN);
+				likeIm.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'
+				$('#likeIm').css('opacity','1')
 				liked = 0;
 				}	
 			else{
 				liked = -1;
 				pageData.likesN--
-				$('#likeButtonText').html(pageData.likesN + ' like');	
+				$('#likeIm').css('opacity','.5')
+				likeIm.src='http://asdf.us/im/84/heart03_1323653907.gif'
+				$('#likeButtonText').html(pageData.likesN);	
 				}
 		}
 	})
@@ -876,6 +984,7 @@ var lastNote;
 var lastMainNote;
 var lastTextDiv;
 var lastMainTextDiv;
+var loadNotify=true;
 
 now.notify = function(_notify,newN,main){
 
@@ -883,7 +992,6 @@ now.notify = function(_notify,newN,main){
 		setTimeout(function(){now.notify(_notify,newN)},300);
 		return;
 	}
-		
 
 	for(var n=0;n<_notify.length;n++){
 		if(main && lastMainNote &&lastMainNote.version ==_notify[n].version && lastMainNote.user==_notify[n].user && lastMainNote.page==_notify[n].page && lastMainNote.action==_notify[n].action)
@@ -915,7 +1023,7 @@ now.notify = function(_notify,newN,main){
 				$(".notifyBox").html(notify);
 				document.title="("+notify+") gifpumper"	
 			}
-			$(".notifyBox").css('padding','2px 4px 2px 4px');
+			$(".notifyBox").css('padding','3px 5px 3px 5px');
 			
 			var note = document.createElement('div');
 			note.className="mainNotify"
@@ -959,11 +1067,13 @@ now.notify = function(_notify,newN,main){
 					lastMainNote=_notify[n];
 			}
 			
-			var imgBox = new imgBoxClass(_notify[n].user,'user',70,true)
+			var imgBox = new imgBoxClass(_notify[n].user,'user',60,true)
 			
 			textDiv.style.paddingTop='4px';
+			//textDiv.style.fontSize='13px';
+
 			//textDiv.style.paddingLeft='46px';
-			textDiv.style.minHeight='70px'
+			textDiv.style.minHeight='60px'
 			if(main)
 				lastMainTextDiv=textDiv
 			else

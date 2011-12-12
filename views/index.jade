@@ -26,6 +26,7 @@
 ////add/////
 
 #addMenu.uiClosed(name='addMenu', style='position: fixed; left:300px; top:200px; width:auto;padding:5px')
+  |ADD:
   div(style="font-size:13px;padding:5px")
       a(href="javascript:addMenu(\'image\');")
         |Image | 
@@ -106,8 +107,9 @@
 // 
 ////replace/////
 
-#editMenu.uiClosed(name='editMenu', style='position: fixed; width:auto;')
-  div(style="font-size:13px;padding:5px")
+#editMenu.uiClosed(name='editMenu', style='position: fixed; width:auto;	left: 140px;top:70px;')
+  |EDIT:
+  div(style="font-size:13px;padding:5px 0 5px 0")
       a(href="javascript:addMenu(\'editImage\');")
         |Image | 
       a(href="javascript:addMenu(\'editText\');")
@@ -116,19 +118,29 @@
         |Media | 
       a(href="javascript:addMenu(\'editDiv\');")
         |Div
-  #editImageContainer(style="padding:5px;display:block")
-    input#editImage.editType(style='width:160px;', type='text', placeholder='http://blahblah.gif')
+  #editImageContainer(style="padding:0px;display:block")
+    |edit image url:
+    <br>
+    input#editImage.editType(style='width:155px;', type='text', placeholder='http://blahblah.gif')
     br
-    form(name='f2')
-      input(type='radio', name='replaceType', value='one', checked='CHECKED')
-      | last image
-      input(type='radio', name='replaceType', value='all')
-      | all
+    input#keyOut.button(style='width:160px;', type='button', name='keyOut', value='Key-Out White', onclick="keyOut()")
+    br
+    |(wait for url to refresh)
+    br
+    |more img effects here: 
+    br
+    a(href="http://asdf.us/im/", target='blank') http://asdf.us/im/
+    br 
+    //form(name='f2')
+    //  input(type='radio', name='replaceType', value='one', checked='CHECKED')
+    //  | selection
+    //  input(type='radio', name='replaceType', value='all')
+    //  | all
   
-  #editTextContainer(style="padding:5px;display:none")
+  #editTextContainer(style="padding:0px;display:none")
     textarea#editContent.editType.tinymce
   
-  #editMediaContainer(style="padding:5px;display:none")
+  #editMediaContainer(style="padding:0px;display:none")
     | youtube link:
     br
     input.mediaEdit(style='width:220px;', type='text', id='editYoutubeUrl', placeholder='http://youtube.com/xxxx',onfocus="typing=true; ", onblur="typing=false;")
@@ -152,7 +164,7 @@
     br
     textarea.editType.mediaEdit(style='width:220px;height:100px', type='text', name='embed', id="editMedia", placeholder='paste embed code here',onfocus="typing=true; ", onblur="typing=false;")
     br
-  #editDivContainer(style="padding:5px;display:none")
+  #editDivContainer(style="padding:0px;display:none")
     | background color:
     br
     input#editBackgroundColor.editType(style='width:160px;', type='text', placeholder='name, hex or rgba(r,g,b,a)',onfocus="typing=true; ", onblur="typing=false;")
@@ -198,11 +210,16 @@ input#lastId(type='hidden', name='lastId')
 ////add/////
 
 #helpMenu.uiClosed(name='helpMenu', style='left:300px;border:1px solid grey; padding:0;padding-top:15px; top:50px; width=300px')
-  div(style='background-color:white;  padding: 15px; width:340px; height:480px;overflow:auto; font-size:14px;color:black')
+  div(style='background-color:white;  padding: 15px; width:340px; height:500px;overflow:auto; font-size:14px;color:black')
+    b Walk Around:
+    br
+    img(src='http://s3.amazonaws.com/gifpumper/ui/wasd.png',height='60px') 
+    |  or arrow keys
+    br
     b Rotate Canvas:
     br
     //div(style:'margin:-15px')
-    img(src='http://s3.amazonaws.com/gifpumper/ui/space_bar.jpeg',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/space.png',height='30px')
     br
     br
     b Move element:
@@ -212,33 +229,33 @@ input#lastId(type='hidden', name='lastId')
     br
     b Resize:
     br
-    img(src='http://s3.amazonaws.com/gifpumper/ui/shift_key.png',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/shift_key.png',height='35px')
     |  and drag
     br
     br
     b Move forward/back:
     br
-    img(src='http://s3.amazonaws.com/gifpumper/ui/alt_key.jpg',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/alt_key.jpg',height='35px')
     |   drag up/down
     br
     br
     b Rotate around Z:
     br
-    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_z.png',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_z.png',height='35px')
     |  drag left/right
     br
     br
     b Rotate around the X/Y:
     br
-    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='35px')
     |  drag
     br
     br
     b Delete element: 
     br
-    img(src='http://s3.amazonaws.com/gifpumper/ui/ctrl%20key.png',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/ctrl%20key.png',height='35px')
     | 
-    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='40px')
+    img(src='http://s3.amazonaws.com/gifpumper/ui/letter_x.png',height='35px')
     br
     br
     br
@@ -262,10 +279,16 @@ input#lastId(type='hidden', name='lastId')
     a(href='http://www.facebook.com/pages/gifpumpercom/117231671686998') gifpumper facebook page
     br
     br 
-    | gifpumper was created by Slava Balasanov
+    | Gifpumper was created by Slava Balasanov with support from 
+    a(href="http://eyebeam.org",target='blank') Eyebeam
+    br
+    br
+    | props to ryz from 
+    a(href="http://asdf.us",target='blank') http://asdf.us
+    |  for the key-out tool
     br
   .x
-    a(href='javascript:openMenu(\'helpMenu\');') x
+    a(href='javascript:openMenu(\'helpMenu\');buttonPress("help");') x
 //
 ////more pages/////
 
@@ -273,6 +296,7 @@ input#lastId(type='hidden', name='lastId')
   | create new page:
   br
   input(style='width:160px;', type='text',id='newPage', name='newPage', placeholder='enter unique page name', onfocus="typing=true", onblur="typing=false")
+  //textarea.addEditors(style='width:auto;', type='text',id='newPage', name='newPage', placeholder='enter user name', onfocus="value='', typing=true",onblur="typing=false", onKeyPress="searchPages();")
   br
   input#makeNew.button(type='submit', style='width:78px;', name='makeNew', value='new page',onclick="addPage(false)")
   | 
@@ -322,8 +346,8 @@ input#lastId(type='hidden', name='lastId')
   textarea.addEditors(style='width:auto;', type='text',id='addEditors', name='addEditors', placeholder='enter user name', onfocus="value='', typing=true",onblur="typing=false", onKeyPress="searchUsers();")
   #searchResults
   input#pageSettings.button(type='submit', style='width:78px;', name='pageSettings', value='Save',onclick='setPrivacy()') 
-  | 
-  input#deletePage.button(type='submit', style='width:78px;', name='deletePage', value='Delete Page',onclick='deletePage()')
+  //| 
+  //input#deletePage.button(type='submit', style='width:78px;', name='deletePage', value='Delete Page',onclick='deletePage()')
   .x
     a(href='javascript:openMenu(\'pageMenu\');') x
 
@@ -344,21 +368,21 @@ input#lastId(type='hidden', name='lastId')
   | Username:
   //span(class="regClass", id="unique",style="display:none;") (must be unique)
   form(action='/login', name='logIn', method='POST', enctype='application/x-www-form-urlencoded')
-    input(style='width:155px;', type='text', name='username', value='', size='32', maxlength='32')
+    input(style='width:155px;', type='text', name='username', value='', size='32', maxlength='32', onfocus="typing=true", onblur="typing=false")
     br
     | Password:
     br
-    input(style='width:155px;', type='password', name='password', value='', size='32', maxlength='32')
+    input(style='width:155px;', type='password', name='password', value='', size='32', maxlength='32', onfocus="typing=true", onblur="typing=false")
     br
     div(class="regClass", style="display:none;")
       | Password Again:
       br
-      input(style='width:155px;', type='password', name='passwordAgain', value='', size='32', maxlength='32')
+      input(style='width:155px;', type='password', name='passwordAgain', value='', size='32', maxlength='32',onfocus="typing=true", onblur="typing=false")
       | Email: (optional)
       //br 
       //| used for password recovery:
       br
-      input(style='width:155px;', type='email', name='email', value='', size='32', maxlength='32')
+      input(style='width:155px;', type='email', name='email', value='', size='32', maxlength='32',onfocus="typing=true", onblur="typing=false")
       br
     br
     //div(style="display:inline; width:100%")
@@ -379,14 +403,29 @@ input#lastId(type='hidden', name='lastId')
 
 
 
+#saveMenu.uiClosed(style='left:400px; top:100px;')
+  //|Save page in this site:
+  //br
+  //input#sightName(style='width:155px;', type='text', name='siteName', value='', size='32', maxlength='32', onfocus="typing=true", onblur="typing=false")
+  br
+  |Version Name:
+  br
+  input#versionName(style='width:155px;', type='text', name='versionName', value='', size='32', maxlength='32', onfocus="typing=true", onblur="typing=false")
+  br
+  input#pageSettings.button(type='submit', style='width:78px;', name='saveVersion', value='Save Version',onclick='saveVersion()') 
+  .x
+    a(href='javascript:openMenu(\'saveMenu\');') x
+
+
 //input#console1(class='console1',id='console1', style='background-color:white; width:100%; top:0px; left:0px; margin-left:5px; margin-right:5px; z-index:999;', type='text', value='', size='100')
 
-//#topBar(style="position:fixed;top:0px;left:0;width:100%;height:25px;background:rgba(255,255,255,.5);")
+//#topBar(style="position:fixed;top:0px;left:0;width:100%;height:26px;background:rgba(255,255,255,.5);")
 
-#menuContainer(style="z-index:1000;top:5px;left:5px;position:fixed;")
+#menuContainer.gpui(style="z-index:10002;top:5px;left:5px;position:fixed;")
+  div(style="float:left;z-index:200000;margin-right:4px;padding-right:4px;position:relative")
     //-if(loggedIn || page=='invite')
     #editElementButton.menuButton.dropButton(onclick='javascript:buttonPress("editElement");')
-      |Elements
+      |Content
     | 
     #editPageButton.menuButton.dropButton(onclick='javascript:buttonPress("editPage");')
       |Page
@@ -396,14 +435,16 @@ input#lastId(type='hidden', name='lastId')
     | 
     #helpButton.menuButton(onclick='javascript:openMenu(\'helpMenu\');buttonPress("help");')
       |Help
+    &nbsp   
     //-else
     //  a(href='/') GIFPUMPER.COM
-    |       
-    #pageName(style="display:inline;")
-    | 
-    #likePageButton.menuButton
-      a(href='javascript:likePage();')
-        #likeButtonText(style="display:inline;")
+    //pageInfoDiv(style="float:right")     
+  #likePageButton(style="display:inline-block;padding-left:18px", onclick="likePage()")
+        a(href='javascript:likePage();')
+          #likeButtonText(style="display:inline;")
+        #likeIm(style='position:relative;display:none;') 
+      #pageName(style="display:inline;")
+
 
 #editElementMenu.menu(style="display:none;position:fixed;")
       //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
@@ -414,10 +455,10 @@ input#lastId(type='hidden', name='lastId')
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Profile Image
       //div.menuDiv.mainMenu  
         a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
-      div.menuDiv.mainMenu  
-        a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
       div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'editMenu\');fillEditMenu()') ⇧E Edit
+      div.menuDiv.mainMenu  
+        a(href='javascript:openMenu(\'deleteMenu\');') ⇧D Delete
       div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'backgroundMenu\');') ⇧B Background
       div.menuDiv.profileOnly 
@@ -428,12 +469,15 @@ input#lastId(type='hidden', name='lastId')
         |-page 
       div.menuDiv 
         a(href='javascript:openMenu(\'moreMenu\');') ⇧N New
-      div.menuDiv
-        a(href='javascript:saveVersion();') ⇧S Save Version 
-      #settingsButton.menuDiv(style="display:block") 
-          a(href='javascript:openMenu(\'pageMenu\');') ⇧P Settings   
-      #deleteVersion.menuDiv(style="display:block") 
-          a(href='javascript:deleteVersion();') Delete This Version
+      #saveButton.menuDiv
+        a(href='javascript:saveVersion()') ⇧S Save
+      #settingsButton.menuDiv(style="display:block")
+          a(href='javascript:openMenu(\'pageMenu\');') ⇧P Privacy
+      //#deleteVersion.menuDiv(style="display:block")
+          a(href='javascript:deleteVersion();') New Site
+      #deleteVersion.menuDiv(style="display:block;padding-left:10px")
+          a(href='javascript:deleteVersion();') 
+            |--Delete--
       //div.shortCut
 
 
@@ -459,39 +503,44 @@ input#lastId(type='hidden', name='lastId')
 
 
 
-#rightMenu(style='position:fixed; top:5px; right:150px; opacity:.8; padding:0; height:10px')
-  div(style="height:100%; float:left; padding-right:20px")
-    //input(style='width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
-    //|  | 
-    a(href="javascript:goToPage('main','null')") Main Page 
-    | |
+#rightMenu.gpui.label2(style='position:fixed; top:5px; right:160px; opacity:.8; padding:0; ')
+  //input(style='float:left;display:inline;width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
+  div(style="float:left;display:inline; margin-right:10px; ")
+
     -if(!loggedIn)
-      //div.menuButton
-      a(href='javascript:openMenu(\'loginMenu\');') Login 
+        //div.menuButton
+        a(href='javascript:openMenu(\'loginMenu\');') Login 
     -if(loggedIn)
-      //div.menuButtonP
-      div.notifyBox
+      div.menuText(style="display:inline")
         //div.insideNotify(style="width:20px;height:20px;position:relative")
-      a(href="javascript:goToPage(user, 'profile');") My Profile 
-      | | 
-      a(href='javascript:logOut();') Logout 
+        //div.menuButton
+        a(href="javascript:goToPage('main','null')") Main Page 
+        | |        
+        div.notifyBox
+        | | 
+        a(href="javascript:goToPage(user, 'profile');") My Profile 
+        | |
+        //div.menuButton 
+        a(href='javascript:logOut();') Logout
 
 
-  div(style='opacity:.8; padding:0;float:right')
+  #fbLike(style='opacity:.8; padding:0;float:right;margin-right:4px;')
     iframe#fblike(src='http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fgifpumpercom%2F117231671686998&layout=button_count&show_faces=false&width=100&action=like&font&colorscheme=light&height=21px', scrolling='no', frameborder='0', style='text-align: right; background:none border:none; overflow:hidden; width:80px; height:21px;', allowtransparency='true')
 
-#online.moveable(style="top:5px; right:10px; cursor:moveable")
-   //div.headBar
-   div(style="height:18px; padding:2px;") users on this page:
+#online.moveable.gpui(style="top:5px; right:10px; cursor:moveable")
+    //div.headBar
+    div(style="height:18px; padding:2px;") users on this page:
 
+    
 
-
+      
+      
 
 #chatButton(style="display:none; height:30px") 
      | <a href='javascript:openChat();'><img src="http://how2program.com/thumbs/4054_Pixel_chat_icon_._.._.jpg6U4SDMK2R5.jpg",border='0px', height='30px'></a>
 
-div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; height:auto; padding:0")
-   #chatTop.menuTop.chat(style="padding-top:1px;padding-bottom:1px;	opacity: .7;color:red")
+div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; height:auto; padding:0")
+   #chatTop.menuTop.chat.label2(style="padding-top:1px;padding-bottom:1px;	opacity: .7;color:red")
     | msg
     .x 
       a(href='javascript:openChat();') x
@@ -555,7 +604,52 @@ div(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto; heig
     | You can try out features on this page, but you'll need an invite to register. If you already have an account, go ahead and 
     a(href="javascript:openMenu(\'loginMenu\')") login
     |. Visit the <a href="http://www.facebook.com/gifpumper">facebook page</a> for updates.
- 
-///////////////
-////////MAIN
-////////// 
+
+#miniLogo(onclick="javascript:goToPage(\'main\')")
+  div.zspin(style='width:30px;float:left;')
+    img(src="https://s3.amazonaws.com/gifpumper/ui/cd.png",style="width:100%")
+  div(style="float:left;position:relative;margin-top:2px")
+    div.label2(style="font-size:23px;") GP
+
+#tipDiv(style="position:fixed;bottom:5px;right:5px;opacity:.8;display:none")
+    img(src="https://s3.amazonaws.com/gifpumper/ui/space.png", style="width:120px")
+    |  
+    img(src="https://s3.amazonaws.com/gifpumper/ui/wasd.png", style="width:95px")
+
+
+//#mainMenu.shadow
+  div.headTab
+  #accordion
+    div.menuHead.label2
+      |Edit Page
+    div.menuC 
+      div.menuDiv.mainMenu 
+        a(href='javascript:openMenu(\'addMenu\');')⇧Add
+      div.menuDiv.profileOnly 
+        a(href='javascript:openMenu(\'addMenu\');')⇧A Profile Image
+      div.menuDiv.mainMenu 
+        a(href='javascript:openMenu(\'editMenu\');fillEditMenu()')⇧Edit Selection
+      div.menuDiv.mainMenu  
+        a(href='javascript:openMenu(\'deleteMenu\');')⇧Delete
+      div.menuDiv.mainMenu 
+        a(href='javascript:openMenu(\'backgroundMenu\');')⇧Background
+      div.menuDiv.profileOnly 
+        a(href='javascript:openMenu(\'backgroundMenu\');')⇧Background      
+    div.menuHead.label2
+      |Edit Site
+    div.menuC
+      |⇧ Edit Site
+      br
+      |Page Settings
+      br
+      |Element
+    div.menuHead.label2
+      |Animations
+    div.menuC 
+      |Save
+    div.menuHead.label2
+      |Help
+    div.menuC
+      |Page
+      br
+      |Element

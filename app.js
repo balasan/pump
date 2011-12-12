@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -151,6 +151,7 @@ var pageSchema = new Schema({
   , d2d : {type: Boolean, default: false}
   , notify : [notifySchema]
   , bgDisplay : String
+  , created : { type: Date, default: Date.now }
 });
 
 var userSchema = new Schema({
@@ -172,6 +173,7 @@ var userSchema = new Schema({
 	, notify : [notifySchema]
 	, newNotify : Number
 	, nowId : String
+	, clicks : {type: Number, default:0,min:0}
 });
 
 
@@ -543,7 +545,7 @@ everyone.now.updateAll = function(pageData,callback){
 }
 
 
-everyone.now.loadProfileInfo = function(user, callback){
+everyone.now.loadProfileInfo = function(user, callback1,callback2){
 
 	if (this.user.name=='n00b'){
 		return;
@@ -551,37 +553,47 @@ everyone.now.loadProfileInfo = function(user, callback){
 
 	userModel.findOne({username:user}, { password : 0, salt:0 },function(error,result){
 		if(!error){
-				
+			if(callback1!=null)
+				callback1(result)	
 			pageModel.find({$or :[{owner:user},{"images.user":user}]},{'pageName':1,'likes':1,'likesN':1,'vLikes':1,'contributors':1,'owner':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(error,result2){
 				result.pages=result2;
-				callback(result);
+				result.type='profile'
+
+				callback2(result);
 			})
 		}		
 	})	
 }
 
+//TODO finish dynamic loading of main feed
+everyone.now.loadMainNotify = function(start,callback){
+	if (this.user.name=='n00b'){
+		return;
+		}
+	pageModel.find({pageName:'main'},{notify:{$slice: [start+20,20]}},function(err,result){
+		if(!err) callback(result)
+		else console.log(err)
+	})
+
+}
 
 
-everyone.now.loadMainPage = function(user, callback){
+everyone.now.loadMainPage = function(user,startN,callback){
 
 	if (this.user.name=='n00b'){
 		return;
 		}
-	userModel.find({}, { password : 0, salt:0 }).sort('username',1).run(function(error,result){
-		if(!error){
-			var responce = {}
-			responce.users = result;	
-			pageModel.find({},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).run(function(err,result2){
 
+		pageModel.find( {privacy:{$ne:3}},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).skip(startN).limit(20).run(function(err,result2){
 				if(err)
 					console.log(err)
 				else{
+					var responce={};
 					responce.pages=result2;
+					responce.type='main'
 					callback(responce);
 				}
-			})
-		}
-	})
+			})		
 }
 
 
@@ -593,8 +605,8 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 		groupName = "profile___"+userProfile;
 		
 	if (this.user.name=='n00b'){
-		groupName='invite';
-		pageName='invite';
+		//groupName='invite';
+		//pageName='invite';
 		}
 	
 	console.log(groupName);
@@ -614,7 +626,7 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
 	//var pageReg = new RegExp("^"+pageName+"$",'i')
 
-	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice: -100}}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }
@@ -624,17 +636,32 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 			nowjs.getGroup(groupName).addUser(oldthis.user.clientId);
 			
 			//TODO: not n00b?
-			onlineModel.update({nowId:oldthis.user.clientId},{$set : {page:groupName,user:oldthis.user.name}},{upsert:true},function(err){
+			if(result.privacy<3)
+				onlineModel.update({nowId:oldthis.user.clientId},{$set : {page:groupName,user:oldthis.user.name}},{upsert:true},function(err){
 				if(err) console.log(err)
 				});
 				
 			if(nowjs.getGroup(groupName).pageUsers == undefined)
 				nowjs.getGroup(groupName).pageUsers={};
-							
+			
+			//leavePage
+			if(oldthis.user.currentPage!=undefined && oldthis.user.currentPage != groupName){
+				if(oldthis.user.currentPage != null){
+					nowjs.getGroup(oldthis.user.currentPage).exclude(oldthis.user.clientId).now.updatePageUser('delete',oldthis.user.name);		
+					delete nowjs.getGroup(oldthis.user.currentPage).pageUsers[oldthis.user.clientId];
+					nowjs.getGroup(oldthis.user.currentPage).removeUser(oldthis.user.clientId);
+					
+					nowjs.getGroup('main').exclude(oldthis.user.clientId).now.updateFeed(oldthis.user.name,oldthis.user.image,oldthis.user.currentPage,'leave')
+					oldthis.user.currentPage = null;
+				}			
+			}
+				
+								
 			oldthis.user.currentPage=groupName;
-			nowjs.getGroup('main').now.updateFeed(oldthis.user.name,oldthis.user.image,groupName,'join')
+			if(result.privacy<3)
+				nowjs.getGroup('main').now.updateFeed(oldthis.user.name,oldthis.user.image,groupName,'join')
+			
 			oldthis.now.updatePageUser('add',nowjs.getGroup(groupName).pageUsers,userProfile);
-
 			if(oldthis.user.name=='n00b'){
 				var userObj = {}
 				userObj={'n00b':true};
@@ -665,9 +692,7 @@ everyone.now.getAllUsers = function(callback){
 
 everyone.now.leftWindow = function(left){
 
-	
 	if(this.user.currentPage != null){
-
 		if(left){
 			nowjs.getGroup(this.user.currentPage).now.clientLeftWindow(this.user.name,true);
 			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
@@ -677,31 +702,23 @@ everyone.now.leftWindow = function(left){
 			nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId][this.user.name]=false;
 			}
 	}
-
-
 }
-
-everyone.now.leavePage = function(userProfile, callback){	
-	
-	if(this.user.currentPage != null){
-		nowjs.getGroup(this.user.currentPage).exclude(this.user.clientId).now.updatePageUser('delete',this.user.name,userProfile);		
-		//if(this.user.currentPage != "main" && this.user.currentPage != "profile")
-		delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
-		nowjs.getGroup(this.user.currentPage).removeUser(this.user.clientId);
-		nowjs.getGroup('main').now.updateFeed(this.user.name,this.user.image,this.user.currentPage,'leave')
-
-		this.user.currentPage = null;
-		callback();
-	}
-	else callback();	
-};
 
 everyone.on('leave', function(){
 	
-	userModel.update({username:this.user.name},{$set : {nowId:null}},function(err){
+	if(this.user.clicks==undefined){
+		this.user.clicks=0;
+	}
+/*
+		userModel.update({username:this.user.name},{$inc:{clicks:this.user.clicks}},function(err){
+			if(err) console.log(err)
+		})
+*/
+	
+	userModel.update({username:this.user.name},{$set : {nowId:null} , $inc:{clicks:this.user.clicks}},function(err){
 		if(err) console.log(err)
 	})
-	nowjs.getGroup('main').now.updateFeed(this.user.name,this.user.name,this.user.currentPage,'leave')
+	nowjs.getGroup('main').exclude(this.user.clientId).now.updateFeed(this.user.name,this.user.name,this.user.currentPage,'leave')
 
 	if(nowjs.getGroup(this.user.currentPage).pageUsers!=undefined)
 		delete nowjs.getGroup(this.user.currentPage).pageUsers[this.user.clientId];
@@ -710,26 +727,43 @@ everyone.on('leave', function(){
 	onlineModel.remove({nowId:this.user.clientId},function(err){});
 });
 
-
+everyone.now.click = function(){
+	if(this.user.clicks==undefined)
+		this.user.clicks=0;
+	this.user.clicks+=1;
+	nowjs.getGroup('profile___'+this.user.name).now.updateClicks()
+	
+}
 
 
 ///////////////
 ///PERMISSIONS
 /////////////
 
-everyone.now.getPagePermissions = function(pageName,userProfile,callback){
+everyone.now.getPagePermissions = function(pageName,userProfile,version,callback){
 
 	oldthis=this;
 	if(this.user.pagePermissions==undefined)
 		this.user.pagePermissions={};
 
 	if (this.user.name=='n00b'){
-		groupName='invite';
-		pageName='invite';
+		//groupName='invite';
+		//pageName='invite';
 		}
-	
-	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true, editors:true},function(err, result){
-		if(!err && result !=undefined){
+/*
+	if(version==null || version==undefined)
+		version=-1;
+*/
+	pageModel.findOne({pageName:pageName}, {privacy:true, owner:true, editors:true, currentVersion:1},function(err, result){
+		if(!err && result !=undefined){	
+			
+			if(result.currentVersion != undefined && version != null && version !=undefined){
+				if(result.currentVersion<=version){
+					callback('noPage')
+					return;
+					}
+			}
+				
 			
 			var owner=false;
 			if(result.owner == oldthis.user.name){
@@ -745,7 +779,6 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 					}
 				}
 			}
-
 			
 			if(oldthis.user.name == 'n00b' && result.privacy<2)
 				oldthis.user.pagePermissions[pageName]=2;
@@ -771,6 +804,10 @@ everyone.now.getPagePermissions = function(pageName,userProfile,callback){
 			oldthis.now.setPagePermissions(oldthis.user.pagePermissions[pageName], owner);
 			callback(null, oldthis.user.name,oldthis.user.pagePermissions[pageName]);	
 		}
+		else {
+			console.log(err)
+			callback('noPage')
+			}
 		
 	})
 }
@@ -859,7 +896,9 @@ everyone.now.addNewImg = function(pageName, imgArray, scrollTop, scrollLeft,call
 			notify.action = 'update'
 			notify.page = pageName;
 			nowjs.getGroup(pageName).now.newImg(imgs);
-			nowjs.getGroup('main').now.notify([notify],null, true)		
+			//nowjs.getGroup('main').now.notify([notify],null, true)		
+			everyone.now.notify([notify],null, true)		
+
 		}
 		else console.log(err)
 	})
@@ -1070,6 +1109,7 @@ everyone.now.setPrivacy = function(pageName, privacy,editors,_2d,callback){
 ///ADD_DELETE PAGES
 //////////////////
 
+
 everyone.now.addPage = function(pageName, copyPageName,callback){
 
 	var oldthis1=this;
@@ -1118,6 +1158,7 @@ everyone.now.addPage = function(pageName, copyPageName,callback){
 				newPage.save(function (error,result) {
 					if(!error){
 					    notifyUsers([],result.owner,oldthis1.user.name,oldthis.user.image,'new',pageName);	
+						everyone.now.updateMain()						
 						callback(null, pageName);
 						}
 					else callback(error,null);
@@ -1138,10 +1179,21 @@ everyone.now.deletePage = function(pageName,callback){
 		}
 	
 	pageModel.remove({pageName:pageName},function(error){
-		if(!error)
+		if(!error){
 			callback(null);
+			everyone.now.updateMain()
+			pageModel.update({pageName:'main'},{$pullAll : {notify:{page:pageName}}},function(err){
+				if(err) console.log(err)
+				})
+			}
 		else callback(error);
 		});
+
+
+
+
+		
+
 
 }
 
@@ -1151,8 +1203,8 @@ everyone.now.deletePage = function(pageName,callback){
 
 everyone.now.submitComment = function(pageName,textObject, userProfile){
 
-
-	if(this.user.name=='n00b')
+	pageName=this.user.currentPage;
+	if(this.user.name=='n00b' && pageName!='invite')
 		return;
 		
 	var oldthis = this;	
@@ -1191,17 +1243,26 @@ everyone.now.submitComment = function(pageName,textObject, userProfile){
 everyone.now.findUser = function(userTxt, callback){
 
 	var user = new RegExp("^"+userTxt,'i');
-	//console.log(user)
 	userModel.find({username: user}, { username : 1 },function(error,result){
-	//userModel.find({username: { $regex : user}}, { username : 1 },function(error,result){
 		if(!error){
-				//console.log(result);
 				callback(result);
 				
 				}
 		else console.log(error)
-	}).limit(10);
+	});
 }
+
+everyone.now.findPage = function(page, callback){
+
+	var user = new RegExp("^"+page,'i');
+	pageModel.find({pageName: page}, { pageName : 1 },function(error,result){
+		if(!error){
+				callback(result);
+				}
+		else console.log(error)
+	});
+}
+
 
 ///////////////////////////
 ///////////VERSIONS
@@ -1307,15 +1368,15 @@ everyone.now.likePage = function(action, version, callback){
 			}
 
 		if(version==undefined){
-			pageModel.findOne({pageName:pageName, likes:{$nin:[this.user.name]}},{likes:1,likesN:1,owner:1,'images.user':1},function(err,result){
+			pageModel.findOne({pageName:pageName, likes:{$nin:[this.user.name]}},{privacy:1,likes:1,likesN:1,owner:1,'images.user':1},function(err,result){
 			
 				if(!err && result != null){
 					pageModel.update({pageName:pageName},{$addToSet : {likes:oldthis.user.name},$inc:{likesN:1}},function(err){
 						if(err) console.log(err)
 					})	
 					callback(null)
-					notifyUsers(result.images,result.owner,oldthis.user.name,oldthis.user.image,'like',pageName);				
-
+						notifyUsers(result.images,result.owner,oldthis.user.name,oldthis.user.image,'like',pageName);							everyone.now.updateMain()
+					
 				}
 				else callback(err)
 				
@@ -1327,7 +1388,7 @@ everyone.now.likePage = function(action, version, callback){
 			var query = {}
 			query['versions.'+version+'.likes']={$nin:[this.user.name]};
 			query['pageName']=pageName;
-			pageModel.findOne(query,{likes:1,likesN:1,owner:1,versions:ver},function(err,result){
+			pageModel.findOne(query,{likes:1,likesN:1,owner:1,versions:ver,privacy:1},function(err,result){
 			
 				if(!err && result != null){
 					pageModel.update({pageName:pageName,'versions.currentVersion':version},{$addToSet : {'versions.$.likes':oldthis.user.name},$inc:{likesN:1,'versions.$.likesN':1}},function(err){
@@ -1335,8 +1396,8 @@ everyone.now.likePage = function(action, version, callback){
 					})	
 					
 					callback(null)
-					notifyUsers(result.versions[0].images,result.owner,oldthis.user.name,oldthis.user.image,'like',pageName,version);	
-
+					notifyUsers(result.versions[0].images,result.owner,oldthis.user.name,oldthis.user.image,'like',pageName,version);
+					everyone.now.updateMain()
 				}
 				else callback(err)
 			})
@@ -1357,8 +1418,10 @@ everyone.now.likePage = function(action, version, callback){
 			//console.log(pullObj2);
 			
 			pageModel.update({pageName:pageName, 'versions.currentVersion':version},{$pull:{'versions.$.likes':this.user.name},$inc:{'versions.$.likesN':-1,likesN:-1}},function(err){
-					if(!err)
+					if(!err){
+						//everyone.now.updateMain()
 						callback(null)
+						}
 					else callback(err)
 				})
 			}
@@ -1381,11 +1444,13 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	if(action!='msg' && (lastNotify!={} || lastNotify.user!=notify.user || lastNotify.page!=notify.page || lastNotify.action!=notify.action || lastNotify.version!=notify.version)){		
 		pageModel.update({pageName:'main'},{$push:{notify:notify}},function(err){
 			if(err) console.log(err);
+/*
 			else pageModel.update({pageName:'main'},{$pop:{notify : -1}},function(err2){
 				if(err2) console.log(err);
 				})
+*/
 		})
-	 	nowjs.getGroup('main').now.notify([notify],undefined, true)	
+	 	everyone.now.notify([notify],undefined, true)	
 	}
 	//console.log(lastNotify)
 	lastNotify=notify;

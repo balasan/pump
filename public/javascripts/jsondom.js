@@ -99,6 +99,44 @@ function imageToDom(image, property){
 		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
 	
 	}
+	else if(contentType=="mp3"){
+			var mp3url = image.content;
+			
+			var fileType =mp3url
+			
+			fileType = mp3url.split('.').pop();
+			console.log(fileType);
+
+		if(!is_firefox && (fileType=='mp3' || fileType=='mp4')){
+			img.innerHTML='<video width="100%" height="100%" controls autoplay="autoplay">\
+			<source src="'+mp3url+'" type="audio/mp4"\>'+  
+			'<object width="100%" height="100%">\
+			<param name="src" value="'+mp3url+'">\
+			<param name="autoplay" value="true">\
+			<param name="controller" value="true">\
+			<param name="bgcolor" value="">\
+			<param name="bgcolor" value="">\
+			<param name="wmode" value="transparent">\
+			<embed wmode="transparent" src="'+mp3url+'" autostart="true" loop="false" width="100%" height="100%"\
+			controller="true" bgcolor=""></embed>\
+			</object>\
+			</video>'
+		}
+		else{
+			//TODO firefox!
+			img.innerHTML='<object width="100%" height="100%">\
+			<param name="src" value="'+mp3url+'">\
+			<param name="autoplay" value="true">\
+			<param name="controller" value="true">\
+			<param name="bgcolor" value="">\
+			<param name="bgcolor" value="">\
+			<param name="wmode" value="transparent">\
+			<embed wmode="transparent" src="'+mp3url+'" autostart="true" loop="false" width="100%" height="100%"\
+			controller="true" bgcolor=""></embed>\
+			</object>'
+		}
+
+	}
 	
 	img.style.left = image.left;
 	img.style.top = image.top;	
@@ -125,6 +163,20 @@ function imageToDom(image, property){
 	
 	img.style.webkitTransform = transform;
 	img.style.MozTransform = transform;
+	
+	
+/*
+	$(img).draggable({
+		drag:null,
+		scroll:true,
+		distance:10,
+		start:function(e,el){
+		//console.log(el.helper[0])
+		dragHandler(e.originalEvent,el.helper[0])
+		}
+	})
+*/
+	//.widget
 
 	return false;
 }
@@ -136,18 +188,54 @@ function imageToDom(image, property){
 
 function jsonToDom(pageDataIn){
 
+	//var r = Math.random()
+	//$('.menuHead').css('backgroundColor', colorList[Math.floor(r*colorList.length)])
+	//$('#mainMenu').css('backgroundColor', colorList[Math.floor(r*colorList.length)])
+	//r = Math.random()
+	//$('.menuC').css('background', colorList[Math.floor(r*colorList.length)])
+
+	//document.getElementById(menuType).style.backgroundColor=colorList[Math.floor(r*colorList.length)];
+
+
+	if(currentUser!='n00b' || pageName=='invite'){	
+		$('#miniLogo').hide();
+		$('#tipDiv').hide();
+	}
+	else{
+		$('#miniLogo').show();
+		$('#tipDiv').show();
+		document.getElementById('tipDiv').style.right='5px';
+	
+	}
+	if(pageName == 'main'){
+		//$('#miniLogo').show();
+	}
+	if(currentUser!='n00b')
+		document.getElementById('tipDiv').style.right='180px';
+
 	lastPost=null;
 	pageData = pageDataIn;
 	onlineObj = {}
+	$('input:radio[name=privacy]').filter('[value='+pageData.privacy+']').attr('checked', true);
+
+	mainDivTrasfrom.z=0;
+	mainDivTrasfrom.rotY=0;
+	mainDivTrasfrom.x=0;
+	mainDivTrasfrom.rotX=0;
+	updateMainDiv();
 	
 	if(pageData.pageName=='profile'){
 		$('#editPageButton').hide();
+		
+		if($('#editPageButton').hasClass('menuButtonP'))
+			buttonPress('editPage');
+		$('#editPageMenu').hide();
+		
 		$('#helpButton').hide();
 		$('#animateButton').hide();
 		$('.mainMenu').hide()
 		$('.profileOnly').show()
-	}
-		
+	}		
 	else{
 		$('#editPageButton').show();
 		$('#helpButton').show();
@@ -155,7 +243,13 @@ function jsonToDom(pageDataIn){
 		$('.mainMenu').show()
 		$('.profileOnly').hide()
 	}	
-
+	
+	if(pageData.pageName=='main' || pageData.pageName=='invite'){
+		$('#fbLike').show()
+	}
+	else{
+		$('#fbLike').hide()	
+	}
 		
 	document.getElementById('activeNow').innerHTML='';
 	document.getElementById('feed').style.display="none"
@@ -193,11 +287,17 @@ function jsonToDom(pageDataIn){
 	if(pageData.likesN==undefined || pageData.likesN==0)
 		pageData.likesN='';
 	liked = jQuery.inArray(currentUser, pageData.likes);
-	if(liked == -1)
-		$('#likeButtonText').html(pageData.likesN + ' like');
-	else
-		$('#likeButtonText').html(pageData.likesN + ' unlike');
-		
+	if(liked == -1){
+		$('#likeIm').css('opacity','.5')
+		likeIm.src='http://asdf.us/im/84/heart03_1323653907.gif'
+		$('#likeButtonText').html(pageData.likesN);
+		}
+	else{
+		$('#likeIm').css('opacity','1')
+		likeIm.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'
+
+		$('#likeButtonText').html(pageData.likesN);
+		}
 
 	if(pageData.editors != undefined){
 		var editorsText="";
@@ -208,8 +308,10 @@ function jsonToDom(pageDataIn){
 	}
 
 	if(pageData.pageName=='main' && pageData.notify!=undefined){
-		$('#feedContainer').html('');
-		now.notify(pageData.notify,null,true);
+		//$('#feedContainer').html('');
+		if(loadNotify)
+			now.notify(pageData.notify,null,true);
+		loadNotify=false;
 	}
 			
 	$("#userImage").remove();
@@ -225,8 +327,10 @@ function jsonToDom(pageDataIn){
 	  $("#nextVersionDiv").hide();
 
 
-	if(pageData.pageName != "main" && pageData.pageName != "profile" && pageData.pageName != "invite")
+	if(pageData.pageName != "main" && pageData.pageName != "profile" && pageData.pageName != "invite"){
+		document.getElementById('likeIm').style.display='inline'
 		document.getElementById('pageName').innerHTML = "<a href='javascript:goToPage(\""+pageData.pageName+"\")'>" +pageData.pageName+"</a> by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a> ";
+		}
 	else
 		document.getElementById('pageName').innerHTML="";
 
@@ -290,22 +394,43 @@ function jsonToDom(pageDataIn){
 
 	
 	if(pageName=="profile")
-		now.loadProfileInfo( userProfile,loadProfileInfo);		
+		now.loadProfileInfo( userProfile,loadProfileInfo,fillPages);		
 
 	//TODO: customise for user
-	if(pageName=="main")
-		now.loadMainPage( null,loadProfileInfo);	
-		
+	if(pageName=="main"){
+		if(updateMainFlag){
+			mainPageData={}
+			nextPageSkip=0;
+			updateMainFlag=false;
+			}
+		if(mainPageData.pages==undefined){
+			now.loadMainPage(null,0,function(_page){
+				mainPageData.pages=[];
+				loadProfileInfo(_page); 
+				fillPages(_page)
+			});
+
+			}
+		else{
+			fillPages(mainPageData)
+			//document.getElementById('userPages').style.display='block';
+
+			loadProfileInfo(mainPageData)
+		}
+	}
+
 	if(currentUser != 'n00b'){
 		$('#notifyDiv').show();	
 		$('#notifyDiv').position({ 
 			of: $('.notifyBox'), 
-			my:"left top",
-			at:"left bottom" })
+			my:"right top",
+			at:"right bottom" })
 		$('#notifyDiv').hide();
 	}	
 
 	$('#loadingImg').hide();
+	
+	
 
 }
 
@@ -314,8 +439,14 @@ function jsonToDom(pageDataIn){
 ////PROFILE
 ///////////
 
+now.updateClicks=function(){
+	profileClicks++;
+	document.getElementById('profileClicks').innerHTML=profileClicks+' clicks';
+	
+}
 
 var profileInfo={}
+var profileClicks=0;
 
 loadProfileInfo = function(info){
 
@@ -345,17 +476,23 @@ loadProfileInfo = function(info){
 	document.body.style.backgroundImage=profileInfo.backgroundImage;
 	
 	if(pageName=="profile"){
+		profileClicks=profileInfo.clicks;
 		document.getElementById('profileContainer').style.display="block"
 		var containerDiv=document.getElementById('profileContainer');
-		//containerDiv.id="profileContainer";
-		//containerDiv.className="shadow";
-		//var r = Math.random()
-		//containerDiv.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
 		
 		var userNameDiv=document.createElement('div');
 		userNameDiv.id="userName";
 		userNameDiv.innerHTML="<a href='javascript:changeProfileColor()'>"+profileInfo.username+"</a>"
 		containerDiv.appendChild(userNameDiv);
+		
+		if(profileInfo.clicks!=undefined){
+			var clicks=document.createElement('div')
+			clicks.id='profileClicks';
+			clicks.innerHTML=profileInfo.clicks+" clicks"
+			clicks.style.color='white';
+			clicks.style.fontSize='12px';
+			userNameDiv.appendChild(clicks)
+		}
 		
 		var url;
 		if(profileInfo.userImage=="")
@@ -382,7 +519,8 @@ loadProfileInfo = function(info){
 		$('#userPages').css('marginLeft','10px')
 		$('#userPages').css('marginTop','40px')
 	}
-//switch chat for profile page	
+	
+	//switch chat for profile page	
 	var lastPost="";
 	var lastTxtDiv;	
 	if(profileInfo.text != undefined){
@@ -394,6 +532,53 @@ loadProfileInfo = function(info){
 	
 	///fill out pages
 
+
+	if(pageName=="main"){
+
+		document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+		document.getElementById('mainFeedDiv').style.display="block"
+		changeProfileColor();
+		$('#feed').show();	
+
+		$(window).scrollTop(mainPageScroll);
+
+	}
+
+	changeBackground();
+	changeProfileColor()
+	
+		
+	return false;
+}
+
+var nextPageSkip=0;
+var loadingPages=false;
+var updateMainFlag=false;
+
+now.updateMain=function(){
+	updateMainFlag=true;;
+}
+
+loadMorePages=function(){
+	
+	if(!loadingPages && mainPageData.pages!=undefined){
+		loadingPages=true;
+		now.loadMainPage(null,nextPageSkip,fillPages);
+	}
+
+}
+
+fillPages = function(_profileInfo){
+
+	if(_profileInfo.type=='main'){
+		profileInfo=_profileInfo
+		nextPageSkip+=20;
+		mainPageData.pages=mainPageData.pages.concat(profileInfo.pages);
+		}
+	else
+		profileInfo=_profileInfo;
+
+	
 	for(var i =0;i<profileInfo.pages.length;i++){
 	
 		var thisPage=profileInfo.pages[i];
@@ -412,7 +597,9 @@ loadProfileInfo = function(info){
 			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
 			txtDiv.style.paddingBottom="1px";
 			txtDiv.style.paddingLeft="0px";
-			txtDiv.style.paddingTop="2px";	
+			txtDiv.style.paddingTop="10px";	
+			txtDiv.style.fontSize="16px";	
+
 
 			infoDiv.id=thisPage._id;
 			infoDiv.className="infoDiv";
@@ -421,28 +608,31 @@ loadProfileInfo = function(info){
 			var infoTxt=""
 			if(pageName=="profile"){
 				if(thisPage.owner==profileInfo.username)
-					infoTxt +=' (owner'
+					infoTxt +='owner'
 				else
-					infoTxt +=' (contributor'
+					infoTxt +='contributor'
 			}
 			else {
 				if(thisPage.privacy==0)
-					infoTxt=' (public'							
+					infoTxt='public'							
 				else if(thisPage.privacy==1)
-					infoTxt=' (semi-public'
+					infoTxt='semi-public'
 				else 
-					infoTxt=' (private'
+					infoTxt='private'
 
 			}	
 			var vDiv = document.createElement('div')
 			vDiv.style.fontSize='11px'
 			vDiv.style.color='grey'
-			vDiv.style.display='inline'
-			vDiv.style.marginLeft='2px'
+			vDiv.style.marginTop='2px';
+
+			vDiv.style.marginBottom='2px';
+			//vDiv.style.display='inline'
+/* 			vDiv.style.marginLeft='2px' */
 			if(thisPage.versions != undefined && thisPage.versions.length > 0){
 				infoTxt+=", "+thisPage.versions.length+"v"
 			}
-			vDiv.innerHTML = infoTxt+")"; 
+			vDiv.innerHTML = infoTxt+""; 
 			txtDiv.appendChild(vDiv);
 			
 			
@@ -453,7 +643,17 @@ loadProfileInfo = function(info){
 				//if(thisPage.vLikes!=undefined)
 				//	thisPage.likesN+=thisPage.vLikes
 				
-				likeDiv.innerHTML = " " +thisPage.likesN+" likes";
+				likeDiv.innerHTML = " " +thisPage.likesN;
+			    likeDiv.style.fontSize='11px'
+			    likeDiv.style.marginTop='4px'
+				
+				var likeImg = new Image();
+				likeImg.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'
+				//likeIm.src='http://www.platonicsolids.info/Animated_GIFs/Octahedron.GIF'
+				likeImg.style.width='15px'
+				likeImg.style.marginBottom='-4px'
+				likeImg.style.marginLeft='1px'
+				likeDiv.appendChild(likeImg)
 				likeDiv.data={id:i}
 				
 				likeDiv.onclick = (function(index,id){ 
@@ -487,30 +687,19 @@ loadProfileInfo = function(info){
 		}
 	}
 	document.getElementById('userPages').style.display='block';
-
-
-	if(pageName=="main"){
-/*
-		for(var i =0;i<profileInfo.users.length;i++){
-				newDiv = document.createElement('div');
-				newDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.users[i].username+"\",\"profile\")'>"+profileInfo.users[i].username+"</a>";
-				newDiv.style.paddingBottom="1px";
-				newDiv.style.paddingTop="2px";
-				document.getElementById('cList').appendChild(newDiv);
-		}
-*/
-		document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-		//document.getElementById('contributePages').style.display='block';
-		document.getElementById('mainFeedDiv').style.display="block"
-		changeProfileColor();
-		$('#feed').show();	
+	loadingPages=false;
+	
+	if(profileInfo.type=='main'){
+		$(window).scrollTop(mainPageScroll);
+		if(mainPageScroll> document.body.scrollTop)
+			loadMorePages()
 
 	}
 
-	changeBackground();
-	changeProfileColor()
-	return false;
 }
+
+
+
 
 changeProfileColor =function(){
 	var r = Math.random()
@@ -524,10 +713,14 @@ changeProfileColor =function(){
 	var r = Math.random()
 	var color=bgColorList2[Math.floor(r*bgColorList2.length)];
 	document.getElementById('mainFeedDiv').style.backgroundColor= color;
+	
+	//$("#mainFeedDiv a").css('color',oppositeColor(color));	
 	containerDiv.style.backgroundColor=color;
 	var r = Math.random()
 	var color=bgColorList2[Math.floor(r*bgColorList2.length)];
-	document.getElementById('feed').style.backgroundColor= color;
+	document.getElementById('feed').style.backgroundColor = color;
+	//$("#feed a").css('color',oppositeColor(color));	
+
 	return false;
 }
 
@@ -606,7 +799,6 @@ fillOnline = function(onlineNow){
 		onlineDiv.appendChild(txtDiv)
 		onlineDiv.className='activePages'
 		mainOnlineDiv.appendChild(onlineDiv)
-		
 	}
 	
 	changeBackground();
