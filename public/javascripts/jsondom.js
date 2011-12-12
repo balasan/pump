@@ -88,6 +88,8 @@ function imageToDom(image, property){
 		<param name="allowscriptaccess" value="always"></param> \
 		<param value="transparent" name="wmode">\
 		<embed wmode="transparent" allowscriptaccess="always" height="100%" src="https://player.soundcloud.com/player.swf?url='+scUrl+'" type="application/x-shockwave-flash" width="100%"></embed> </object>'
+	
+		$(img).addClass('noDrag');
 	}
 	else if(contentType=="vimeo"){
 		var vimeoId = image.content;

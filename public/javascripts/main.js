@@ -320,8 +320,9 @@ function dragHandler(e,el){
   }
   
   if(!$(selObj).is('input') && (selObj==undefined || !$(selObj).hasClass('editableElement'))){
-  	selObj=target.parentElement;
   	
+  	if(!$(target.parentElement).hasClass('noDrag'))
+  		selObj=target.parentElement;
   }
   
   //if(selObj==null)
