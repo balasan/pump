@@ -71,11 +71,11 @@ function imageToDom(image, property){
 			}	
 			
 			img.innerHTML='<object width="100%" height="100%">\
-			<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US"></param>\
+			<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?autoplay=1&amp;&amp;loop=1version=3&amp;hl=en_US"></param>\
 			<param name="allowFullScreen" value="true"></param>\
 			<param name="allowscriptaccess" value="always"></param>\
 			<param value="transparent" name="wmode">\
-			<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
+			<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?autoplay=1&amp;loop=1&amp;version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
 		}
 
 	}
@@ -94,9 +94,9 @@ function imageToDom(image, property){
 		vimeoId=vimeoId.split('vimeo.com/')[1];
 		img.innerHTML='<object width="100%" height="100%"><param name="allowfullscreen" value="true" />\
 		<param name="allowscriptaccess" value="always" />\
-		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" />\
+		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=1&amp;loop=1" />\
 		<param value="transparent" name="wmode">\
-		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=0&amp;loop=0" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
+		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=1&amp;loop=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
 	
 	}
 	else if(contentType=="mp3"){

@@ -421,15 +421,22 @@ document.onkeyup=function(e){
 	}
 	
 var typing = false;
+var hideUi = false;
 //shortcut keys	
 document.onkeydown=function(e){
 
 
 
-	if(e.which == 27){
+	if(e.which == 27 && currentUser != 'n00b'){
 	
 		$('#chat, #online, #rightMenu, #menuContainer').toggle();
-	
+		if(hideUi==false)
+			hideUi=true;
+		else{
+			hideUI=false;
+			document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
+
+			}
 	}
  
 	if(!typing){
@@ -642,7 +649,7 @@ function eraseCookie(name) {
 
 //eraseCookie("connect.sid");
 
-window.addEventListener("scroll", recenter, false);
+window.addEventListener("scroll", function(){recenterFlag=true;}, false);
 
 function getDocHeight() {
     var D = document;
@@ -654,8 +661,15 @@ function getDocHeight() {
 }
 
 var mainPageScroll=0;
-function recenter(){
 
+var recenterFlag=true;
+
+function recenter(){
+	setTimeout(recenter,300);
+
+	if(!recenterFlag)
+		return;
+	
 	var sTop = document.body.scrollTop;
 	var sLeft = document.body.scrollLeft;  	  
 
@@ -667,6 +681,8 @@ function recenter(){
 
 	if(pageName=='main'){
 		mainPageScroll=sTop;
+		recenterFlag=false;
+		return false;
 	}
 
 	var yCenter = document.body.scrollTop + window.innerHeight / 2;
@@ -674,6 +690,8 @@ function recenter(){
 	
 	var transformX = xCenter+"px";
 	var transformY = yCenter+"px";
+	
+
 	
 	var div3d = document.getElementById("div3d")
 	var mainDiv = document.getElementById("mainDiv")
@@ -710,6 +728,7 @@ function recenter(){
 	mainDiv.style.MozPerspectiveOriginY=transformY;
 	
 	//console.log(xCenter +" " + yCenter);
+	recenterFlag=false;
 
 }
 
@@ -737,7 +756,7 @@ window.onload = function() {
 	var chatTop = document.getElementById('chatTop');
 	chatTop.style.backgroundColor=colorList[Math.floor(r*colorList.length)];
 
-	recenter()
+	setTimeout(recenter,300);
 	changeBackground();
 	
 /*

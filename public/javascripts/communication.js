@@ -83,7 +83,7 @@ function permissions(_page,_userProfile,version,url){
 				else{ $('#invite').hide();
 				}
 				
-				if(pageName=='invite' || currentUser != 'n00b'){
+				if((pageName=='invite' || currentUser != 'n00b') && !hideUi){
 					$('#loginMenu').show;
 					$('.gpui').show();
 				}

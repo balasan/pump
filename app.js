@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -626,7 +626,7 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
 	
 	//var pageReg = new RegExp("^"+pageName+"$",'i')
 
-	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20}}, function(error, result) {
+	pageModel.findOne({'pageName': pageName},{versions:{$slice: sliceParam},text:{$slice:-20},notify:{$slice:-100}}, function(error, result) {
           if( error ){
           	 callback(error, null)
           }

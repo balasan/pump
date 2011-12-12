@@ -43,7 +43,9 @@ function imgBoxClass(name,type,size,shadow){
 		var width = img.width;
 		
 		var replaceGif =false
-		if((height > 600 || width > 800))
+		if(!is_safari && (height > 400 || width > 600))
+			replaceGif = true;
+		else if(is_safari && (height > 200 && width > 400))
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)
