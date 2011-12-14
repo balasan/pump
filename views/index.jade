@@ -439,10 +439,10 @@ input#lastId(type='hidden', name='lastId')
     //-else
     //  a(href='/') GIFPUMPER.COM
     //pageInfoDiv(style="float:right")     
-  #likePageButton(style="display:inline-block;padding-left:18px", onclick="likePage()")
-        a(href='javascript:likePage();')
-          #likeButtonText(style="display:inline;")
-        #likeIm(style='position:relative;display:none;') 
+  #likePageButton(style="display:inline-block;padding-left:18px")
+        a()
+          #likeButtonText(style="display:inline;cursor:pointer",onclick="likePage()")
+        #likeIm(style='position:relative;display:none;cursor:pointer',onclick="likePage()") 
       #pageName(style="display:inline;")
 
 

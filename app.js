@@ -1203,7 +1203,7 @@ everyone.now.deletePage = function(pageName,callback){
 
 everyone.now.submitComment = function(pageName,textObject, userProfile){
 
-	pageName=this.user.currentPage;
+	//pageName=this.user.currentPage;
 	if(this.user.name=='n00b' && pageName!='invite')
 		return;
 		

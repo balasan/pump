@@ -139,6 +139,9 @@ function imageToDom(image, property){
 		}
 
 	}
+	if(contentType=="media"){	
+		$(img).addClass('noDrag');
+	}
 	
 	img.style.left = image.left;
 	img.style.top = image.top;	
@@ -211,6 +214,7 @@ function jsonToDom(pageDataIn){
 	}
 	if(pageName == 'main'){
 		//$('#miniLogo').show();
+
 	}
 	if(currentUser!='n00b')
 		document.getElementById('tipDiv').style.right='180px';
@@ -237,6 +241,8 @@ function jsonToDom(pageDataIn){
 		$('#animateButton').hide();
 		$('.mainMenu').hide()
 		$('.profileOnly').show()
+		$('#mainDiv,#div3d').hide()
+
 	}		
 	else{
 		$('#editPageButton').show();
@@ -244,7 +250,13 @@ function jsonToDom(pageDataIn){
 		$('#animateButton').show();
 		$('.mainMenu').show()
 		$('.profileOnly').hide()
-	}	
+		$('#mainDiv,#div3d').show()
+
+	}
+	if(pageData.pageName=='main'){
+		$('#mainDiv,#div3d').hide()	
+	}
+
 	
 	if(pageData.pageName=='main' || pageData.pageName=='invite'){
 		$('#fbLike').show()
@@ -290,7 +302,7 @@ function jsonToDom(pageDataIn){
 		pageData.likesN='';
 	liked = jQuery.inArray(currentUser, pageData.likes);
 	if(liked == -1){
-		$('#likeIm').css('opacity','.5')
+		$('#likeIm').css('opacity','1')
 		likeIm.src='http://asdf.us/im/84/heart03_1323653907.gif'
 		$('#likeButtonText').html(pageData.likesN);
 		}

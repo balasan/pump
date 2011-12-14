@@ -504,9 +504,10 @@ function replaceImg(){
 	}
 	
 	var replace = "";
-	var	len = document.f2.replaceType.length;
+	//var	len = document.f2.replaceType.length;
 	var lastId =pageData.lastId;
 
+/*
 	if(lastId == undefined)
 		return;
 		
@@ -515,9 +516,10 @@ function replaceImg(){
 			replaceType = document.f2.replaceType[i].value;
 		}		
 	}
+*/
 	var all = false;
-	if(replaceType == "all")
-		all=true;
+//	if(replaceType == "all")
+//		all=true;
 
 	var editElement = {}
 	editElement = pageData.images[lastId];
@@ -972,7 +974,7 @@ likePage = function(){
 			else{
 				liked = -1;
 				pageData.likesN--
-				$('#likeIm').css('opacity','.5')
+				$('#likeIm').css('opacity','1')
 				likeIm.src='http://asdf.us/im/84/heart03_1323653907.gif'
 				$('#likeButtonText').html(pageData.likesN);	
 				}

@@ -328,12 +328,18 @@ function dragHandler(e,el){
   //if(selObj==null)
   //	return false;
   
-  if(!typing)
+  if($(document.activeElement)[0].id=='inputBox'){
+    	$("#inputBox").blur();
+  }
+  
+/*
+  if(!typing ($(document.activeElement).id==inputBox))
   	$("#inputBox").blur();
-  else{
+  else if($(document.activeElement).id==inputBox){
   	$("#inputBox").blur();
 	typing=true;  
   }
+*/
 
  
   if($(selObj).hasClass('editableElement') && selObj.id != pageData.lastId){
@@ -434,7 +440,7 @@ document.onkeydown=function(e){
 		if(hideUi==false)
 			hideUi=true;
 		else{
-			hideUI=false;
+			hideUi=false;
 			document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 
 			}
@@ -523,8 +529,9 @@ document.onkeydown=function(e){
  			menuType = "pageMenu";
  		 	break; 		 	
  		case 83:
- 			//if(isShift)
-			menuType = "saveMenu";
+ 			if(isShift)
+				saveVersion()
+			//menuType = "saveMenu";
  		 	break;
  		default:
 			menuType = "";
@@ -783,8 +790,8 @@ window.onload = function() {
 		likeIm = new Image();
 		likeIm.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'
 		//likeIm.src='http://www.platonicsolids.info/Animated_GIFs/Octahedron.GIF'
-		likeIm.style.width='20px'
-		likeIm.style.marginBottom='-6px'
+		likeIm.style.width='21px'
+		likeIm.style.marginBottom='-8px'
 		likeIm.style.marginLeft='2px'
 		document.getElementById('likeIm').appendChild(likeIm)
 		//$('#likeIm').hide();
