@@ -1165,4 +1165,24 @@ now.updateFeed = function(user,image,page,action){
 }
 
 
+now.updateMainDivServer = function(eye,_animate){
 
+		if(_animate!=undefined){
+			animate()
+			return;
+		}
+
+		if(eye!=undefined)
+			mainDivTrasfrom=eye;
+	
+		document.getElementById("mainDiv").style.webkitTransform =
+			'rotateX('+ mainDivTrasfrom.rotX + 'deg) rotateY('+ mainDivTrasfrom.rotY + 'deg) translateZ('+mainDivTrasfrom.z+'px) translateX('+mainDivTrasfrom.x+'px)';
+		document.getElementById("mainDiv").style.MozTransform =
+			'rotateX('+ mainDivTrasfrom.rotX + 'deg) rotateY('+ mainDivTrasfrom.rotY + 'deg) translateZ('+mainDivTrasfrom.z+'px)translateX('+mainDivTrasfrom.x+'px)';
+}
+
+if(currentUser=='eyebeam'){
+
+	setTimeout
+	
+}

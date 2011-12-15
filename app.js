@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -42,7 +42,8 @@ app.configure(function(){
   app.use(express.favicon(__dirname + '/public/images/favicon.ico',{ maxAge: 
 2592000000 }));
   app.use('/public', express.static(__dirname + '/public'));
- 
+  //app.use(express.static(__dirname + '/public'));
+
 //app.use(express.static(your_path));
 });
 
@@ -277,6 +278,29 @@ app.get('/', function(req, res){
     	})	
 	}
 });
+
+
+//var reg = new RegEx('((?![public]).)','gi')
+/*
+app.get(/((?!(^[\/public]).))/gi, function(req,res) {
+
+
+	console.log(req.params[0])
+	
+	var tokens = req.params[0].split("/");
+	if(tokens[0]=='public'){
+		return;
+	}
+
+		res.render('index.jade',{locals: {
+	        		loggedIn: true,
+			        user:'n00b',
+			        owner:false,
+				    privacy:3
+				    }
+	    		})
+})
+*/
 
 
 
@@ -634,6 +658,10 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
           	
 			//pageName=result.pageName;	
 			nowjs.getGroup(groupName).addUser(oldthis.user.clientId);
+
+			if(oldthis.user.name=='eyebeam')
+				nowjs.getGroup('eyebeam-real-time').addUser(oldthis.user.clientId);
+
 			
 			//TODO: not n00b?
 			if(result.privacy<3)
@@ -680,6 +708,19 @@ everyone.now.loadAll = function(pageName,userProfile,version,callback){
      	}
      });
 }
+
+
+everyone.now.camera = function(transform,animate){
+
+	if(this.user.name=='eyebeam-user'){
+	
+		nowjs.getGroup('eyebeam-real-time').now.updateMainDivServer(transform,animate)
+	
+	}
+
+
+}
+
 
 onlineModel.remove({},function(err){});
 

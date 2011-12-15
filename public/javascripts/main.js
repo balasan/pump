@@ -958,12 +958,16 @@ setupTinymce = function(){
 
 function animate(){
 
+
 	var mainDiv = document.getElementById('mainDiv');
 	if (mainDiv.className == 'animate'){
 		/* mainDiv.className = 'mainDiv'; */
 		mainDiv.className = 'stopAnimate';
 	}
 	else mainDiv.className = 'animate';
+	
+	if(currentUser=='eyebeam-user')
+		now.camera(undefined, true)
 
 }
 
@@ -976,7 +980,7 @@ if(is_chrome)
 
 if(!Modernizr.csstransforms3d){
 	if (is_chrome){
-		alert("OH BOY, EITHER YOUR VERSION OF CHROME NEEDS AN UPDATE OR YOU DON'T HAVE A VERY GOOD GRAPHICS CARD : (");
+		//alert("OH BOY, EITHER YOUR VERSION OF CHROME NEEDS AN UPDATE OR YOU DON'T HAVE A VERY GOOD GRAPHICS CARD : (");
 	}
 	else
 		alert('THIS BROWSER DOES NOT SUPPORT 3D TRANSFORMATIONS, PLEASE USE CHROME OR SAFARI TO VIEW GIFPUMPER');
