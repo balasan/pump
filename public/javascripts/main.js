@@ -786,6 +786,8 @@ window.onload = function() {
 		$('input').blur(function(){typing=false;})
 */
 
+		//if(currentUser=='eyebeam')
+		randomPage()
 	
 		likeIm = new Image();
 		likeIm.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'

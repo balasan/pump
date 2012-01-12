@@ -115,7 +115,8 @@ function permissions(_page,_userProfile,version,url){
 			else{
 				if(err=='noPage'){
 					$('#loadingImg').hide();
-					alert("This page doesn't exist anymore, It might have been deleted by the owner")
+					if(currentUser!='eyebeam')
+						alert("This page doesn't exist anymore, It might have been deleted by the owner")
 					return;
 					//window.history.back();
 				}
@@ -1149,6 +1150,9 @@ showLikes = function(index,id){
 
 now.updateFeed = function(user,image,page,action){
 
+	if(page==undefined)
+		return;
+
 	if(page.split('profile___')[0]=='' || page=='main')
 		return
 	
@@ -1183,8 +1187,15 @@ now.updateMainDivServer = function(eye,_animate){
 			'rotateX('+ mainDivTrasfrom.rotX + 'deg) rotateY('+ mainDivTrasfrom.rotY + 'deg) translateZ('+mainDivTrasfrom.z+'px)translateX('+mainDivTrasfrom.x+'px)';
 }
 
-if(currentUser=='eyebeam'){
+randomPage = function(){
 
-	setTimeout
-	
+	if(currentUser==undefined){
+		setTimeout(randomPage,30000)
+		return;
+	}
+	else if(currentUser == 'eyebeam'){
+		var r = Math.random();
+		setTimeout(function(){goToPage(mainPageData.pages[Math.floor(r*mainPageData.pages.length)].pageName);randomPage()},60000)
+	}
+
 }

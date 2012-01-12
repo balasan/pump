@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -759,6 +759,8 @@ everyone.on('leave', function(){
 	userModel.update({username:this.user.name},{$set : {nowId:null} , $inc:{clicks:this.user.clicks}},function(err){
 		if(err) console.log(err)
 	})
+	
+	if(this.user.currentPage!=undefined)
 	nowjs.getGroup('main').exclude(this.user.clientId).now.updateFeed(this.user.name,this.user.name,this.user.currentPage,'leave')
 
 	if(nowjs.getGroup(this.user.currentPage).pageUsers!=undefined)
