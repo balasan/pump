@@ -72,27 +72,26 @@ function permissions(_page,_userProfile,version,url){
 				privacy=_permissions;
 				currentUser=name;
 
-				if(currentUser=='n00b' && (pageName=='main' || pageName=='invite')){
-					if(pageName!='invite'){
-						goToPage('invite')
-						return;
-					}
-					$('#invite').show();
+				if(currentUser=='n00b'){
+					document.getElementById('loggedOut').style.display='inline';
+					
 					$('.gpui').hide();
+					//$('#loginMenu').show();
+					$('#miniLogo').show();
 				}
-				else{ $('#invite').hide();
-				}
-				
-				if((pageName=='invite' || currentUser != 'n00b') && !hideUi){
-					$('#loginMenu').show;
+				else{ 
+					document.getElementById('loggedIn').style.display='inline';
 					$('.gpui').show();
-				}
-				else{
-					$('.gpui').hide();
-					//$('#loginMenu').show;
 
 				}
-			
+				
+
+				if(pageName=="main" && currentUser=="n00b"){
+					$('.gpui').show();
+					$('#chat').hide();
+					$('#menuContainer').hide();
+				}
+
 				
 				var type=null;
 				var tmpPageName=pageName	
@@ -647,6 +646,14 @@ function addPage(copyPage){
 		copyPage=null;
 		
 	var desiredPageName = document.getElementById('newPage').value;
+	
+	if(desiredPageName.match('/')!=null){	
+		alert('"/" is not allowed in page names')
+		return;
+	}
+	
+	desiredPageName=decodeURI(desiredPageName);
+	
 	now.addPage(desiredPageName, copyPage, function(error, newPage){
 			if(error) alert(error);
 			else {
@@ -1040,8 +1047,9 @@ now.notify = function(_notify,newN,main){
 			//TODO grouping notifications			
 
 		if(main && lastMainNote && lastMainNote.user==_notify[n].user && lastMainNote.action==_notify[n].action){
-			if(_notify[n].version !=undefined)
+			if(_notify[n].version !=undefined){
 				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
+				}
 			else
 				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\")'>"+_notify[n].page+"</a>";			
 			continue;			

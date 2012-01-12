@@ -994,6 +994,12 @@ div.selected{
 	border:none;
 }
 
+.fakeLink{
+
+	color:blue;
+
+}
+
 .x {
 	position: absolute;
 	font-family: Courier New, Courier New, monospace;	

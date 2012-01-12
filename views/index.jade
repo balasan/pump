@@ -506,25 +506,26 @@ input#lastId(type='hidden', name='lastId')
 #rightMenu.gpui.label2(style='position:fixed; top:5px; right:160px; opacity:.8; padding:0; ')
   //input(style='float:left;display:inline;width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
   div(style="float:left;display:inline; margin-right:10px; ")
-
-    -if(!loggedIn)
+    
+    div.menuText(style="display:inline")
+      a(href="javascript:goToPage('main','null')") Main Page 
+        | | 
+    #loggedOut(style="display:none")
         //div.menuButton
         a(href='javascript:openMenu(\'loginMenu\');') Login 
-    -if(loggedIn)
+    #loggedIn(style="display:none")
       div.menuText(style="display:inline")
         //div.insideNotify(style="width:20px;height:20px;position:relative")
-        //div.menuButton
-        a(href="javascript:goToPage('main','null')") Main Page 
-        | |        
+        //div.menuButton       
         div.notifyBox
         | | 
-        a(href="javascript:goToPage(user, 'profile');") My Profile 
+        a(href="javascript:goToPage(currentUser, 'profile');") My Profile 
         | |
         //div.menuButton 
         a(href='javascript:logOut();') Logout
 
 
-  #fbLike(style='opacity:.8; padding:0;float:right;margin-right:4px;')
+  #fbLike(style='opacity:.8; padding:0;float:right;margin-right:4px;display:none')
     iframe#fblike(src='http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fgifpumpercom%2F117231671686998&layout=button_count&show_faces=false&width=100&action=like&font&colorscheme=light&height=21px', scrolling='no', frameborder='0', style='text-align: right; background:none border:none; overflow:hidden; width:80px; height:21px;', allowtransparency='true')
 
 #online.moveable.gpui(style="top:5px; right:10px; cursor:moveable")

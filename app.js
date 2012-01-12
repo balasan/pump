@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -39,6 +39,10 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
+  
+
+
+
   app.use(express.favicon(__dirname + '/public/images/favicon.ico',{ maxAge: 
 2592000000 }));
   app.use('/public', express.static(__dirname + '/public'));
@@ -232,6 +236,7 @@ var onlineModel = mongoose.model('onlineModel',onlineSchema);
 //GETS
 /////
 
+/*
 app.get('/', function(req, res){
 
 	var loggedIn = false;
@@ -278,19 +283,23 @@ app.get('/', function(req, res){
     	})	
 	}
 });
+*/
 
 
 //var reg = new RegEx('((?![public]).)','gi')
-/*
-app.get(/((?!(^[\/public]).))/gi, function(req,res) {
+
+//app.get(/((?!(^[\/public]).))/gi, function(req,res) {
+
+app.get('/*', function(req,res,next) {
 
 
-	console.log(req.params[0])
 	
 	var tokens = req.params[0].split("/");
 	if(tokens[0]=='public'){
+		next();
 		return;
 	}
+	console.log(req.params[0])
 
 		res.render('index.jade',{locals: {
 	        		loggedIn: true,
@@ -300,11 +309,11 @@ app.get(/((?!(^[\/public]).))/gi, function(req,res) {
 				    }
 	    		})
 })
-*/
 
 
 
 
+/*
 app.get("/:page/:version?", function(req,res) {
 
 	if(req.params.page == "javascripts" || req.params.page == "stylesheets")
@@ -359,7 +368,11 @@ app.get("/:page/:version?", function(req,res) {
 	}
 	}
 });
+*/
 
+
+
+/*
 app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
 	req.params.user=req.params[0];
 	if(req.params.user!='favicon.ico'){
@@ -406,6 +419,7 @@ app.get(/^\/profile?(?:\/(\d+)(?:\.\.(\d+))?)?/, function(req,res) {
 	}
 	}
 });
+*/
 
 
 
@@ -592,7 +606,7 @@ everyone.now.loadProfileInfo = function(user, callback1,callback2){
 //TODO finish dynamic loading of main feed
 everyone.now.loadMainNotify = function(start,callback){
 	if (this.user.name=='n00b'){
-		return;
+		//return;
 		}
 	pageModel.find({pageName:'main'},{notify:{$slice: [start+20,20]}},function(err,result){
 		if(!err) callback(result)
@@ -605,7 +619,7 @@ everyone.now.loadMainNotify = function(start,callback){
 everyone.now.loadMainPage = function(user,startN,callback){
 
 	if (this.user.name=='n00b'){
-		return;
+		//return;
 		}
 
 		pageModel.find( {privacy:{$ne:3}},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).skip(startN).limit(20).run(function(err,result2){

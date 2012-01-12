@@ -3,7 +3,7 @@ var url = document.location.href;
 var tokens = url.split("/");
 
 //this is our page (change to 3 for actual relese, 4 for beta)
-var pageName = tokens[3];
+var pageName = decodeURI(tokens[3]);
 var version=undefined;
 var prevVersion=undefined;
 var nextVersion=undefined;
@@ -436,11 +436,24 @@ document.onkeydown=function(e){
 
 	if(e.which == 27 && currentUser != 'n00b'){
 	
-		$('#chat, #online, #rightMenu, #menuContainer').toggle();
-		if(hideUi==false)
+		if(hideUi==false){
 			hideUi=true;
+			$('#chat, #online, #rightMenu, #menuContainer,#prevVersionDiv,#nextVersionDiv').hide();
+
+			}
 		else{
 			hideUi=false;
+			$('#chat, #online, #rightMenu, #menuContainer').show();
+			
+			if(prevVersion!=undefined)
+			  $("#prevVersionDiv").show();
+			else
+			  $("#prevVersionDiv").hide();
+			if(version!=undefined)
+			  $("#nextVersionDiv").show();
+			else
+			  $("#nextVersionDiv").hide();
+		
 			document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
 
 			}
@@ -852,7 +865,8 @@ window.onload = function() {
 	    			my:"left top",
 	    			at:"left bottom" })	
     		//}	
-				$(".gpui").hide();
+			//if(currentUser=='n00b')	
+			$(".gpui").hide();
 		
 			if(readCookie('loginMenu') && !loggedIn){
 				document.getElementById('loginMenu').style.display = readCookie('loginMenu');
@@ -1004,10 +1018,10 @@ var registering=false;
 
 function switchToRegister(){
 
-	var inviteCode=prompt("Please enter the invitation code");
+	//var inviteCode=prompt("Please enter the invitation code");
 
-	now.checkInvite(inviteCode,function(right){
-		if(right){	
+	//now.checkInvite(inviteCode,function(right){
+	//	if(right){	
 			var regElements = document.querySelectorAll(".regClass")
 				for(var i=0; i<regElements.length;i++){
 					regElements[i].style.display='inline';
@@ -1017,9 +1031,9 @@ function switchToRegister(){
 					logElements[i].style.display='none';
 				}
 			registering=true;
-		}
-		else alert('Sorry, invitation code is incorrect : (')
-	})
+	//	}
+	//	else alert('Sorry, invitation code is incorrect : (')
+	//})
 
 }
 

@@ -608,7 +608,15 @@ fillPages = function(_profileInfo){
 			var txtDiv = document.createElement('div');
 			var infoDiv = document.createElement('div');
 
-			txtDiv.innerHTML = "<a href='javascript:goToPage(\""+profileInfo.pages[i].pageName+"\")'>"+profileInfo.pages[i].pageName+"</a>";
+			txtDiv.innerHTML = profileInfo.pages[i].pageName;
+			txtDiv.onclick=(function(page) {
+			    return function() {
+			       goToPage(page);
+			    };
+			})(profileInfo.pages[i].pageName);
+			txtDiv.style.cursor='pointer';
+			txtDiv.className='fakeLink';
+			
 			txtDiv.style.paddingBottom="1px";
 			txtDiv.style.paddingLeft="0px";
 			txtDiv.style.paddingTop="10px";	
@@ -713,8 +721,6 @@ fillPages = function(_profileInfo){
 }
 
 
-
-
 changeProfileColor =function(){
 	var r = Math.random()
 	var color=bgColorList[Math.floor(r*bgColorList.length)];
@@ -794,9 +800,34 @@ fillOnline = function(onlineNow){
 
 		var imgBox = new imgBoxClass(onlineArr[i].page,'page',100,true);
 		
-		if(onlineArr[i].type==null)
-			txtDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\")'>"+onlineArr[i].page+"</a>: ";		
-		else txtDiv.innerHTML= "<a href='javascript:goToPage(\""+onlineArr[i].page+"\",\"profile\")'>"+onlineArr[i].page+"</a>: ";		
+		if(onlineArr[i].type==null){
+			txtDiv.innerHTML= onlineArr[i].page + ": ";			
+			//txtDiv.innerHTML = profileInfo.pages[i].pageName;
+			txtDiv.onclick=(function(page) {
+			    return function() {
+			       goToPage(page);
+			    };
+			})(onlineArr[i].page);
+			
+			txtDiv.style.cursor='pointer';
+			txtDiv.className='fakeLink';
+			
+			}
+		else{ 
+		
+			txtDiv.innerHTML=", " + onlineArr[i].page;			
+			//txtDiv.innerHTML = profileInfo.pages[i].pageName;
+			txtDiv.onclick=(function(page) {
+			    return function() {
+			       goToPage(page,"profile");
+			    };
+			})(onlineArr[i].page);
+			
+			txtDiv.style.cursor='pointer';
+			txtDiv.className='fakeLink';
+			
+			
+			}
 			
 		txtDiv.id='activePages'+onlineArr[i].page;
 		
@@ -804,6 +835,10 @@ fillOnline = function(onlineNow){
 		
 			var usrDiv = document.createElement('div');
 			usrDiv.innerHTML="<a href='javascript:goToPage(\""+onlineArr[i].users[n]+"\",\"profile\")'>"+onlineArr[i].users[n]+"</a> "
+			
+			
+			
+			
 			usrDiv.style.display='inline'
 			usrDiv.style.fontSize='12px'
 			usrDiv.id='onlineUser'+onlineArr[i].users[n];
@@ -819,3 +854,16 @@ fillOnline = function(onlineNow){
 	return false;
 }
 
+
+pageLink = function(el, _page, _profile, _version){
+
+	el.onclick=(function(page,profile,version) {
+	    return function() {
+	       goToPage(page,profile,version);
+	    };
+	})(_page,_profile,_version);
+	
+	el.style.cursor='pointer';
+	el.className='fakeLink';
+
+}
