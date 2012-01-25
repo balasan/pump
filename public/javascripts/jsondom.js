@@ -82,6 +82,8 @@ function imageToDom(image, property){
 	else if(contentType=="soundCloud"){
 		var scUrl = image.content;
 		scUrl=scUrl.split('url=')[1]
+		if(scUrl==undefined)
+			return;
 		scUrl=scUrl.split('\"><')[0]
 		img.innerHTML='<object height="100%" width="100%">\
 		<param name="movie" value="https://player.soundcloud.com/player.swf?url='+scUrl+'"></param>\
@@ -93,6 +95,7 @@ function imageToDom(image, property){
 	}
 	else if(contentType=="vimeo"){
 		var vimeoId = image.content;
+
 		vimeoId=vimeoId.split('vimeo.com/')[1];
 		img.innerHTML='<object width="100%" height="100%"><param name="allowfullscreen" value="true" />\
 		<param name="allowscriptaccess" value="always" />\
@@ -431,7 +434,29 @@ function jsonToDom(pageDataIn){
 
 			loadProfileInfo(mainPageData)
 		}
+		
+/*
+		var blackOut = document.getElementById('blackOut')
+		if(blackOut==undefined){
+		
+			var blackOut = document.createElement('div');
+			blackOut.id='blackOut';
+	
+			blackOut.style.backgroundColor='#000000';
+			blackOut.style.width=window.innerWidth+'px';
+			blackOut.style.height=window.innerHeight+'px';
+			blackOut.style.position='fixed';
+			blackOut.style.webkitTransform='translateZ(100000px)';
+			blackOut.style.zIndex='100000';
+	
+			document.body.appendChild(blackOut);
+		}
+		blackOut.style.display='block';
+*/
+		
 	}
+	else if(document.getElementById('blackOut') != undefined) 
+		document.getElementById('blackOut').style.display="none";
 
 	if(currentUser != 'n00b'){
 		$('#notifyDiv').show();	

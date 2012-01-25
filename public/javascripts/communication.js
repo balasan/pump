@@ -82,6 +82,25 @@ function permissions(_page,_userProfile,version,url){
 				else{ 
 					document.getElementById('loggedIn').style.display='inline';
 					$('.gpui').show();
+					
+					if(hideUi==true){
+						hideUi=true;
+						$('#chat, #online, #rightMenu, #menuContainer,#prevVersionDiv,#nextVersionDiv').hide();
+			
+						}
+					else{
+						hideUi=false;
+						$('#chat, #online, #rightMenu, #menuContainer').show();
+						
+						if(prevVersion!=undefined)
+						  $("#prevVersionDiv").show();
+						else
+						  $("#prevVersionDiv").hide();
+						if(version!=undefined)
+						  $("#nextVersionDiv").show();
+						else
+						  $("#nextVersionDiv").hide();
+						 }
 
 				}
 				
