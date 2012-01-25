@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -1553,5 +1553,47 @@ notifyUsers = function(images,_owner,user,image,action,pageName,version){
 	}
 }
 
+everyone.now.trimAll = function(){
+
+	pageModel.find({},{pageName:1},function(err, result){
+	
+		if(!err){
+			for(var i=0; i<result.length;i++){
+			
+				console.log(result[i].pageName)
+				
+				var newPageName = trim1(result[i].pageName)
+				
+				if(newPageName==""){
+					newPageName="_";
+					console.log("_")
+					}
+				
+				//console.log('!!!! ' + newPageName)
+
+
+				if(result[i].pageName!=newPageName){
+					
+					pageModel.update({pageName:result[i].pageName},{$set:{pageName:newPageName}},function(err){
+						if(err)
+							console.log(err)
+					})
+					
+					console.log('!!!! ' + newPageName)
+							
+				}
+
+					
+
+			
+			}
+		}
+	});
+
+}
+
+function trim1 (str) {
+    return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+}
 
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

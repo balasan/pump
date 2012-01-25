@@ -653,9 +653,9 @@ now.pagePrivacy = function(setPrivacy,d2d){
 }
 
 
-///////////////////
+////////////////////////
 ///ADD DELETE SAVE PAGE
-//////////////////
+//////////////////////
 
 
 function addPage(copyPage){
@@ -670,6 +670,14 @@ function addPage(copyPage){
 		alert('"/" is not allowed in page names')
 		return;
 	}
+	
+	desiredPageName = $.trim(desiredPageName)
+	
+	if(desiredPageName=="" || desiredPageName=="%20"){
+		alert('blank page name')
+		return;
+	}
+	
 	
 	desiredPageName=decodeURI(desiredPageName);
 	
