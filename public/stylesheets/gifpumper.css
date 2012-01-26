@@ -18,6 +18,7 @@ body {
 /* 	height:2000px: */
 /* 	width:2000px: */
 	margin:0px;
+	opacity:0;
 }
 
 
@@ -944,9 +945,9 @@ padding-left:16px;
 	left:5px;
 	cursor:pointer;
 	width:auto;
- 	z-index:10002;
-	-webkit-transform: translateZ(10000px);
-	-moz-transform: translateZ(10000px);
+ 	z-index:100002;
+	-webkit-transform: translateZ(100000px);
+	-moz-transform: translateZ(100000px);
 }
 
 

@@ -218,9 +218,14 @@ function loadAll(error, pageData, notifications){
 	}
 	else{
 		if(lastVersion>0)
-			prevVersion=lastVersion-1;	
-		jsonToDom(pageData);
+			prevVersion=lastVersion-1;
+		//if(!loadingFirstTime){	
+			jsonToDom(pageData);
+		//}
 	}
+	loadingFirstTime=false;
+	$('body').css('opacity',1)
+
 }
 
 /////////////

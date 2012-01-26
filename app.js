@@ -299,15 +299,40 @@ app.get('/*', function(req,res,next) {
 		next();
 		return;
 	}
-	console.log(req.params[0])
+	
+	//console.log(req.params[0])
+	
+	var pageName=tokens[0];
+	console.log(pageName)
+	if(pageName=='')
+		pageName='main';	
+	if(tokens[0]!='profile'){
 
+		pageModel.findOne({'pageName': pageName},{versions:{$slice: 0},text:{$slice:-20},notify:{$slice:-100}}, function(error, result) {	
+		if(!error)
 		res.render('index.jade',{locals: {
 	        		loggedIn: true,
 			        user:'n00b',
 			        owner:false,
-				    privacy:3
+				    privacy:3,
+				    getPageData:result
+				    }
+				})
+			})		
+	}
+	else{
+		res.render('index.jade',{locals: {
+	        		loggedIn: true,
+			        user:'n00b',
+			        owner:false,
+				    privacy:3,
+				   	getPageData:null
+
 				    }
 	    		})
+	   	}
+	   
+    
 })
 
 
@@ -585,9 +610,11 @@ everyone.now.updateAll = function(pageData,callback){
 
 everyone.now.loadProfileInfo = function(user, callback1,callback2){
 
+/*
 	if (this.user.name=='n00b'){
 		return;
-		}
+	}
+*/
 
 	userModel.findOne({username:user}, { password : 0, salt:0 },function(error,result){
 		if(!error){
@@ -845,7 +872,7 @@ everyone.now.getPagePermissions = function(pageName,userProfile,version,callback
 				if(userProfile == oldthis.user.name)
 					oldthis.user.pagePermissions[pageName]='owner';
 				else if(oldthis.user.name == 'n00b')
-					oldthis.user.pagePermissions[pageName]=3;
+					oldthis.user.pagePermissions[pageName]=2;
 				else 
 					oldthis.user.pagePermissions[pageName]=2;
 			}

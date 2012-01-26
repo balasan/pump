@@ -439,11 +439,12 @@ input#lastId(type='hidden', name='lastId')
     //-else
     //  a(href='/') GIFPUMPER.COM
     //pageInfoDiv(style="float:right")     
-  #likePageButton(style="display:inline-block;padding-left:18px")
-        a()
-          #likeButtonText(style="display:inline;cursor:pointer",onclick="likePage()")
-        #likeIm(style='position:relative;display:none;cursor:pointer',onclick="likePage()") 
-      #pageName(style="display:inline;")
+#likePageButton(style="z-index:10002;top:5px;left:250px;position:fixed;")
+    a()
+          #likeButtonText(style="float:left;cursor:pointer",onclick="likePage()")
+          #likeIm(style='float:left;position:relative;display:none;cursor:pointer',onclick="likePage()") 
+    #pageName(style="padding:0;padding-right:4px;float:left;width:auto;")
+    div(class="fb-like",id="fb-like", data-href="http://gifpumper.com/forest", layout="button_count", data-send="false",   data-width="90", data-show-faces="false", style="float:left;width:90px")
 
 
 #editElementMenu.menu(style="display:none;position:fixed;")
@@ -607,10 +608,10 @@ div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto;
     |. Visit the <a href="http://www.facebook.com/gifpumper">facebook page</a> for updates.
 
 #miniLogo(onclick="javascript:goToPage(\'main\')")
-  div.zspin(style='width:30px;float:left;')
+  div.zspin(style='width:25px;float:left;margin-top:-2px')
     img(src="https://s3.amazonaws.com/gifpumper/ui/cd.png",style="width:100%")
-  div(style="float:left;position:relative;margin-top:2px")
-    div.label2(style="font-size:23px;") GP
+  div(style="float:left;position:relative;margin-top:0px")
+    div.label2(style="font-size:18px;") GP
 
 #tipDiv(style="position:fixed;bottom:5px;right:5px;opacity:.8;display:none")
     img(src="https://s3.amazonaws.com/gifpumper/ui/space.png", style="width:120px")
@@ -654,3 +655,6 @@ div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto;
       |Page
       br
       |Element
+
+<div id="fb-root"></div>
+div(id="document_object", style="display:none")=JSON.stringify(getPageData)

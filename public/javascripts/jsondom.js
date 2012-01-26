@@ -204,7 +204,22 @@ function jsonToDom(pageDataIn){
 
 	//document.getElementById(menuType).style.backgroundColor=colorList[Math.floor(r*colorList.length)];
 
+	if(pageName!='profile'){
+		var newFBurl = "gifpumper.com/"+pageName;
+		$('#fb-like').html('<div data-href=' + newFBurl + ' class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');
+		}
+	else{
+		var newFBurl = "gifpumper.com/profile/"+userProfile;
+		$('#fb-like').html('<div data-href=' + newFBurl + ' class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');	
+		}		
 
+
+	
+	if(pageName=='main')
+		$('#fb-like').hide();
+	else
+		$('#fb-like').show();
+			
 	if(currentUser!='n00b' || pageName=='invite'){	
 		$('#miniLogo').hide();
 		$('#tipDiv').hide();
@@ -245,6 +260,8 @@ function jsonToDom(pageDataIn){
 		$('.mainMenu').hide()
 		$('.profileOnly').show()
 		$('#mainDiv,#div3d').hide()
+		$('#likeIm').hide();
+		document.title = userProfile;
 
 	}		
 	else{
@@ -254,7 +271,8 @@ function jsonToDom(pageDataIn){
 		$('.mainMenu').show()
 		$('.profileOnly').hide()
 		$('#mainDiv,#div3d').show()
-
+		$('#likeIm').show();
+		document.title = pageName;
 	}
 	if(pageData.pageName=='main'){
 		$('#mainDiv,#div3d').hide()	
@@ -296,10 +314,13 @@ function jsonToDom(pageDataIn){
 	addEditorsEl.val('');
 
 
-	if(currentUser == 'n00b' || pageName=='main' || pageName == 'profile')
-		$('#likePageButton').hide();
+	if(pageName=='main'){
+		$('#likePageButton').hide();		
+		}
 	else 
 		$('#likePageButton').show();
+		
+
 		
 	if(pageData.likesN==undefined || pageData.likesN==0)
 		pageData.likesN='';
@@ -324,6 +345,8 @@ function jsonToDom(pageDataIn){
 		}
 	}
 
+
+
 	if(pageData.pageName=='main' && pageData.notify!=undefined){
 		//$('#feedContainer').html('');
 		if(loadNotify)
@@ -345,7 +368,7 @@ function jsonToDom(pageDataIn){
 
 
 	if(pageData.pageName != "main" && pageData.pageName != "profile" && pageData.pageName != "invite"){
-		document.getElementById('likeIm').style.display='inline'
+		//document.getElementById('likeIm').style.display='inline-block'
 		document.getElementById('pageName').innerHTML = "<a href='javascript:goToPage(\""+pageData.pageName+"\")'>" +pageData.pageName+"</a> by <a href='javascript:goToPage(\""+pageData.owner+"\",\"profile\")'>"+pageData.owner+"</a> ";
 		}
 	else
@@ -358,6 +381,20 @@ function jsonToDom(pageDataIn){
 		
 		}
 	}
+
+
+	if(currentUser=='n00b' || pageName=='profile'){
+		$('#likePageButton').css('left','70px')
+		$("#likeButtonText").hide();
+		$("#likeIm").hide();
+
+		}
+	else{
+		$('#likePageButton').css('left','250px')
+		$("#likeButtonText").show();
+		$("#likeIm").show();
+		}		
+		
 		
 //////////Added text::			
 	if(pageData.text != undefined){
@@ -469,7 +506,9 @@ function jsonToDom(pageDataIn){
 
 	$('#loadingImg').hide();
 	
-	
+	if (typeof FB !== 'undefined') {
+		FB.XFBML.parse(document.getElementById('like'));
+	}	
 
 }
 
@@ -742,7 +781,6 @@ fillPages = function(_profileInfo){
 			loadMorePages()
 
 	}
-
 }
 
 

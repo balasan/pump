@@ -17,6 +17,7 @@ var mainPageData = {};
 var mainPage = false;
 var profile = false;
 var userProfile=null;
+var loadingFirstTime=false;
 //if(pageName=='main'){
 //	window.history.pushState('','','/');
 //}
@@ -761,6 +762,8 @@ var IE = document.all?true:false
 var likeIm;
 
 window.onload = function() { 
+
+
 	
 	var type = null;
 	if(profile)
@@ -794,6 +797,7 @@ window.onload = function() {
 	
 	$().ready(function() {
 	
+
 /*
 		$('input').focus(function(){typing=true;})
 		$('input').blur(function(){typing=false;})
@@ -806,7 +810,9 @@ window.onload = function() {
 		likeIm.src='https://s3.amazonaws.com/gifpumper/ui/heart-03.gif'
 		//likeIm.src='http://www.platonicsolids.info/Animated_GIFs/Octahedron.GIF'
 		likeIm.style.width='21px'
-		likeIm.style.marginBottom='-8px'
+		likeIm.style.marginTop='-2px'
+		//likeIm.style.paddingTop='-2px'
+
 		likeIm.style.marginLeft='2px'
 		document.getElementById('likeIm').appendChild(likeIm)
 		//$('#likeIm').hide();
@@ -900,11 +906,25 @@ window.onload = function() {
 		  fuzzMin: 1,
 		  fuzz: 100
 		});
+		
+		
 */
-
+		//$('body').css('opacity',0)
 		windowReady=true;
+
+		var pageData = JSON.parse($("#document_object").html());
+		currentUser='n00b';
+		jsonToDom(pageData);
+		updateMainFlag=true;
+		pageName=pageData.pageName;
+
+		//loadingFirstTime=true;
+
+
 		permissions(pageName,userProfile,version,'/');
 		loadNotifications();
+		
+		
 	});
 	
 };
@@ -1223,3 +1243,12 @@ success = function(cleanImg){
 
 } 
 error = function(){}
+
+//FB BUTTON
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=168994279818694";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
