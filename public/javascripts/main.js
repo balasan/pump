@@ -910,16 +910,16 @@ window.onload = function() {
 		
 */
 		//$('body').css('opacity',0)
-		windowReady=true;
 
-		var pageData = JSON.parse($("#document_object").html());
-		currentUser='n00b';
-		jsonToDom(pageData);
-		updateMainFlag=true;
-		pageName=pageData.pageName;
+		//var pageData = JSON.parse($("#document_object").html());
+		//currentUser='n00b';
+		//jsonToDom(pageData);
+		//updateMainFlag=true;
+		//pageName=pageData.pageName;
 
 		//loadingFirstTime=true;
 
+		windowReady=true;
 
 		permissions(pageName,userProfile,version,'/');
 		loadNotifications();

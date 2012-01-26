@@ -215,10 +215,14 @@ function jsonToDom(pageDataIn){
 
 
 	
-	if(pageName=='main')
+	if(pageName=='main'){
+		$("#invite").show();
 		$('#fb-like').hide();
-	else
+		}
+	else{
+		$("#invite").hide();
 		$('#fb-like').show();
+		}
 			
 	if(currentUser!='n00b' || pageName=='invite'){	
 		$('#miniLogo').hide();
