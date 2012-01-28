@@ -205,17 +205,24 @@ function jsonToDom(pageDataIn){
 	//document.getElementById(menuType).style.backgroundColor=colorList[Math.floor(r*colorList.length)];
 
 	if(pageName!='profile'){
-		var newFBurl = "gifpumper.com/"+pageName;
+
+
+
+
+		var newFBurl = "gifpumper.com/"+encodeURI(pageName);
 		$('#fb-like').html('<div data-href=' + newFBurl + ' class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');
+		
 		}
 	else{
 		var newFBurl = "gifpumper.com/profile/"+userProfile;
-		$('#fb-like').html('<div data-href=' + newFBurl + ' class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');	
+		
+		$('#fb-like').html('<div data-href=' + newFBurl + 'class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');	
 		}		
 
 
 	
 	if(pageName=='main'){
+		if(currentUser=='n00b')
 		$("#invite").show();
 		$('#fb-like').hide();
 		}

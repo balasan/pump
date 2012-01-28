@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -309,16 +309,31 @@ app.get('/*', function(req,res,next) {
 	if(tokens[0]!='profile'){
 
 		pageModel.findOne({'pageName': pageName},{versions:{$slice: 0},text:{$slice:-20},notify:{$slice:-100}}, function(error, result) {	
-		if(!error)
-		res.render('index.jade',{locals: {
-	        		loggedIn: true,
-			        user:'n00b',
-			        owner:false,
-				    privacy:3,
-				    getPageData:result
-				    }
-				})
-			})		
+		if(!error){
+
+			var img;
+			if(result != undefined && result.backgroundImage !=undefined && result.backgroundImage!=""){
+				img=result.backgroundImage;
+			}
+			else if(result!=undefined && result.images !=undefined && result.images[0]!=undefined && result.images[0]!=''){
+				img=result.images[0].url;
+			}
+			else 
+				img='http://asdf.us/im/16/recliningnude_02_1318746347_d_magik_1327306294_d_magik.gif'
+			
+			res.render('index.jade',{locals: {
+		        		loggedIn: true,
+				        user:'n00b',
+				        owner:false,
+					    privacy:3,
+					    getPageData:result,
+					    image:img,
+					    title:pageName,
+					    url:'http://gifpumper.com/'+encodeURI(pageName)
+					    }
+					})
+				}
+		})		
 	}
 	else{
 		res.render('index.jade',{locals: {
@@ -326,7 +341,10 @@ app.get('/*', function(req,res,next) {
 			        user:'n00b',
 			        owner:false,
 				    privacy:3,
-				   	getPageData:null
+				   	getPageData:null,
+				   	image:"",
+				   	title:'profile',
+				   	url:'gifpumper.com'
 
 				    }
 	    		})

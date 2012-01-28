@@ -439,7 +439,7 @@ input#lastId(type='hidden', name='lastId')
     //-else
     //  a(href='/') GIFPUMPER.COM
     //pageInfoDiv(style="float:right")     
-#likePageButton(style="z-index:10002;top:5px;left:250px;position:fixed;")
+#likePageButton.gpui(style="z-index:10002;top:5px;left:250px;position:fixed;z-index:10002;")
     a()
           #likeButtonText(style="float:left;cursor:pointer",onclick="likePage()")
           #likeIm(style='float:left;position:relative;display:none;cursor:pointer',onclick="likePage()") 
@@ -655,4 +655,4 @@ div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto;
       |Element
 
 <div id="fb-root"></div>
-div(id="document_object", style="display:none")=JSON.stringify(getPageData)
+//div(id="document_object", style="display:none")=JSON.stringify(getPageData)

@@ -439,12 +439,12 @@ document.onkeydown=function(e){
 	
 		if(hideUi==false){
 			hideUi=true;
-			$('#chat, #online, #rightMenu, #menuContainer,#prevVersionDiv,#nextVersionDiv').hide();
+			$('#chat, #online, #rightMenu, #menuContainer,#prevVersionDiv,#nextVersionDiv,#likePageButton').hide();
 
 			}
 		else{
 			hideUi=false;
-			$('#chat, #online, #rightMenu, #menuContainer').show();
+			$('#chat, #online, #rightMenu, #menuContainer,#likePageButton').show();
 			
 			if(prevVersion!=undefined)
 			  $("#prevVersionDiv").show();
@@ -910,16 +910,21 @@ window.onload = function() {
 		
 */
 		//$('body').css('opacity',0)
+		windowReady=true;
+
 
 		//var pageData = JSON.parse($("#document_object").html());
-		//currentUser='n00b';
-		//jsonToDom(pageData);
-		//updateMainFlag=true;
-		//pageName=pageData.pageName;
+
+
+		 
+/*		currentUser='n00b';
+		jsonToDom(pageData);
+		updateMainFlag=true;
+		pageName=pageData.pageName;
+*/
 
 		//loadingFirstTime=true;
 
-		windowReady=true;
 
 		permissions(pageName,userProfile,version,'/');
 		loadNotifications();
