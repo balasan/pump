@@ -6,12 +6,12 @@ directions:
 install nodejs 0.4.12
 ///
 
-*the unstable version 0.5.xx will not work!
-*best to install without using sudo
+*best to install without using sudo via git 
+(make sure to check out the right version, latest stable is best)
 see: https://gist.github.com/579814
 
 if you use github to get node, after cloning, do
-git checkout v0.4.12
+git checkout [latest stable tag from previous command, e.g., v0.2.5]
 in terminal
 
 ///
@@ -34,11 +34,11 @@ to install all the necessary modules, in termina, in project directory enter:
 npm install -d
 (this will install all the dependencies)
 
-last thing!
-
+to run gifpumper locally via gifpumper.net:
+in app.js, switch gifpumper.com to gifpumper.net
 ///
-Ždit /etc/hosts file
-in terminal, inter 
+ï¿½dit /etc/hosts file
+in terminal, enter 
 sudo vi /etc/hosts
 
 press 'i' to edit
@@ -51,9 +51,7 @@ then 'esc' then 'wq'
 we need to do this the address gifpumper.net is redirected to the localhost 
 this is for the cookies/login to work
 
-thats it!
-
-in the project directory enter 
+to run server enter
 sudo node app.js
 
 oh yeah, you also need to make sure mongodb is running and call some function to populate the database:
