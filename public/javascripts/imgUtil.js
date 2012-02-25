@@ -151,7 +151,7 @@ function imgBoxClass(name,type,size,shadow,mason){
 		if(userImages[type+name].img!=null){
 			this.img.src=userImages[type+name].img;
 			if(mason=='mason' && !$('#userPages').is(':hidden')){
-				$('#pagesList, #pagesListProfile').isotope( 'reLayout', null )
+				relayout();
 		}			}
 		else
 			this.imgDiv.style.backgroundColor=userImages[type+name].color
@@ -218,8 +218,8 @@ function relayout(){
 
 	//if(mason=='mason' && !$('#userPages').is(':hidden')){
 	if(!layingOut){	
-		layingOut=true;
-		if(pageName=='main'){
+		if(pageName=='main' && $('#pagesList').data('isotope')){
+			layingOut=true;
 			
 			$('#pagesList').isotope( 'reLayout', function(){
 				if(pageName != 'main')
@@ -231,6 +231,7 @@ function relayout(){
 				})
 		}
 		if(pageName=='profile' && $('#pagesListProfile').data('isotope')){
+			layingOut=true;
 			$('#pagesListProfile').isotope( 'reLayout', function(){
 				if(pageName != 'profile')
 					return;

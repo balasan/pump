@@ -23,6 +23,11 @@ function loadNotifications(){
 var backButton=true;
 goToPage = function(page, type, _version,back){
 
+	if(pageName=='main' && page == 'main')
+		updateMainPage=true;
+	else
+		updateMainPage=false;
+
 	if(back)
 		backButton=true
 	else

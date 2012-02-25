@@ -19,6 +19,7 @@ var profile = false;
 var userProfile=null;
 var loadingFirstTime=false;
 var mainPageFilter='likes';
+var updateMainPage = false;
 //if(pageName=='main'){
 //	window.history.pushState('','','/');
 //}
@@ -854,7 +855,7 @@ window.onload = function() {
 		
 		$('#pagesList, #pagesListProfile').isotope({
 		  	// options
-		  	itemSelector : '.pageItem',
+		  	itemSelector : '.pageItem, .pageItemFeed',
 	  		layout: 'masonry'
 	  	})
 		

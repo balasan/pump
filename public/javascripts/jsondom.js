@@ -513,6 +513,7 @@ function jsonToDom(pageDataIn){
 		$('#pagesListProfile').show().isotope({
 		  	// options
 		  	itemSelector : '.pageItem',
+
 	  		layout: 'masonry'
 	  	})
 		now.loadProfileInfo( userProfile,loadProfileInfo,fillPages);		
@@ -525,8 +526,23 @@ function jsonToDom(pageDataIn){
 	
 	if(pageName=="main"){
 		$('#pagesList').show();
-		if(updateMainFlag){
+		if(updateMainFlag && updateMainPage){
 			mainPageData={}
+			updateMainPage=false;	
+		if($('#pagesList').data('isotope'))
+			
+			$('#pagesList').isotope( 'destroy' )			
+
+		  	$('div').remove('.pageItemTemp')
+
+			
+			$('#pagesList').isotope({
+			  	// options
+			  	itemSelector : '.pageItem',
+		  		layout: 'masonry'
+		  	})
+		  	
+		  				
 			nextPageSkip=0;
 			updateMainFlag=false;
 			}
@@ -779,7 +795,7 @@ fillPages = function(_profileInfo){
  			pageLink.style.width = '160px';
 			pageLink.style.overflow = 'hidden';
 			pageLink.style.textOverflow = 'ellipsis';
- 			
+ 			pageLink.style.maxHeight = '300px'
 
 			pageLink.innerHTML = makePageLink(pageLink,profileInfo.pages[i].pageName) 			
 			
@@ -870,6 +886,7 @@ fillPages = function(_profileInfo){
 			pageItem.appendChild(imgBox.imgDiv);
 			pageItem.appendChild(infoDiv);
 			$(pageItem).addClass('pageItem');
+			$(pageItem).addClass('pageItemTemp');
 
 			
 			likeDiv=undefined;

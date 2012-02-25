@@ -639,6 +639,8 @@ position:fixed;
 	top:100px;
 	left:100px;
 	width:300px;
+	overflow:hidden;
+	text-overflow:ellipsis;
 	
 }
 
@@ -874,6 +876,8 @@ input[type="password"]{
 .thumbContainer{
 	width:40px;
 	height:40px;
+	max-height:400px;
+
 	overflow:hidden;
 	display:inline-block;
  	vertical-align: top;
