@@ -71,6 +71,7 @@ function permissions(_page,_userProfile,version,url){
 			if (!err){
 				privacy=_permissions;
 				currentUser=name;
+				document.getElementById('linkToProfile').href="/profile/"+currentUser
 
 				if(currentUser=='n00b'){
 					document.getElementById('loggedOut').style.display='inline';
@@ -120,7 +121,7 @@ function permissions(_page,_userProfile,version,url){
 				}
 					
 				if(!backButton){
-					console.log(url)
+					//console.log(url)
 					var currentScroll=$(window).scrollTop()
 					window.history.pushState({page:tmpPageName,type:type,version:version,scroll:currentScroll}, "", url);
 					}
@@ -263,19 +264,30 @@ now.updatePageUser = function(action, userArray){
 				newDiv.style.padding="0px 7px 2px 7px";
 
 				var imgBox = new imgBoxClass(user,'user',25)
-				
+				imgBox.imgDiv.style.overflow='hidden'
+
+				imgBox.imgDiv.style.float='left'
+				imgBox.imgDiv.style.marginRight='6px'
+		
 				var textDiv=document.createElement('div');
-				if(user!="n00b")
-					textDiv.innerHTML += " <b><a href='/profile/"+user+"'>"+user+"</a></b> ";
+				if(user!="n00b"){
+					var nameLink = makePageLink(null,user,'profile');
+					nameLink.style.fontWeight='bold';
+					$(textDiv).append(nameLink)
+					}
 				else{
 					textDiv.id="n00bText"					
 					textDiv.innerHTML += " <b>"+user+"</b>";
 				}
+				
+				
+				textDiv.style.display='inline-block';
+
 				textDiv.style.textOverflow = 'ellipsis';
 				textDiv.style.overflow='hidden';
 				textDiv.style.width='65%'
 				textDiv.style.paddingTop='4px';
-				textDiv.style.height='30px'
+				textDiv.style.height='30px';
 				
 				newDiv.appendChild(imgBox.imgDiv)
 				newDiv.appendChild(textDiv);
@@ -671,8 +683,9 @@ function addPage(copyPage){
 		
 	var desiredPageName = document.getElementById('newPage').value;
 	
-	if(desiredPageName.match('/')!=null){	
-		alert('"/" is not allowed in page names')
+	//TODO: check on server also!
+	if(desiredPageName.match('/')!=null || desiredPageName.match('"')!=null){	
+		alert('/ and " are not allowed in page names')
 		return;
 	}
 	
@@ -879,14 +892,19 @@ function fillChat(user, text) {
 	
 	if(user!=lastPost){
 		var newTxtDiv = document.createElement('div');
-		newTxtDiv.innerHTML ="<b><a href='/profile/"+user+"'>"+user+"</a>:</b> " +text;
+	
+		var chatName = makePageLink(null,user,'profile')
+		chatName.style.fontWeight='bold'
+		$(newTxtDiv).append(chatName,'<b>: </b>',text);
+				
 		newTxtDiv.style.paddingBottom="1px";
 		document.getElementById('chatBox').appendChild(newTxtDiv);
 		lastPost=user;
 		lastTxtDiv=newTxtDiv;
+		
 	}
 	else{
-		lastTxtDiv.innerHTML+="<br>"+text;
+		$(lastTxtDiv).append("<br>"+text);
 	}
 	
 
@@ -1079,28 +1097,21 @@ now.notify = function(_notify,newN,main){
 			//TODO grouping notifications			
 
 		if(main && lastMainNote && lastMainNote.user==_notify[n].user && lastMainNote.action==_notify[n].action){
-			if(_notify[n].version !=undefined){
-				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
-				}
-			else
-				lastMainTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\")'>"+_notify[n].page+"</a>";			
+			
+			
+			$(lastMainTextDiv).append(", ",makePageLink(null,_notify[n].page,null,_notify[n].version))
 			continue;			
 		}
 		
 		if(!main && lastNote && lastNote.user==_notify[n].user && lastNote.action==_notify[n].action){
-			if(_notify[n].version !=undefined)
-				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
-			else
-				lastTextDiv.innerHTML+=", <a href='javascript:goToPage(\""+_notify[n].page+"\")'>"+_notify[n].page+"</a>";
+			
+			$(lastTextDiv).append(", ",makePageLink(null,_notify[n].page,null,_notify[n].version))
 			continue;			
 		}
-						
-			if(_notify[n].version !=undefined)
-				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\",\"null\","+_notify[n].version+")'>"+_notify[n].page+" v"+_notify[n].version+"</a>";
-			else
-				textDiv.innerHTML="<a href='javascript:goToPage(\""+_notify[n].user+"\",\"profile\")'>"+_notify[n].user+"</a> "+ actionVerb +" <a href='javascript:goToPage(\""+_notify[n].page+"\")'>"+_notify[n].page+"</a>";
-			
-			
+		else			
+			$(textDiv).append(makePageLink(null,_notify[n].user,'profile')," "+actionVerb+" ",makePageLink(null,_notify[n].page,null,_notify[n].version))	
+
+
 			if(!main){
 				$('#notifyDiv').prepend($(note));
 					lastNote=_notify[n];
@@ -1111,8 +1122,17 @@ now.notify = function(_notify,newN,main){
 			}
 			
 			var imgBox = new imgBoxClass(_notify[n].user,'user',60,true)
-			
+			imgBox.imgDiv.style.overflow='hidden'
+
+			imgBox.imgDiv.style.float='left'
+			imgBox.imgDiv.style.marginRight='6px'
+		
 			textDiv.style.paddingTop='4px';
+			textDiv.style.display='inline-block';
+			textDiv.style.width='70%';
+
+
+			//textDiv.style.float='left'
 			//textDiv.style.fontSize='13px';
 
 			//textDiv.style.paddingLeft='46px';
@@ -1148,7 +1168,7 @@ showLikes = function(index,id){
 		whoLikes.id='whoLikes';
 		//whoLikes.style.position='relative';
 		whoLikes.style.fontSize="12px"
-		whoLikes.style.paddingLeft="10px"
+		whoLikes.style.paddingTop="3px"
 		whoLikes.style.overflow='hidden';
 		//whoLikes.style.width='auto'
 		whoLikes.style.display='none';
@@ -1179,9 +1199,17 @@ showLikes = function(index,id){
 	
 	document.getElementById(id).appendChild(whoLikes);	
 	//var height = $(whoLikes).height();
-	$(whoLikes).slideToggle();	
+	$(whoLikes).slideToggle(
+		function(){
+		if(!$('#userPages').is(':hidden') && pageName=='main'){
+			$('#pagesList').isotope( 'reLayout', null )
+		}
+		else if(pageName=='profile' && $('#pagesListProfile').data('isotope')){
+			$('#pagesListProfile').isotope( 'reLayout',null)		
+		}
+	});	
 	lastLikeId=id;
-	
+
 }
 
 //////////

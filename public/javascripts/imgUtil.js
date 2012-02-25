@@ -1,4 +1,4 @@
-function imgBoxClass(name,type,size,shadow){
+function imgBoxClass(name,type,size,shadow,mason){
 
 
 	self=this;
@@ -22,7 +22,20 @@ function imgBoxClass(name,type,size,shadow){
 	this.imgDiv.style.borderRadius="2px";
 	
 	
-	this.imgDiv.appendChild(this.img);
+	//this.imgDiv.appendChild(this.img);
+	var linkPage = name
+	var profile = null;
+	if(type=='user')
+		profile='profile'
+	
+//	var mySpan = $(makePageLink(null,name,profile, null,true))
+//	mySpan.children(0).append(this.img)
+//	$(this.imgDiv).append($(makePageLink(null,name,profile, null,true)).children(1).append(this.img))
+
+	$(this.imgDiv).append($(makePageLink(this.imgDiv,name,profile, null,true)).append(this.img))
+	
+	//$(this.imgDiv).append(makePageLink(this.img,name,null,null, null, null,true),this.img,'</a>')
+	
 	$(this.img).hide();
 
 	this.loadImg = function(url,user,type){
@@ -38,7 +51,7 @@ function imgBoxClass(name,type,size,shadow){
 				}
 	}
 	
-	this.cropImg = function(img,size){
+	this.cropImg = function(img,size,div,_mason){
 		var height = img.height;
 		var width = img.width;
 		
@@ -51,18 +64,34 @@ function imgBoxClass(name,type,size,shadow){
 		//   freeze_gif(img)
 	
 		if(width>height){
-			var ratio = size/height;
-			img.height=size;
-			img.width=width*ratio;
-			var offset = -(width*ratio-size)/2
-			img.style.marginLeft=offset+'px';
+			if(_mason=='mason'){
+				img.width=size
+				img.height=height*size/width;
+				div.style.height=height*size/width+"px"
+				div.style.width=size+"px"
+				}
+			else{
+				var ratio = size/height;
+				img.height=size;
+				img.width=width*ratio;
+				var offset = -(width*ratio-size)/2
+				img.style.marginLeft=offset+'px';
+			}
 		}
 		else {
+			if(_mason=='mason'){
+				img.width=size
+				img.height=height*size/width;
+				div.style.height=height*size/width+"px"
+				div.style.width=size+"px"
+				}
+			else{
 			var ratio = size/width;
 			img.width=size
 			img.height=height*ratio;
 			var offset = -(height*ratio-size)/2
 			img.style.marginTop=offset+'px';
+			}
 		}
 
 		$(img).show();
@@ -70,12 +99,17 @@ function imgBoxClass(name,type,size,shadow){
 			freeze_gif(img)
 	}
 
-	this.img.onload=(function(_img,_div,size,_self){
+	this.img.onload=(function(_img,_div,size,_self,_mason){
 			return function(){
-				_self.cropImg(_img,size,_div);
+				_self.cropImg(_img,size,_div,_mason);
 				//$(_img).show();
+				
+				if(mason=='mason' && !$('#userPages').is(':hidden')){
+					//$('#pagesList, #pagesListProfile').isotope( 'reLayout', null )
+					relayout();				
+				}
 			}
-		})(self.img,self.imgDiv,size,self)
+		})(self.img,self.imgDiv,size,self,mason)
 	
 	if(userImages[type+name]==undefined){
 		userImages[type+name]={}
@@ -96,7 +130,7 @@ function imgBoxClass(name,type,size,shadow){
 
 				//page = page.replace(/\?|\]|\s/g,'_')
 				//page=RegExp.escape(page)
-				console.log(page)
+				//console.log(page)
 				if(_url!=undefined && isUrl(_url))
 					self.loadImg(_url,page,'page')
 				else if(_img!=undefined && isUrl(_img))
@@ -114,15 +148,21 @@ function imgBoxClass(name,type,size,shadow){
 	}
 	else if(userImages[type+name].img!='loading'){
 
-		if(userImages[type+name].img!=null)
+		if(userImages[type+name].img!=null){
 			this.img.src=userImages[type+name].img;
+			if(mason=='mason' && !$('#userPages').is(':hidden')){
+				$('#pagesList, #pagesListProfile').isotope( 'reLayout', null )
+		}			}
 		else
 			this.imgDiv.style.backgroundColor=userImages[type+name].color
+		
+		
 	}
 
 	if(shadow)
 		$(this.imgDiv).addClass('shadow');
 	
+/*
 	if(type=='user')
 		this.imgDiv.onclick=(function(user) {
 			    return function() {
@@ -136,6 +176,7 @@ function imgBoxClass(name,type,size,shadow){
 			       goToPage(page);
 			    };
 			})(origName);
+*/
 }
 
 function isUrl(s) {
@@ -168,4 +209,40 @@ function freeze_gif(i,div) {
      	 c.setAttribute(a.name, a.value);
     i.parentNode.replaceChild(c, i);
   }
+}
+
+var layingOut=false;
+var doLayout=false;
+
+function relayout(){
+
+	//if(mason=='mason' && !$('#userPages').is(':hidden')){
+	if(!layingOut){	
+		layingOut=true;
+		if(pageName=='main'){
+			
+			$('#pagesList').isotope( 'reLayout', function(){
+				if(pageName != 'main')
+					return;
+				layingOut=false; 
+				if(doLayout) 
+					relayout(); 
+				doLayout=false;  
+				})
+		}
+		if(pageName=='profile' && $('#pagesListProfile').data('isotope')){
+			$('#pagesListProfile').isotope( 'reLayout', function(){
+				if(pageName != 'profile')
+					return;
+				layingOut=false; 
+				if(doLayout) 
+					relayout(); 
+				doLayout=false;  
+				})
+		
+		}
+		
+
+	}
+	else doLayout=true; 
 }

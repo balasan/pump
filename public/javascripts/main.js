@@ -18,6 +18,7 @@ var mainPage = false;
 var profile = false;
 var userProfile=null;
 var loadingFirstTime=false;
+var mainPageFilter='likes';
 //if(pageName=='main'){
 //	window.history.pushState('','','/');
 //}
@@ -76,7 +77,8 @@ var orgCursor=null;   // The original Cursor (mouse) Style so we can restore it
 var dragOK=false;     // True if we're allowed to move the element under mouse
 var dragXoffset=0;    // How much we've moved the element on the horozontal
 var dragYoffset=0;    // How much we've moved the element on the verticle
-
+var dragZoffset=0;
+var dragXoffsetZ=0;
 
 //#######################
 //MOVE and RESIZE FUNCTIONS
@@ -131,7 +133,16 @@ function moveHandler(e){
 			angler = parseInt(selObj.getAttribute("data-angler"));
 */
 			
-			z = pageData.images[selObj.id].z + (e.clientY-clickY)/3;
+			
+			
+			//z = pageData.images[selObj.id].z + (e.clientY-clickY);
+	
+			
+	    	z= pageData.images[selObj.id].z + Math.cos(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientY-clickY);	    			   	
+	    	selObj.style.left= -Math.sin(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientY)+dragXoffsetZ+'px';
+	
+
+
 			anglex = pageData.images[selObj.id].anglex;
 			angler = pageData.images[selObj.id].angler;
 			angley = pageData.images[selObj.id].angley;
@@ -142,13 +153,13 @@ function moveHandler(e){
 			angler=parseInt(angler);
 	
 			//var skew = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
-	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
+			var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
 	
 			selObj.style.webkitTransform=transform;
 			selObj.style.MozTransform=transform;
 			
 			updateTransform = true;
-			
+			updateElement(selObj,"left",selObj.style.left);
 			updateElement(selObj,"z",z);
 
 	
@@ -174,7 +185,7 @@ function moveHandler(e){
 			angler=parseInt(angler);
 			
 			//var transform = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
-	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
+			var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
 		        		
 			selObj.style.webkitTransform=transform;
 			selObj.style.MozTransform=transform;
@@ -219,19 +230,49 @@ function moveHandler(e){
 			
 		}
 	    else{
-	    	if(selObj.style.left!="")
-	    		selObj.style.left=e.clientX-dragXoffset+'px';
-	    	else
-	    		selObj.style.right=-e.clientX-dragXoffset+'px';
-	    	
+
+	
+/*
+			selObj.style.webkitTransform=transform;
+			selObj.style.MozTransform=transform;
+*/
+			
+			updateTransform = true;
+			z = pageData.images[selObj.id].z;
+ 
+	    
+	    	if(selObj.style.left!=""){
+	    		z=  Math.sin(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientX) - dragZoffset+'px';	    			   	
+	    		selObj.style.left= Math.cos(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientX)-dragXoffset+'px';
+	    		}
+	    	else{
+	    		selObj.style.right= Math.cos(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientX)-dragXoffset+'px';
+	    		z=  Math.sin(mainDivTrasfrom.rotY*Math.PI/180) * (e.clientX) - dragZoffset+'px';	    			   	    
+	    	}
 	    	if(selObj.style.top!="")
 	    		selObj.style.top=e.clientY-dragYoffset+'px'; 
 	    	else
 	    		selObj.style.top=-e.clientY-dragYoffset+'px'; 
 
+
+			anglex = pageData.images[selObj.id].anglex;
+			angler = pageData.images[selObj.id].angler;
+			angley = pageData.images[selObj.id].angley;
+			
+			z=parseInt(z);
+			anglex=parseInt(anglex);
+			angley=parseInt(angley);
+			angler=parseInt(angler);
+	
+			//var skew = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
+	   		var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
+			selObj.style.webkitTransform=transform;
+			selObj.style.MozTransform=transform;
+			
+			updateTransform = true;
+			updateElement(selObj,"z",z);
 	    	updateElement(selObj,"left",selObj.style.left);
-			updateElement(selObj,"top",selObj.style.top);
-	    	   
+			updateElement(selObj,"top",selObj.style.top);   
 	    }
 	    
 	   	//ajax.ajaxFunction("element");
@@ -315,9 +356,9 @@ function dragHandler(e,el){
   	selObj=el;
   	}
   else{ 		
-  var target = e.target != null ? e.target : e.srcElement;
-  selObj=target;
-  selObj=document.getElementById(selObj.id);
+  	var target = e.target != null ? e.target : e.srcElement;
+  	selObj=target;
+  	selObj=document.getElementById(selObj.id);
   }
   
   if(!$(selObj).is('input') && (selObj==undefined || !$(selObj).hasClass('editableElement'))){
@@ -369,11 +410,16 @@ function dragHandler(e,el){
 		i_height = - $(selObj).height();
 		i_width = - $(selObj).width();
 
-	 if(selObj.style.left!="")
-     	dragXoffset=e.clientX-parseInt(selObj.style.left);	
-	 else
-     	dragXoffset=-e.clientX+parseInt(selObj.style.right);
-     
+	 if(selObj.style.left!=""){
+     	
+     	dragXoffsetZ=Math.sin(mainDivTrasfrom.rotY*Math.PI/180)*(e.clientY)+parseInt(selObj.style.left);
+     	dragXoffset=Math.cos(mainDivTrasfrom.rotY*Math.PI/180)*(e.clientX)-parseInt(selObj.style.left);
+     	dragZoffset=Math.sin(mainDivTrasfrom.rotY*Math.PI/180)*(e.clientX)-pageData.images[selObj.id].z;
+     }	
+	 else{
+        dragXoffset=Math.cos(mainDivTrasfrom.rotY*Math.PI/180)*(e.clientX)-parseInt(selObj.style.right);
+     	dragZoffset=Math.sin(mainDivTrasfrom.rotY*Math.PI/180)*(e.clientX)-pageData.images[selObj.id].z;
+     }
      if(selObj.style.top!="")
      	dragYoffset=e.clientY-parseInt(selObj.style.top);
      else	
@@ -692,8 +738,8 @@ function recenter(){
 	if(!recenterFlag)
 		return;
 	
-	var sTop = document.body.scrollTop;
-	var sLeft = document.body.scrollLeft;  	  
+	var sTop = window.pageYOffset;//document.body.scrollTop;
+	var sLeft = window.pageXOffset;//document.body.scrollLeft;  	  
 
 	var pagesBottom = $('#userPages').position().top + $('#userPages').height();
 	
@@ -707,8 +753,8 @@ function recenter(){
 		return false;
 	}
 
-	var yCenter = document.body.scrollTop + window.innerHeight / 2;
-	var xCenter = document.body.scrollLeft + window.innerWidth / 2;
+	var yCenter = window.pageYOffset + window.innerHeight / 2;
+	var xCenter = window.pageXOffset + window.innerWidth / 2;
 	
 	var transformX = xCenter+"px";
 	var transformY = yCenter+"px";
@@ -727,7 +773,7 @@ function recenter(){
 */
 	
 	//TODO: CHROME BUG?
-	if(is_chrome || is_firefox){
+	if(is_chrome){
 		div3d.style.webkitPerspectiveOriginX=transformX;
 		div3d.style.webkitPerspectiveOriginY=transformY;
 		div3d.style.MozPerspectiveOriginX=transformX;
@@ -798,12 +844,21 @@ window.onload = function() {
 	$().ready(function() {
 	
 
+
 /*
 		$('input').focus(function(){typing=true;})
 		$('input').blur(function(){typing=false;})
 */
 
 		//if(currentUser=='eyebeam')
+		
+		$('#pagesList, #pagesListProfile').isotope({
+		  	// options
+		  	itemSelector : '.pageItem',
+	  		layout: 'masonry'
+	  	})
+		
+		
 		randomPage()
 	
 		likeIm = new Image();
@@ -872,7 +927,6 @@ window.onload = function() {
 	    			at:"left bottom" })	
     		//}	
 			//if(currentUser=='n00b')	
-			$(".gpui").hide();
 		
 			if(readCookie('loginMenu') && !loggedIn){
 				document.getElementById('loginMenu').style.display = readCookie('loginMenu');
@@ -890,8 +944,8 @@ window.onload = function() {
 			//$('.tagify-container').focus(function(){typing=true})
 			//$('.tagify-container').blur(function(){typing=false})
 			
-			setupTinymce();
-			
+
+
 		$('.menuButton,.notifyBox').okshadow({color:'rgba(60,60,60,.6)'});
 /*
 		$('#pageName a,#pageName,#rightMenu').okshadow({
@@ -911,7 +965,9 @@ window.onload = function() {
 */
 		//$('body').css('opacity',0)
 		windowReady=true;
-
+		
+		setupTinymce();
+		$(".gpui").hide();
 
 		//var pageData = JSON.parse($("#document_object").html());
 
@@ -928,6 +984,9 @@ window.onload = function() {
 
 		permissions(pageName,userProfile,version,'/');
 		loadNotifications();
+		
+		
+
 		
 		
 	});
@@ -949,15 +1008,15 @@ setupTinymce = function(){
         	//skin_variant : "silver",
 			
 			//inlinepopups
-			plugins : "autolink,lists,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist",
+			plugins :  "autolink,lists,pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,advlist",
 
 			// Theme options
-			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,bullist,numlist,|,blockquote,|,link,unlink,image,cleanup,code,",
+			theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,|,forecolor,backcolor,fontsizeselect,|,blockquote,|,link,unlink,image,media,|,code",
 			
 			
 			//styleselect,formatselect,fontselect,fontsizeselect",
 			
-			theme_advanced_buttons2 : "fontsizeselect,styleselect,|,forecolor,backcolor,iespell,media,advhr,pagebreak",
+			theme_advanced_buttons2 : "",
 			theme_advanced_buttons3: "",
 			theme_advanced_toolbar_location : "top",
 			theme_advanced_toolbar_align : "left",
@@ -966,7 +1025,7 @@ setupTinymce = function(){
 			// Example content CSS (should be your site CSS)
 			
 			//TODO: SERVER update url
-			content_css : "/public/stylesheets/gifpumper.css",
+			//content_css : "/public/stylesheets/gifpumper.css",
 			theme_advanced_font_sizes : "8px,10px,12px,14px,18px,24px,36px,50px,100px",
     		font_size_style_values : "medium,medium,medium,medium,medium,medium,medium,medium,medium",
 
@@ -1168,9 +1227,10 @@ function popFunction(e){
 	var back=true;
 	
 	if(e.state!=null){
-		if(e.state.page=undefined)
+		if(e.state.page==undefined)
 			return;
 		goToPage(e.state.page,e.state.type,e.state.version,back)
+			$(window).scrollTop(mainPageScroll);
 			//$('window').scrollTop(e.state.scroll);
 		}
 }
@@ -1231,7 +1291,7 @@ function disableSelection(target){
 	else if (typeof target.style.MozUserSelect!="undefined") //Firefox route
 		target.style.MozUserSelect="none"
 	else //All other route (ie: Opera)
-		target.onmousedown=function(){return false}
+		target.onmousedown=function(){console.log('sel disabled'); return false}
 	target.style.cursor = "default"
 }
 

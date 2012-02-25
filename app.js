@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
 }}));
 // Configuration
 
@@ -43,8 +43,7 @@ app.configure(function(){
 
 
 
-  app.use(express.favicon(__dirname + '/public/images/favicon.ico',{ maxAge: 
-2592000000 }));
+  app.use(express.favicon(__dirname + '/public/images/favicon.ico',{ maxAge: 2592000000 }));
   app.use('/public', express.static(__dirname + '/public'));
   //app.use(express.static(__dirname + '/public'));
 
@@ -157,6 +156,8 @@ var pageSchema = new Schema({
   , notify : [notifySchema]
   , bgDisplay : String
   , created : { type: Date, default: Date.now }
+  , edited : { type: Date, default: Date.now }
+
 });
 
 var userSchema = new Schema({
@@ -295,7 +296,7 @@ app.get('/*', function(req,res,next) {
 
 	
 	var tokens = req.params[0].split("/");
-	if(tokens[0]=='public'){
+	if(tokens[0]=='public' || tokens[0]=='favicon.ico'){
 		next();
 		return;
 	}
@@ -661,13 +662,17 @@ everyone.now.loadMainNotify = function(start,callback){
 }
 
 
-everyone.now.loadMainPage = function(user,startN,callback){
+everyone.now.loadMainPage = function(user,startN,filter,callback){
 
 	if (this.user.name=='n00b'){
 		//return;
 		}
 
-		pageModel.find( {privacy:{$ne:3}},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort('likesN',-1,'pageName',1).skip(startN).limit(20).run(function(err,result2){
+	var dbFilter=filter;
+	if(filter=='likes')
+		dbFilter='likesN'
+
+		pageModel.find( {privacy:{$ne:3}},{'pageName':1,'likes':1,'likesN':1,'privacy':1,'contributors':1,'owner':1,'vLikes':1,'versions.currentVersion':1}).sort(dbFilter,-1,'pageName',1).skip(startN).limit(20).run(function(err,result2){
 				if(err)
 					console.log(err)
 				else{
@@ -1111,7 +1116,7 @@ everyone.now.setProfileBackground = function(userProfile, type, background,callb
 		}
 		
 	if(type=="backgroundImage"){
-		var background = 'url('+background+')';
+		//var background = background;
 		userModel.update({"username":userProfile},{$set: {backgroundImage:background}}, function(err){
 			if(!err)
 				callback()

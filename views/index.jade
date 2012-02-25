@@ -444,7 +444,7 @@ input#lastId(type='hidden', name='lastId')
           #likeButtonText(style="float:left;cursor:pointer",onclick="likePage()")
           #likeIm(style='float:left;position:relative;display:none;cursor:pointer',onclick="likePage()") 
     #pageName(style="padding:0;padding-right:4px;float:left;width:auto;")
-    div(class="fb-like",id="fb-like", data-href="http://gifpumper.com/forest", layout="button_count", data-send="false",   data-width="90", data-show-faces="false", style="float:left;width:90px")
+    div(class="fb-like",id="fb-like", data-href="http://gifpumper.com", layout="button_count", data-send="false",   data-width="90", data-show-faces="false", style="float:left;width:90px;height:auto")
 
 
 #editElementMenu.menu(style="display:none;position:fixed;")
@@ -509,7 +509,7 @@ input#lastId(type='hidden', name='lastId')
   div(style="float:left;display:inline; margin-right:10px; ")
     
     div.menuText(style="display:inline")
-      a(href="javascript:goToPage('main','null')") Main Page 
+      a(href="/",onclick="goToPage('main','null'); return false") Main Page 
         | | 
     #loggedOut(style="display:none")
         //div.menuButton
@@ -520,7 +520,7 @@ input#lastId(type='hidden', name='lastId')
         //div.menuButton       
         div.notifyBox
         | | 
-        a(href="javascript:goToPage(currentUser, 'profile');") My Profile 
+        a#linkToProfile(href="/profile/", onClick="goToPage(currentUser, 'profile'); return false;") My Profile 
         | |
         //div.menuButton 
         a(href='javascript:logOut();') Logout
@@ -549,30 +549,41 @@ div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto;
    #chatBox.chat
    textarea#inputBox.chat(placeholder="type here to chat", onkeyup="doResize()", rows=1, onfocus="typing=true", onblur="typing=false", onKeyPress="enter(event);")
    
+
+
 #profileContainer.shadow
   div(style="position:absolute;bottom:-15px;right:5px;font-size:13")
     //a(href="javascript:openMenu(\'addMenu\');")
       |Edit Profile Pic
 
-#mainFeedDiv.shadow.userPages
-  div(style="padding:5px;font-size:20px;")
-    span.label1(style="z-index:20000")
-      |active pages:
-  #activeNow
 
 //#divUi
-#feed.shadow.userPages
-    div(style="padding:5px;font-size:20px;")
-      span.label1(style="z-index:20000")
-        |feed:
-    #feedContainer
-      
-      
-#userPages.shadow.userPages
+
+
+
+
+#feed.userPages
+      div(style="padding:5px;font-size:20px;")
+        span.label1(style="z-index:20000")
+          |feed:
+      #feedContainer
+
+#userPages.userPages
   div(style="padding:5px;font-size:20px;")
     span.label1(style="z-index:20000")
-      |pages:
-  #pagesList.pageList
+      |pages:  
+  #pagesListProfile
+  #pagesList
+    #mainFeedDiv.userPages.pageItem
+      div(style="padding:5px;font-size:20px;")
+        span.label1(style="z-index:20000")
+          |active pages:
+      #activeNow
+
+
+      
+      
+
 
 #contributePages.shadow.userPages
   div(style="padding:5px;font-size:20px;")
@@ -584,10 +595,10 @@ div.gpui(id='chat', style="bottom:10px ; position:fixed; right:10px; width:auto;
 
 #prevVersionDiv.shadow.twoD(style="display:none;z-index:1000;top:50%;left:0px;position:fixed;")
      a(href="javascript:goToPage(pageData.pageName, null, prevVersion)")
-       img(src='http://mousepointers.net/wp-content/uploads/2008/05/arrow-left.gif')
+       img(src='https://s3.amazonaws.com/gifpumper/ui/arrow-left.gif')
 #nextVersionDiv.shadow.twoD(style="display:inline;display:none;z-index:1000;top:50%;right:0px;position:fixed;")  
      a(href="javascript:goToPage(pageData.pageName, null, nextVersion)")
-       img(src="http://mousepointers.net/wp-content/uploads/2008/05/arrow-right.gif")   	  
+       img(src="https://s3.amazonaws.com/gifpumper/ui/arrow-right.gif")   	  
 
 //#whoLikes(style="display:none;padding:5px; position:relative;font-size:12px")
   .x

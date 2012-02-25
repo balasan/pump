@@ -642,12 +642,20 @@ position:fixed;
 	
 }
 
+#feedContainer{
+
+	background-color: rgba(255,255,255,.80);
+	border-radius: 3px;
+
+}
+
 #mainFeedDiv{
 	display:none;
+/* 	overflow:hidden; */
 /* 	position:fixed; */
 /* 	top:100px; */
 /* 	left:100px; */
-	width:25%;
+	width:160px;
 /* 	height:200px; */
 /* 	overflow:auto; */
 	color:white;
@@ -658,15 +666,19 @@ position:fixed;
 
 #feed{
 	display:none;
-	top:0px;
+/* 	top:0px; */
 /* 	left:33%; */
-	width:30%;
+	width:240px;
+	height:auto;
 /* 	height:210px; */
 /* 	overflow:auto; */
-	background-color: rgba(255,255,255,.85);
+/* 	background-color: rgba(255,255,255,.85); */
 	color:white;
 	float:left;
 	max-width:380px;
+	margin-left:40px;
+	padding-top:5px;
+	margin-right:20px;
 
 }
 
@@ -681,8 +693,10 @@ position:fixed;
 }
 
 #userPages{
-	width:25%;
-	max-width:350;
+	width:70%;
+	
+/* 	width:780px; */
+/* 	max-width:350; */
 
 /* 	left:50%; */
 /* 	overflow:auto; */
@@ -697,14 +711,14 @@ position:fixed;
 
 }
 .userPages{
-	padding:10px;
-	max-width:350px;
+/* 	padding:10px; */
+/* 	max-width:350px; */
 /* 	position:fixed; */
 /* 	top:100px; */
 	display:none;
-	background-color: rgba(255,255,255,.85);
-	color:grey;
-	margin:10px;
+/* 	background-color: rgba(255,255,255,.85); */
+	color:white;
+/* 	margin:10px; */
 	margin-top:40px;
 	border-radius: 3px;
 	position:relative;
@@ -714,9 +728,15 @@ position:fixed;
 .infoDiv{
 
 	font-size: 12px;
-	margin-top:-3px;
-	margin-bottom:3px;
-	color:grey;
+/* 	margin-top:-3px; */
+/* 	margin-bottom:3px; */
+	color:white;
+	
+	position:relative;
+	display:block;
+/* 	left:0px; */
+/* 	bottom:0px; */
+	
 /*
 	float:right;
 	position:absolute;
@@ -734,15 +754,19 @@ position:fixed;
 	font-size:12px;
 	padding-top:6px;
 	padding-bottom:6px;
+	padding:5px;
+/* 	margin:5px; */
 	border-bottom:1px grey dotted;
 /* 	border-left:1px grey dotted; */
 
 }
 
 .pageList{
-	max-height: 400px;
+/* 	max-height: 400px; */
 	font-size: 16px;
-	padding:5px;
+	padding:10px;
+	margin:5px;
+
 	color:grey;
 }
 
@@ -842,7 +866,7 @@ input[type="password"]{
 }
 
 .activePages{
-	padding: 2px 4px 2px 4px;
+/* 	padding: 2px 4px 2px 4px; */
 	font-size:16px;
 	color:grey;
 }
@@ -851,8 +875,14 @@ input[type="password"]{
 	width:40px;
 	height:40px;
 	overflow:hidden;
-	margin:1px 6px 1px 0px;
-	float:left;
+	display:inline-block;
+ 	vertical-align: top;
+/*     display: -moz-inline-stack; */
+/*     vertical-align: top; */
+
+
+/* 	margin:1px 6px 1px 0px; */
+/* 	float:left; */
 }
 
 .usersOnline{
@@ -999,6 +1029,42 @@ div.selected{
 
 	color:blue;
 
+}
+
+#pagesList{
+
+	width:100%;
+/* 	height:800px; */
+
+}
+
+#pagesListProfile{
+
+	max-width:560px;
+/* 	height:800px; */
+	background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0%,#4be78c), color-stop(47%,#c03ec4), color-stop(100%,#ecc494));
+/* 	margin-top:-33px; */
+/* 	padding-top:33px; */
+
+
+}
+
+.pageItem{
+
+	margin:5px;
+	padding:7px;
+	background-color:rgba(255,255,255,.4);
+	border: 1px dotted white;	
+	border-radius:2px;
+}
+
+.activePages{
+
+	margin:5px;
+	padding:5px;
+	background-color:rgba(255,255,255,.4);
+	border: 1px dotted white;	
+	border-radius:2px;
 }
 
 .x {
