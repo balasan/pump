@@ -120,8 +120,8 @@ function moveHandler(e){
 			selObj.style.width=e.clientX-clickX-i_width+'px';
 			selObj.style.height=e.clientY-clickY-i_height+'px';
 
-			updateElement(selObj,"width", selObj.style.width);
-			updateElement(selObj,"height",selObj.style.height);
+			updateElement(selObj,{"width": selObj.style.width,
+				"height":selObj.style.height})
 			            
 	    }
 		else if (e.altKey && !pageData.images[selObj.id].d2d) {
@@ -160,8 +160,8 @@ function moveHandler(e){
 			selObj.style.MozTransform=transform;
 			
 			updateTransform = true;
-			updateElement(selObj,"left",selObj.style.left);
-			updateElement(selObj,"z",z);
+			updateElement(selObj,{"left":selObj.style.left,
+				"z":z});
 
 	
 	
@@ -193,7 +193,7 @@ function moveHandler(e){
 			
 			updateTransform = true;
 			
-			updateElement(selObj,"angler",angler);
+			updateElement(selObj,{"angler":angler});
 			
 			
 	
@@ -226,8 +226,7 @@ function moveHandler(e){
 			
 			updateTransform = true;
 
-			updateElement(selObj,"anglex",anglex);
-			updateElement(selObj,"angley",angley);			
+			updateElement(selObj,{"anglex":anglex, "angley":angley});
 			
 		}
 	    else{
@@ -271,9 +270,10 @@ function moveHandler(e){
 			selObj.style.MozTransform=transform;
 			
 			updateTransform = true;
-			updateElement(selObj,"z",z);
-	    	updateElement(selObj,"left",selObj.style.left);
-			updateElement(selObj,"top",selObj.style.top);   
+			updateElement(selObj,{"z":z,
+	    		"left":selObj.style.left,
+				"top":selObj.style.top,
+				})  
 	    }
 	    
 	   	//ajax.ajaxFunction("element");
@@ -844,7 +844,7 @@ window.onload = function() {
 	
 	$().ready(function() {
 	
-
+		jQuery("abbr.timeago").timeago();
 
 /*
 		$('input').focus(function(){typing=true;})

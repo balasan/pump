@@ -39,9 +39,15 @@ function imageToDom(image, property){
 		if(image.backgroundImage != undefined)
 			if(isUrl(image.backgroundImage))
 				img.style.backgroundImage = 'url(' + image.backgroundImage + ')';
-		if(image.content != undefined && contentType!='youtube' && contentType!='soundCloud' && contentType!='vimeo')
-			img.innerHTML = image.content;
-		img.style.padding="30px";
+		if(image.content != undefined && contentType!='youtube' && contentType!='soundCloud' && contentType!='vimeo'){
+		
+			var testImg = document.createElement('div');
+			testImg.innerHTML=image.content;
+			if(img==undefined || img.innerHTML!=testImg.innerHTML){		
+				img.innerHTML = image.content;
+				img.style.padding="30px";
+			}
+		}
 		//img.style.webkitTransformStyle= "preserve-3d";
 		//img.style.MozTransformStyle= "preserve-3d";
 		if(contentType=='media' && !is_safari){
@@ -62,7 +68,7 @@ function imageToDom(image, property){
 		}
 	}
 	
-	if(contentType=="youtube"){
+	if(contentType=="youtube" ){
 	
 		var video_id = image.content.split('v=')[1];
 		if(video_id!=undefined){
@@ -71,12 +77,19 @@ function imageToDom(image, property){
 			  video_id = video_id.substring(0, ampersandPosition);
 			}	
 			
-			img.innerHTML='<object width="100%" height="100%">\
+			var vidHtml='<object width="100%" height="100%">\
 			<param name="movie" value="http://www.youtube-nocookie.com/v/' + video_id + '?autoplay=1&amp;&amp;loop=1version=3&amp;hl=en_US"></param>\
 			<param name="allowFullScreen" value="true"></param>\
 			<param name="allowscriptaccess" value="always"></param>\
 			<param value="transparent" name="wmode">\
 			<embed wmode="transparent" src="http://www.youtube-nocookie.com/v/' + video_id + '?autoplay=1&amp;loop=1&amp;version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="100%" height="100%" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
+		
+		
+			var testImg = document.createElement('div');
+			testImg.innerHTML=vidHtml;
+			if(img==undefined || img.innerHTML!=testImg.innerHTML)		
+				img.innerHTML=vidHtml;
+		
 		}
 
 	}
@@ -86,11 +99,16 @@ function imageToDom(image, property){
 		if(scUrl==undefined)
 			return;
 		scUrl=scUrl.split('\"><')[0]
-		img.innerHTML='<object height="100%" width="100%">\
+		vidHtml='<object height="100%" width="100%">\
 		<param name="movie" value="https://player.soundcloud.com/player.swf?url='+scUrl+'"></param>\
 		<param name="allowscriptaccess" value="always"></param> \
 		<param value="transparent" name="wmode">\
 		<embed wmode="transparent" allowscriptaccess="always" height="100%" src="https://player.soundcloud.com/player.swf?url='+scUrl+'" type="application/x-shockwave-flash" width="100%"></embed> </object>'
+	
+		var testImg = document.createElement('div');
+		testImg.innerHTML=vidHtml;
+		if(img==undefined || img.innerHTML!=testImg.innerHTML)
+			img.innerHTML=vidHtml;
 	
 		$(img).addClass('noDrag');
 	}
@@ -98,12 +116,16 @@ function imageToDom(image, property){
 		var vimeoId = image.content;
 
 		vimeoId=vimeoId.split('vimeo.com/')[1];
-		img.innerHTML='<object width="100%" height="100%"><param name="allowfullscreen" value="true" />\
+		vidHtml='<object width="100%" height="100%"><param name="allowfullscreen" value="true" />\
 		<param name="allowscriptaccess" value="always" />\
 		<param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=1&amp;loop=1" />\
 		<param value="transparent" name="wmode">\
-		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=1&amp;loop=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'	
-	
+		<embed wmode="transparent""  src="http://vimeo.com/moogaloop.swf?clip_id='+vimeoId+'&amp;server=vimeo.com&amp;show_title=0&amp;show_byline=0&amp;show_portrait=0&amp;color=00adef&amp;fullscreen=1&amp;autoplay=1&amp;loop=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="100%" height="100%"></embed></object>'
+		
+		var testImg = document.createElement('div');
+		testImg.innerHTML=vidHtml;
+		if(img==undefined || img.innerHTML!=testImg.innerHTML)
+			img.innerHTML=vidHtml;	
 	}
 	else if(contentType=="mp3"){
 			var mp3url = image.content;
@@ -114,7 +136,7 @@ function imageToDom(image, property){
 			//console.log(fileType);
 
 		if(!is_firefox && (fileType=='mp3' || fileType=='mp4')){
-			img.innerHTML='<video width="100%" height="100%" controls autoplay="autoplay">\
+			vidHtml='<video width="100%" height="100%" controls autoplay="autoplay">\
 			<source src="'+mp3url+'" type="audio/mp4"\>'+  
 			'<object width="100%" height="100%">\
 			<param name="src" value="'+mp3url+'">\
@@ -127,10 +149,15 @@ function imageToDom(image, property){
 			controller="true" bgcolor=""></embed>\
 			</object>\
 			</video>'
+			
+			var testImg = document.createElement('div');
+			testImg.innerHTML=vidHtml;
+			if(img==undefined || img.innerHTML!=testImg.innerHTML)
+				img.innerHTML=vidHtml;
 		}
 		else{
 			//TODO firefox!
-			img.innerHTML='<object width="100%" height="100%">\
+			vidHtml='<object width="100%" height="100%">\
 			<param name="src" value="'+mp3url+'">\
 			<param name="autoplay" value="true">\
 			<param name="controller" value="true">\
@@ -140,6 +167,12 @@ function imageToDom(image, property){
 			<embed wmode="transparent" src="'+mp3url+'" autostart="true" loop="false" width="100%" height="100%"\
 			controller="true" bgcolor=""></embed>\
 			</object>'
+			
+			var testImg = document.createElement('div');
+			testImg.innerHTML=vidHtml;
+			if(img==undefined || img.innerHTML!=testImg.innerHTML)
+				img.innerHTML=vidHtml;
+			
 		}
 
 	}

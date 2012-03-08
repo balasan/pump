@@ -241,7 +241,7 @@ body {
 @-moz-keyframes zspin {
 
 	0%  {
-	         -moz-transform: rotateY(3600deg);	
+	         -moz-transform: rotateY(360deg);	
 	    }
 	100%{
 	         -moz-transform: rotateY(0deg);	

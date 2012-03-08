@@ -592,33 +592,49 @@ function replaceImg(){
 //UPDATE
 ///////
 
-function updateElement(element, property, value){
+function updateElement(element, properties){
 
+	if(!okToUpdateElement)
+		return;
+		
 	if(version!=undefined){
 		alert("You can't edit saved versions")
 		return;
 	}
 	
 	var all = false;
-	now.updateElement(pageName, element.id, property, value, all, function(error,response){
+	now.updateElement(pageName, element.id, properties, all, function(error,response){
 		if(error!=null)
 			console.debug("there was an error")
 		else if(response=="done")
 			doNotRefresh=false;
 	});
+	
+	okToUpdateElement=false;
 }
 
-now.updateChanges = function(_id, property, value){
+var okToUpdateElement=false;
 
+function updateLoop(){
+	okToUpdateElement=true;
+	setTimeout(updateLoop, 100)
+}
+
+updateLoop();
+
+now.updateChanges = function(_id, properties){
 
 	if(version!=undefined){
 		//alert("You can't edit saved versions")
 		return;
 	}
-			
-	pageData.images[_id][property]=value;
-	pageData.images[_id].id=_id;
-	imageToDom(pageData.images[_id]);
+		
+	for(var property in properties){	
+		
+		pageData.images[_id][property]=properties[property];
+		pageData.images[_id].id=_id;
+		imageToDom(pageData.images[_id]);
+	}
 }
 
 

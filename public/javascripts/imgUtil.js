@@ -21,7 +21,7 @@ function imgBoxClass(name,type,size,shadow,mason){
 	this.imgDiv.style.cursor='pointer'
 	this.imgDiv.style.borderRadius="2px";
 	
-	
+	this.img.style.width=size+'px';
 	//this.imgDiv.appendChild(this.img);
 	var linkPage = name
 	var profile = null;
@@ -37,6 +37,11 @@ function imgBoxClass(name,type,size,shadow,mason){
 	//$(this.imgDiv).append(makePageLink(this.img,name,null,null, null, null,true),this.img,'</a>')
 	
 	$(this.img).hide();
+	
+	this.img.onerror=(function(img){
+					return function(){
+						$(img).hide()}
+					})(this.img)
 
 	this.loadImg = function(url,user,type){
 		
@@ -45,15 +50,17 @@ function imgBoxClass(name,type,size,shadow,mason){
 				url=defaultIcon.src
 				var el = document.getElementsByClassName(className)
 				for (var i = 0; i < el.length; i++){
-					el[i].src=url;				
+					el[i].src=url;
+					$(el[i]).show();
+				
 				//$("."+className).attr("src", url)
 					userImages[type+user].img=url;
 				}
 	}
 	
 	this.cropImg = function(img,size,div,_mason){
-		var height = img.height;
-		var width = img.width;
+		var height = img.naturalHeight;
+		var width = img.naturalWidth;
 		
 		var replaceGif =false
 		if(!is_safari && (height > 400 || width > 600))
@@ -62,8 +69,10 @@ function imgBoxClass(name,type,size,shadow,mason){
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)
+		$(img).width('auto');
 	
 		if(width>height){
+
 			if(_mason=='mason'){
 				img.width=size
 				img.height=height*size/width;
@@ -220,11 +229,12 @@ function relayout(){
 	if(!layingOut){	
 		if(pageName=='main' && $('#pagesList').data('isotope')){
 			layingOut=true;
-			
+			//console.log('started layout')
 			$('#pagesList').isotope( 'reLayout', function(){
+				layingOut=false; 
+				//console.log('stopped layout')
 				if(pageName != 'main')
 					return;
-				layingOut=false; 
 				if(doLayout) 
 					relayout(); 
 				doLayout=false;  
@@ -233,9 +243,9 @@ function relayout(){
 		if(pageName=='profile' && $('#pagesListProfile').data('isotope')){
 			layingOut=true;
 			$('#pagesListProfile').isotope( 'reLayout', function(){
+				layingOut=false; 
 				if(pageName != 'profile')
 					return;
-				layingOut=false; 
 				if(doLayout) 
 					relayout(); 
 				doLayout=false;  
@@ -247,3 +257,13 @@ function relayout(){
 	}
 	else doLayout=true; 
 }
+
+function layoutLoop(){
+	if(doLayout){	
+	 	layingOut=false;
+	 	relayout()
+	 	layingOut=true;
+	}
+	setTimeout(layoutLoop,4000)
+}
+layoutLoop();

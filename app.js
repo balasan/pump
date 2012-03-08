@@ -28,7 +28,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.net", expires: false 
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
 }}));
 // Configuration
 
@@ -313,7 +313,7 @@ app.get('/*', function(req,res,next) {
 		if(!error){
 
 			var img;
-			if(result != undefined && result.backgroundImage !=undefined && result.backgroundImage!=""){
+			if(result != undefined && result.backgroundImage !=undefined && isUrl(result.backgroundImage)){
 				img=result.backgroundImage;
 			}
 			else if(result!=undefined && result.images !=undefined && result.images[0]!=undefined && result.images[0]!=''){
@@ -322,6 +322,18 @@ app.get('/*', function(req,res,next) {
 			else 
 				img='http://asdf.us/im/16/recliningnude_02_1318746347_d_magik_1327306294_d_magik.gif'
 			
+			var title = pageName
+
+			var url='http://gifpumper.com/'+encodeURI(pageName)
+
+
+			if (pageName=='main'){
+				pageName = ""
+				title = 'gifpumper'
+				url='http://gifpumper.com'
+			}
+			
+			
 			res.render('index.jade',{locals: {
 		        		loggedIn: true,
 				        user:'n00b',
@@ -329,8 +341,8 @@ app.get('/*', function(req,res,next) {
 					    privacy:3,
 					    getPageData:result,
 					    image:img,
-					    title:pageName,
-					    url:'http://gifpumper.com/'+encodeURI(pageName)
+					    title:title,
+					    url:url
 					    }
 					})
 				}
@@ -928,14 +940,22 @@ everyone.now.logStuff = function(msg){
 ///ELEMENTS
 //////////
 
-everyone.now.updateElement = function(pageName, _id, property, value, all, callback){
+//var liveStream=[];
+
+everyone.now.updateElement = function(pageName, _id, properties, all, callback){
     
    	if (this.user.pagePermissions[pageName] == undefined || this.user.pagePermissions[pageName]>1)
 		return;
     oldthis = this;
+    
+    var thisUpdate = {clientId:oldthis.user.clientId, pageName:pageName, properites:properties,elId:_id}
+    
+    //liveStream.push(thisUpdate);
 
-	nowjs.getGroup(pageName).exclude(oldthis.user.clientId).now.updateChanges(_id,property,value);
+	nowjs.getGroup(pageName).exclude(oldthis.user.clientId).now.updateChanges(_id,properties);
 }
+
+
 
 
 everyone.now.editElement = function(pageName, _id, element, all, position, callback){
