@@ -154,7 +154,7 @@ function moveHandler(e){
 			angler=parseInt(angler);
 	
 			//var skew = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
-			var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
+	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
 	
 			selObj.style.webkitTransform=transform;
 			selObj.style.MozTransform=transform;
@@ -186,7 +186,7 @@ function moveHandler(e){
 			angler=parseInt(angler);
 			
 			//var transform = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
-			var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
+	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
 		        		
 			selObj.style.webkitTransform=transform;
 			selObj.style.MozTransform=transform;
@@ -265,7 +265,7 @@ function moveHandler(e){
 			angler=parseInt(angler);
 	
 			//var skew = 'skew('+anglex+'deg,'+angley+'deg)'+' ' + 'rotate('+angler+'deg)';
-	   		var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
+	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
 			selObj.style.webkitTransform=transform;
 			selObj.style.MozTransform=transform;
 			

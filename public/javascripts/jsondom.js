@@ -48,6 +48,8 @@ function imageToDom(image, property){
 				img.style.padding="30px";
 			}
 		}
+		img.style.padding="30px";
+
 		//img.style.webkitTransformStyle= "preserve-3d";
 		//img.style.MozTransformStyle= "preserve-3d";
 		if(contentType=='media' && !is_safari){
@@ -192,7 +194,7 @@ function imageToDom(image, property){
 	var angley = image.angley;
 	var angler = image.angler;
 	
-	var transform = 'translateZ(' + z + 'px)'+ ' '+ 'rotateZ('+angler+'deg)'+' '  + 'rotateX('+angley+'deg)'+' '  +  'rotateY('+anglex+'deg)';
+	   		var transform = 'translateZ(' + z + 'px)'+ ' ' +  'rotateY('+anglex+'deg)'+' '  + 'rotateX('+angley+'deg)'+' ' + 'rotateZ('+angler+'deg)';
 	
 		img.style.webkitTransform = transform;
 		img.style.MozTransform = transform;
