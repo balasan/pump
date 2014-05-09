@@ -1,3 +1,4 @@
+
 <div id="fb-root"></div>
 
 #div3d
@@ -19,9 +20,10 @@
       br
       input(type='radio', name='bgType', value='cover',onclick='setBackground("display")')
       | full screen    
-      br  br
+      br  
+      br
   //div
-    a(href='http://gradients.glrzad.com', title='select the code inside ( ); for webkit') gradients.glrzad.com (hvr fr tip)
+  //  a(href='http://gradients.glrzad.com', title='select the code inside ( ); for webkit') gradients.glrzad.com (hvr fr tip)
   .x
     a(href='javascript:openMenu(\'backgroundMenu\');') x
 
@@ -80,11 +82,11 @@
   #divContainer(style="padding:5px;display:none")
     | background color:
     br
-    input#divBgUrl(style='width:160px;', type='text', id='divColor', placeholder='name, hex or rgba(r,g,b,a)',onfocus="typing=true; ", onblur="typing=false;")
+    input#divColor(style='width:160px;', type='text', placeholder='name, hex or rgba(r,g,b,a)',onfocus="typing=true; ", onblur="typing=false;")
     br
     | background image url:
     br
-    input#divBgUrl(style='width:160px;', type='text', id='divBgUrl', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
+    input#divBgUrl(style='width:160px;', type='text', placeholder='http://blahblah.gif',onfocus="typing=true; ", onblur="typing=false;")
     br
     | preset: 
     form(name='divType')
@@ -106,7 +108,7 @@
     input#add.button(style='width:175px;', type='button', name='addGif', value='add', onclick="addNewImg()")
   .x(style='position:absolute; right:0; top:0; border: 1px white;')
     a(href='javascript:openMenu(\'addMenu\');') x
-// 
+ 
 ////replace/////
 
 #editMenu.uiClosed(name='editMenu', style='position: fixed; width:auto;	left: 140px;top:70px;')
@@ -122,7 +124,7 @@
         |Div
   #editImageContainer(style="padding:0px;display:block")
     |edit image url:
-    <br>
+    br
     input#editImage.editType(style='width:155px;', type='text', placeholder='http://blahblah.gif')
     br
     input#keyOut.button(style='width:160px;', type='button', name='keyOut', value='Key-Out White', onclick="keyOut()")
@@ -189,7 +191,7 @@
     
   .x
     a(href='javascript:openMenu(\'editMenu\');') x
-//
+
 ////delete/////
 
 #deleteMenu.uiClosed(name='deleteMenu', style='position: fixed; left:200px; top:80px; width:160px;')
@@ -204,11 +206,11 @@
   input#delete.button(style='width:160px;', type='button', name='delete', value='delete', onclick="deleteImage()")
   .x
     a(href='javascript:openMenu(\'deleteMenu\');') x
-//
+
 ////last id - hidden/////
 
 input#lastId(type='hidden', name='lastId')
-//
+
 ////add/////
 
 #helpMenu.uiClosed(name='helpMenu', style='left:300px;border:1px solid grey; padding:0;padding-top:15px; top:50px; width=300px')
@@ -291,7 +293,7 @@ input#lastId(type='hidden', name='lastId')
     br
   .x
     a(href='javascript:openMenu(\'helpMenu\');buttonPress("help");') x
-//
+
 ////more pages/////
 
 #moreMenu.uiClosed(name='moreMenu', style='left:400px; top:100px; width:160px;')
@@ -391,9 +393,7 @@ input#lastId(type='hidden', name='lastId')
     input.button(type='submit',class="loginClass", name='login', value='login',style='width:78px;')
     input.button(type='submit',class="regClass", name='register', value='register', style="width:78px; display:none;", onclick="javascript:registerFunc(); return false;")
     input.button(type='submit', id="logOut", name='logout', value='logout', style='width:78px;float:right;display:none')
-      //br
-      //br
-      //| 
+
     div(style="display:inline; position:absolute; right:10px;bottom:10px")
       //div(style="display:inline")=user
       div(style="float:right;display:block",class="loginClass")
@@ -451,13 +451,13 @@ input#lastId(type='hidden', name='lastId')
 
 #editElementMenu.menu(style="display:none;position:fixed;")
       //div.menuDiv(style="font-size:10px;color:rgba(255,0,0,.6);padding:4px;") 
-        |-elements 
+      //  |-elements 
       div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Add
       div.menuDiv.profileOnly 
         a(href='javascript:openMenu(\'addMenu\');') ⇧A Profile Image
       //div.menuDiv.mainMenu  
-        a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
+      //  a(href='javascript:openMenu(\'replaceMenu\');') ⇧R Replace
       div.menuDiv.mainMenu 
         a(href='javascript:openMenu(\'editMenu\');fillEditMenu()') ⇧E Edit
       div.menuDiv.mainMenu  
@@ -484,9 +484,8 @@ input#lastId(type='hidden', name='lastId')
       //div.shortCut
 
 
-//
-  #shortMenu.moveable(style='position:fixed; left:10px; top:10px; z-index:999')
-   div(style='float:left;')
+//#shortMenu.moveable(style='position:fixed; left:10px; top:10px; z-index:999')
+  //div(style='float:left;')
     a(href='javascript:openMenu(\'helpMenu\');') ⇧+click+drag
     |  | 
     a(href='javascript:openMenu(\'helpMenu\');') ⌥ (alt)+click+drag
@@ -510,14 +509,14 @@ input#lastId(type='hidden', name='lastId')
   //input(style='float:left;display:inline;width:155px;', type='users', name='userSearch', placeholder='search', size='32', maxlength='32') 
   div(style="float:left;display:inline; margin-right:10px; ")
     
-    div.menuText(style="display:inline")
+    div.menuText(style="display:inline;float:left;margin-right:4px")
       a(href="/",onclick="goToPage('main','null'); return false") Main Page 
-        | | 
-    #loggedOut(style="display:none")
+        | |   
+    #loggedOut(style="display:none;float:left")
         //div.menuButton
         a(href='javascript:openMenu(\'loginMenu\');') Login 
-    #loggedIn(style="display:none")
-      div.menuText(style="display:inline")
+    #loggedIn(style="display:none;float:left")
+      div.menuText(style="display:inline-block")
         //div.insideNotify(style="width:20px;height:20px;position:relative")
         //div.menuButton       
         div.notifyBox
@@ -527,9 +526,11 @@ input#lastId(type='hidden', name='lastId')
         //div.menuButton 
         a(href='javascript:logOut();') Logout
 
+     #fbLike(style='opacity:.8; padding:0; padding-left:10px;margin-right:0px;float:left')
+       <div class="fb-like" data-href="http://gifpumper.com" data-send="false" data-layout="button_count" data-width="80" data-show-faces="false"></div>
 
-  #fbLike(style='opacity:.8; padding:0;float:right;margin-right:4px;display:none')
-    iframe#fblike(src='http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2Fgifpumpercom%2F117231671686998&layout=button_count&show_faces=false&width=100&action=like&font&colorscheme=light&height=21px', scrolling='no', frameborder='0', style='text-align: right; background:none border:none; overflow:hidden; width:80px; height:21px;', allowtransparency='true')
+  //#fbLike(style='opacity:.8; padding:0;float:right;margin-right:4px;display:none')
+
 
 #online.moveable.gpui(style="top:5px; right:10px; cursor:moveable")
     //div.headBar

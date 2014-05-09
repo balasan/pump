@@ -14,13 +14,11 @@ var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 
-mongoose.connect('localhost','gifpumper',27017)
-
-
 //MemoryStore = express.session.MemoryStore,
-var MongoStore = require('connect-mongo');
+var MongoStore = require('connect-mongo')(express);
 
-sessionStore = new MongoStore({db:'gifpumper'})
+mongoose.connect('mongodb://pumper93:sybalasa@ds027668.mongolab.com:27668/gifpumper')
+sessionStore = new MongoStore({url:'mongodb://pumper93:sybalasa@ds027668.mongolab.com:27668/gifpumper'})
 
 
 
@@ -28,8 +26,7 @@ sessionStore = new MongoStore({db:'gifpumper'})
 var app = module.exports = express.createServer(    
 	express.bodyParser()
   , express.cookieParser()
-  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: false 
-}}));
+  , express.session({store: sessionStore, secret: 'something sweet', cookie: {path:'/',domain:".gifpumper.com", expires: new Date(Date.now() + 1000*60*60*24*360)}}));
 // Configuration
 
 app.configure(function(){
@@ -37,7 +34,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.methodOverride());
-  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+/*   app.use(require('stylus').middleware({ src: __dirname + '/public' })); */
   app.use(app.router);
   
 
@@ -57,6 +54,13 @@ app.configure('development', function(){
 app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
+
+process.on('uncaughtException', function (err) {
+  console.error(err);
+  console.log("Node NOT Exiting...");
+});
+
+
 
 var parseCookie = require('connect').utils.parseCookie;
 
@@ -303,8 +307,8 @@ app.get('/*', function(req,res,next) {
 	
 	//console.log(req.params[0])
 	
-	var pageName=tokens[0];
-	console.log(pageName)
+	var pageName=tokens[0].split('?')[0];
+	
 	if(pageName=='')
 		pageName='main';	
 	if(tokens[0]!='profile'){
@@ -484,6 +488,7 @@ app.listen(80);
 var nowjs = require("now");
 var everyone = nowjs.initialize(app);
 
+
 ////////
 //AUTH
 /////
@@ -495,7 +500,9 @@ function authenticate(name, pass, fn) {
 	  // apply the same algorithm to the POSTed password, applying
 	  // the hash against the pass / salt, if there is a match we
 	  // found the user
-	  if (user.password == hash(pass, user.salt)) return fn(null, user);
+	  console.log(user.password.toString())
+	  console.log(hash(pass, user.salt))
+	  if (user.password.toString() == hash(pass, user.salt)) return fn(null, user);
 	  // Otherwise password is invalid
 	  fn(new Error('invalid password'));  
   });
@@ -523,7 +530,11 @@ app.post('/login', function(req, res){
 	        // Store the user's primary key 
 	        // in the session store to be retrieved,
 	        // or in this case the entire user object
+/* 	        console.log(req.session.user) */
+
 	        req.session.user = user.username;
+	        console.log(req.session)
+
 	        res.redirect('/');
 	      });
 	    } else {
@@ -553,6 +564,8 @@ everyone.now.checkInvite = function(invite,callback){
 
 }
 
+var connect = require('connect');
+
 everyone.on('join', function(){
 
   	var cookie=this.user.cookie['connect.sid']
@@ -561,16 +574,28 @@ everyone.on('join', function(){
 		this.user.name = 'n00b'
 		return;
 	}
-
-	cookie = parseCookie(cookie)['']
+	
+	var cookie1 = parseCookie(cookie)['']
 		
+/* 	console.log(this.user) */
+	var cookie2 = unescape(cookie)
+	console.log(cookie1)
+	console.log(cookie2)
+	console.log(cookie)
+
+
 	var oldthis = this;
 	
-	sessionStore.get(cookie, function (err, session) {
+/* 	var newC = require('cookie').parse(cookie)	 */
+/* 	var newC = connect.utils.parseSignedCookie(cookie, 'something sweet'); */
+	
+/* 	console.log(newC) */
+	sessionStore.get(cookie2, function (err, session) {
             if (err) {
                console.log('something is wrong')
             } 
             else {
+            	console.log(session)
             	if(session == undefined || session.user == undefined)
 					oldthis.user.name = 'n00b'
 				else {
@@ -587,6 +612,7 @@ everyone.on('join', function(){
 
 	}
 );
+
 
 everyone.now.getNotifications = function(){
 	
@@ -1666,4 +1692,4 @@ function trim1 (str) {
     return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
 }
 
-console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+/* console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env); */

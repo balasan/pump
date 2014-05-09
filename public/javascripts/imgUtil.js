@@ -63,12 +63,14 @@ function imgBoxClass(name,type,size,shadow,mason){
 		var width = img.naturalWidth;
 		
 		var replaceGif =false
-		if(!is_safari && (height > 400 || width > 600))
+		if(!is_safari && (height > 200 || width > 400))
 			replaceGif = true;
 		else if(is_safari && (height > 200 && width > 400))
 			replaceGif = true;
 		//if(replaceGif)
 		//   freeze_gif(img)
+		
+/* 		replaceGif = true; */
 		$(img).width('auto');
 	
 		if(width>height){
@@ -113,7 +115,7 @@ function imgBoxClass(name,type,size,shadow,mason){
 				_self.cropImg(_img,size,_div,_mason);
 				//$(_img).show();
 				
-				if(mason=='mason' && !$('#userPages').is(':hidden')){
+				if(mason=='mason'){
 					//$('#pagesList, #pagesListProfile').isotope( 'reLayout', null )
 					relayout();				
 				}
@@ -159,7 +161,7 @@ function imgBoxClass(name,type,size,shadow,mason){
 
 		if(userImages[type+name].img!=null){
 			this.img.src=userImages[type+name].img;
-			if(mason=='mason' && !$('#userPages').is(':hidden')){
+			if(mason=='mason' ){
 				relayout();
 		}			}
 		else

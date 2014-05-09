@@ -1,5 +1,7 @@
 
-var url = document.location.href;
+var url = (document.location.href).split('?')[0];
+if(url != document.location.href)
+	window.location  = url;
 var tokens = url.split("/");
 
 //this is our page (change to 3 for actual relese, 4 for beta)
@@ -718,7 +720,9 @@ function eraseCookie(name) {
 
 //eraseCookie("connect.sid");
 
-window.addEventListener("scroll", function(){recenterFlag=true;}, false);
+window.addEventListener("scroll", function(){
+	recenter()
+}, false);
 
 function getDocHeight() {
     var D = document;
@@ -734,10 +738,13 @@ var mainPageScroll=0;
 var recenterFlag=true;
 
 function recenter(){
-	setTimeout(recenter,300);
 
-	if(!recenterFlag)
-		return;
+
+/* 	setTimeout(recenter,30); */
+/* 	recenter() */
+
+/* 	if(!recenterFlag) */
+/* 		return; */
 	
 	var sTop = window.pageYOffset;//document.body.scrollTop;
 	var sLeft = window.pageXOffset;//document.body.scrollLeft;  	  
@@ -746,6 +753,9 @@ function recenter(){
 	
 	if(pageName == 'main' && sTop+window.innerHeight>pagesBottom){
 		loadMorePages()
+		mainPageScroll=sTop;
+		recenterFlag=false;
+		return false;
 	}
 
 	if(pageName=='main'){
@@ -797,7 +807,7 @@ function recenter(){
 	mainDiv.style.MozPerspectiveOriginY=transformY;
 	
 	//console.log(xCenter +" " + yCenter);
-	recenterFlag=false;
+/* 	recenterFlag=false; */
 
 }
 
@@ -845,6 +855,8 @@ window.onload = function() {
 	$().ready(function() {
 	
 		jQuery("abbr.timeago").timeago();
+
+		jQuery.fx.interval = 60;
 
 /*
 		$('input').focus(function(){typing=true;})
@@ -948,6 +960,7 @@ window.onload = function() {
 
 
 		$('.menuButton,.notifyBox').okshadow({color:'rgba(60,60,60,.6)'});
+
 /*
 		$('#pageName a,#pageName,#rightMenu').okshadow({
 		  color: 'white',

@@ -247,14 +247,17 @@ function jsonToDom(pageDataIn){
 
 
 
-		var newFBurl = "gifpumper.com/"+encodeURI(pageName);
-		$('#fb-like').html('<div data-href=' + newFBurl + ' class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');
-		
+		var newFBurl = "gifpumper.com/"+encodeURI(pageName);		
+			var sUrl = window.location;
+			$('#fb-like').attr('href', sUrl);
 		}
 	else{
 		var newFBurl = "gifpumper.com/profile/"+userProfile;
 		
-		$('#fb-like').html('<div data-href=' + newFBurl + 'class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');	
+		//$('#fb-like').html('<div data-href=' + newFBurl + 'class="fb-like" id="fb-like"   layout="button_count" data-send="false" data-width="90" data-show-faces="false" style="float:left;width:90px;opacity:.8"></div>');
+			var sUrl = window.location;
+			$('#fb-like').attr('href', sUrl);
+					
 		}		
 
 
