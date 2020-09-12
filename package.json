@@ -7,7 +7,7 @@
     , "jade": "= 1.3.0"
     , "mongodb": ">= 0.9.6-16"
 	, "now": "= 0.8.1"
-	, "mongoose" : "= 2.2.4"
+	, "mongoose" : "= 5.10.5"
 	, "mongoose-auth" : ">=0.0.11"
 	, "mongoose-types" : ">=1.0.3"
 	, "connect" : "=1.8.5"
